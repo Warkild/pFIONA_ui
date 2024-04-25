@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'pFIONA_auth',
+    'tailwind',
+    'theme',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [
@@ -75,8 +79,12 @@ WSGI_APPLICATION = 'pFIONA_ui.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'pFIONA_dev_db',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
     }
 }
 
@@ -117,7 +125,27 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+import os
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TAILWIND_APP_NAME = 'theme'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+NPM_BIN_PATH = "E:\\nodejs\\npm.cmd"
+
+# LOGIN
+
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/sensor/list'
+
+
