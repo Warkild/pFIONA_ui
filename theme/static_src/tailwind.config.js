@@ -46,6 +46,10 @@ module.exports = {
             fontFamily: {
                 poppins: ['Poppins','sans-serif'],
                 montserrat: ['Montserrat'],
+            },
+            colors: {
+                'custom-gray-1': "#E8EBEE",
+                'custom-gray-2': "#F4F4F4",
             }
         },
     },

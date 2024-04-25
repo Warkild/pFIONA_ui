@@ -11,7 +11,7 @@
 <body class="flex bg-gradient-to-br from-white to-gray-300 w-[100vw] h-[100vh]">
     <div class="w-2/3 flex justify-center items-center">
         <div class="h-fit w-1/2 p-16 bg-white rounded-2xl drop-shadow-xl">
-            <h1 class="font-poppins font-extrabold text-4xl mb-8">pFIONA</h1>
+            <h1 class="font-poppins font-semibold text-4xl mb-8">pFIONA</h1>
             <form method="POST" class="form-login">
                 {% csrf_token %}
                 {% include "pFIONA_auth/login_form.html" with form=form %}

@@ -1,0 +1,16 @@
+{% load static %}
+<div class="bg-custom-gray-1 w-1/6 h-[100vh]">
+    <h1 class="font-poppins font-semibold text-4xl mb-16 ml-10 mt-16">pFIONA</h1>
+    <div>
+        <ul>
+            <li class="{% if current_path == '/sensors/list/' %}bg-custom-gray-2 border-l-8 border-blue-600 pl-8 flex py-4{% else %}bg-amber-200{% endif %}">
+                <img src="{% static 'img/ico/icons8-list-96.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-8"/>
+                <p class="font-poppins content-around pl-4 font-medium">Sensor List</p>
+            </li>
+            <li class="flex py-4 {% if current_path == '/admin' %}bg-custom-gray-2 border-l-8 border-blue-600 pl-8 flex{% else %}pl-10{% endif %}">
+                <img src="{% static 'img/ico/icons8-admin-96.svg'%}" alt="icons-list" style="{% if current_path == '/admin' %}filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);{% else %}filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);{% endif %}" class="w-8"/>
+                <p class="font-poppins content-around pl-4 font-medium {% if current_path == '/admin' %}{% else %}text-gray-700{% endif %}">User Administration</p>
+            </li>
+        </ul>
+    </div>
+</div>

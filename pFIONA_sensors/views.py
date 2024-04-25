@@ -4,4 +4,5 @@ from django.shortcuts import render
 
 @login_required()
 def sensors_list(request):
-    return render(request, 'pFIONA_sensors/list.html')
+    return render(request, 'pFIONA_sensors/list.html', {'current_path': request.path})
+
