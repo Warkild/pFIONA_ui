@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('pFIONA_auth.urls'))
+    path('', include('pFIONA_auth.urls')),
+    path('', views.home_redirect, name="home_redirect"),
 ]

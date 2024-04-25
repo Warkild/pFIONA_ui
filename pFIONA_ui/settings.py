@@ -143,3 +143,9 @@ INTERNAL_IPS = [
 
 NPM_BIN_PATH = "E:\\nodejs\\npm.cmd"
 
+# LOGIN
+
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/sensor/list'
+
+
