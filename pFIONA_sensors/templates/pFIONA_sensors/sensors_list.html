@@ -1,0 +1,43 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sensors List - pFIONA</title>
+    {% tailwind_css %}
+</head>
+<body>
+    <div class="flex">
+        {% include "./components/sensors_menu_bar.html" %}
+        <div class="bg-custom-gray-2 w-5/6 p-12">
+            <div>
+                <div>
+                    <div class="bg-custom-gray-1 text-gray-700 text-sm rounded-lg mb-6 flex shadow-lg font-poppins px-7 py-3">
+                        <p class="w-4/12">Name</p>
+                        <p class="w-3/12">IP</p>
+                        <p class="w-3/12">Status</p>
+                        <p class="w-2/12"></p>
+                    </div>
+                </div>
+                {% if sensors_list %}
+                    {% for sensor in sensors_list %}
+                        <div class="bg-white text-gray-700 rounded-lg my-6 flex shadow-lg font-poppins px-7 py-5">
+                            <p class="w-4/12">{{ sensor.name }}</p>
+                            <p class="w-3/12">{{ sensor.ip_address }}</p>
+                            <p class="w-3/12 bg-amber-300">TO DO</p>
+                            <p class="w-2/12 pl-2"><a href="{% url 'sensors_manual' sensor.id %}" class="bg-blue-600 py-1 px-8 rounded-lg text-sm text-white font-poppins hover:bg-blue-400">View</a></p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="bg-white text-red-700 rounded-lg my-6 flex shadow-lg font-poppins px-7 py-5">
+                        <p>No sensors in database</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div>
+                <a href="{% url 'sensors_add' %}" class="bg-lime-500 py-1 px-3 rounded-full text-white text-2xl font-poppins font-bold hover:bg-lime-300">+</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

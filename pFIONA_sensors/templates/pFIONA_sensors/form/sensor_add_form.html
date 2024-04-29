@@ -14,22 +14,20 @@
 
 {% for field in form.visible_fields %}
   <div class="form-group flex flex-col mb-8">
-
-    <label for="{{ field.id_for_label }}" class="pb-1">{{ field.label }}</label>
-
+    <label for="{{ field.id_for_label }}" class="font-poppins pb-1">{{ field.label }}</label>
     {% if form.is_bound %}
       {% if field.errors %}
-        {% render_field field class="form-control is-invalid" %}
+        {% render_field field class="form-control is-invalid border-red-700 rounded-lg" %}
         {% for error in field.errors %}
-          <div class="invalid-feedback">
+          <div class="invalid-feedback font-montserrat text-red-700 pt-1 text-sm">
             {{ error }}
           </div>
         {% endfor %}
       {% else %}
-        {% render_field field class="form-control is-valid" %}
+        {% render_field field class="form-control is-valid border-gray-600 rounded-lg" %}
       {% endif %}
     {% else %}
-      {% render_field field class="form-control" %}
+      {% render_field field class="form-control border-gray-600 rounded-lg" %}
     {% endif %}
 
     {% if field.help_text %}
@@ -37,3 +35,4 @@
     {% endif %}
   </div>
 {% endfor %}
+<p class="w-3/12 bg-amber-300 mb-5" >TO DO</p>
