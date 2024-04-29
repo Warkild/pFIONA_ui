@@ -14,8 +14,19 @@
                  <h1>Add</h1>
              </div>
         </div>
-        <div class="bg-custom-gray-2 w-5/6">
-            <p>Hello !</p>
+        <div class="bg-custom-gray-2 w-5/6 p-12">
+            <div>
+                <div class="mb-5">
+                    <h2 class="font-poppins font-bold text-gray-500 text-sm">ADD SENSOR</h2>
+                </div>
+                <div class="bg-white shadow-lg rounded-2xl py-5 px-8">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% include "pFIONA_sensors/form/sensor_add_form.html" with form=form %}
+                        <button type="submit" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold">Add</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </body>
