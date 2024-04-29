@@ -12,11 +12,8 @@
     <div class="w-2/3 flex justify-center items-center">
         <div class="h-fit w-1/2 p-16 bg-white rounded-2xl drop-shadow-xl">
             <h1 class="font-poppins font-semibold text-4xl mb-8">pFIONA</h1>
-            <form method="POST" class="form-login">
-                {% csrf_token %}
-                {% include "pFIONA_auth/login_form.html" with form=form %}
-                <button type="submit" name="button" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold">Login</button>
-            </form>
+            <p class="font-montserrat mb-5">You have been disconnected</p>
+            <a class="font-montserrat text-blue-600 hover:text-blue-400 font-bold" href="{% url 'login' %}"><p>Login again</p></a>
         </div>
     </div>
     <div class="w-1/3">

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     'widget_tweaks',
+    'pFIONA_sensors'
 ]
 
 MIDDLEWARE = [
@@ -146,6 +147,6 @@ NPM_BIN_PATH = "E:\\nodejs\\npm.cmd"
 # LOGIN
 
 LOGIN_URL = '/login'
-LOGIN_REDIRECT_URL = '/sensor/list'
+LOGIN_REDIRECT_URL = '/sensors/list'
 
 

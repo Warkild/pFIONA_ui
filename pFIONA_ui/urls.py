@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pFIONA_auth.urls')),
     path('', views.home_redirect, name="home_redirect"),
+    path('sensors/', include('pFIONA_sensors.urls')),
 ]
