@@ -1,28 +1,75 @@
 {% load static %}
 <div class="bg-custom-gray-1 w-1/6 h-[100vh] flex flex-col justify-between">
-    <div>
-        <h1 class="font-poppins font-black text-4xl mb-16 ml-10 mt-16">pFIONA</h1>
+        <div>
+            <div class="font-poppins font-black flex text-4xl mb-16 ml-10 mt-16">
+                 <a href="{% url 'sensors_list' %}" class="pr-7"><</a>
+                 <h1>XXXXX</h1>
+             </div>
         <div>
             <ul>
-                <li class="{% if current_path == '/sensors/list/' %}bg-custom-gray-2 border-l-8 border-blue-600 pl-8 flex py-4{% else %}bg-amber-200{% endif %}">
-                    <img src="{% static 'img/ico/icons8-list-96.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-8"/>
-                    <p class="font-poppins content-around pl-4 font-medium">Sensor List</p>
-                </li>
-                {% if request.user.is_staff %}
-                <a href="/admin">
-                    <li class="flex py-4 {% if current_path == '/admin' %}bg-custom-gray-2 border-l-8 border-blue-600 pl-8 flex{% else %}pl-10{% endif %}">
-                        <img src="{% static 'img/ico/icons8-admin-96.svg'%}" alt="icons-list" style="{% if current_path == '/admin' %}filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);{% else %}filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);{% endif %}" class="w-8"/>
-                        <p class="font-poppins content-around pl-4 font-medium {% if current_path == '/admin' %}{% else %}text-gray-700{% endif %}">User Administration</p>
+                {% load url_tools %}
+                <!-- MANUAL MODE -->
+                {% if request|is_sensor_manual_path %}
+                    <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
+                        <a class="flex">
+                            <img src="{% static 'img/ico/icons8-joystick-96.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium">Manual Mode</p>
+                        </a>
                     </li>
-                </a>
+                {% else %}
+
                 {% endif %}
+                <!-- DEPLOY MODE -->
+                {% if request|is_sensor_deploy_path %}
+                    <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
+                        <a class="flex">
+                            <img src="{% static 'img/ico/icons8-ocean-wave-64.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium">Deploy Mode</p>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="pl-10 py-5">
+                        <a class="flex" href="">
+                            <img src="{% static 'img/ico/icons8-ocean-wave-64.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium text-gray-700">Deploy Mode</p>
+                        </a>
+                    </li>
+                {% endif %}
+                <!-- DATA MODE -->
+                {% if request|is_sensor_data_path %}
+                    <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
+                        <a class="flex">
+                            <img src="{% static 'img/ico/icons8-bell-curve-100.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium">Data</p>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="pl-10 py-5">
+                        <a class="flex" href="">
+                            <img src="{% static 'img/ico/icons8-bell-curve-100.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium text-gray-700">Data</p>
+                        </a>
+                    </li>
+                {% endif %}
+                <!-- SETTINGS MODE -->
+                {% if request|is_sensor_settings_path %}
+                    <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
+                        <a class="flex">
+                            <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium">Settings</p>
+                        </a>
+                    </li>
+                {% else %}
+                    <li class="pl-10 py-5">
+                        <a class="flex" href="">
+                            <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium text-gray-700">Settings</p>
+                        </a>
+                    </li>
+                {% endif %}
+
+
             </ul>
         </div>
-    </div>
-    <div>
-        <form action="{% url 'logout' %}" method="post" class="flex justify-around">
-            {% csrf_token %}
-            <button class="text-red-600 mb-7 font-poppins font-bold hover:text-red-400 hover:underline" type="submit">Logout</button>
-        </form>
     </div>
 </div>
