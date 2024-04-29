@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from .forms import SensorForm
+
 from pFIONA_sensors.models import Sensor
 
 
@@ -11,7 +12,7 @@ def sensors_list(request):
         'sensors_list': sensors_list,
         'current_path': request.path,
     }
-    return render(request, 'pFIONA_sensors/list.html', context=context)
+    return render(request, 'pFIONA_sensors/sensors_list.html', context=context)
 
 
 def sensors_add(request):
@@ -22,4 +23,8 @@ def sensors_add(request):
             return redirect('sensors_list')
     else:
         form = SensorForm()
-    return render(request, 'pFIONA_sensors/sensor_add.html', {'form': form})
+    return render(request, 'pFIONA_sensors/sensors_add.html', {'form': form})
+
+
+def sensors_manual(request, id):
+    return render(request, 'pFIONA_sensors/sensors_manual.html')

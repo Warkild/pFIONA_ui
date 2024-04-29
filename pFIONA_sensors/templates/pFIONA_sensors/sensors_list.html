@@ -25,7 +25,7 @@
                             <p class="w-4/12">{{ sensor.name }}</p>
                             <p class="w-3/12">{{ sensor.ip_address }}</p>
                             <p class="w-3/12 bg-amber-300">TO DO</p>
-                            <p class="w-2/12">View</p>
+                            <p class="w-2/12 pl-2"><a href="{% url 'sensors_manual' sensor.id %}" class="bg-blue-600 py-1 px-3 rounded-lg text-white font-poppins font-bold">View</a></p>
                         </div>
                     {% endfor %}
                 {% else %}
