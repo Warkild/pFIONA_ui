@@ -14,3 +14,5 @@ def sensors_list(request):
     return render(request, 'pFIONA_sensors/list.html', context=context)
 
 
+def sensors_add(request):
+    return render(request, 'pFIONA_sensors/sensor_add.html')
