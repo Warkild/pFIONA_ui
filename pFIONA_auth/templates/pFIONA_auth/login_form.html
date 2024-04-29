@@ -15,7 +15,7 @@
 {% for field in form.visible_fields %}
   <div class="form-group flex flex-col mb-8">
 
-    {% render_field field.label_tag %}
+    <label for="{{ field.id_for_label }}" class="pb-1">{{ field.label }}</label>
 
     {% if form.is_bound %}
       {% if field.errors %}
