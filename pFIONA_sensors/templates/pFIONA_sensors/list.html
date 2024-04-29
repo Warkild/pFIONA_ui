@@ -9,7 +9,13 @@
 <body>
     <div class="flex">
         {% include "./components/sensors_menu_bar.html" %}
-        <div class="bg-lime-300 w-5/6">TEST</div>
+        <div class="bg-lime-300 w-5/6">
+            {% if sensors_list %}
+                <p>Sensors</p>
+            {% else %}
+                <p>No sensors</p>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>
