@@ -1,1 +1,1 @@
-import App from "./components/App";
+import ManualControlApp from "./components/ManualControlApp";
