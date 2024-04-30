@@ -10,7 +10,18 @@
     <div class="flex">
         {% include "../components/sensors_menu_bar.html" %}
         <div class="bg-custom-gray-2 w-5/6 p-12">
-            <p>Hello World !</p>
+            <div>
+                <div class="mb-5">
+                    <h2 class="font-poppins font-bold text-gray-500 text-sm">ADD SENSOR</h2>
+                </div>
+                <div class="bg-white shadow-lg rounded-2xl py-5 px-8">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% include "pFIONA_sensors/form/sensor_add_form.html" with form=ip_form %}
+                        <button type="submit" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold" name="submit_ip">Change</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </body>

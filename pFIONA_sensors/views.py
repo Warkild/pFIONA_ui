@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from .forms import SensorForm
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import SensorForm, SensorIPForm
 
 from pFIONA_sensors.models import Sensor
 
@@ -42,6 +42,19 @@ def sensors_data(request, id):
     return render(request, 'pFIONA_sensors/view/sensors_data.html', {'id': id})
 
 
-@login_required()
+@login_required
 def sensors_settings(request, id):
-    return render(request, 'pFIONA_sensors/view/sensors_settings.html', {'id': id})
+    sensor = get_object_or_404(Sensor, pk=id)
+    ip_form = SensorIPForm(request.POST or None, instance=sensor, prefix='ip')
+
+    if request.method == 'POST':
+        if 'submit_ip' in request.POST:
+            ip_form = SensorIPForm(request.POST, instance=sensor, prefix='ip')
+            if ip_form.is_valid():
+                ip_form.save()
+                return redirect('sensors_settings', id=id)
+            else:
+                # Afficher les erreurs de validation pour diagnostiquer le problème
+                print(ip_form.errors)
+    # Ce bloc s'exécute si la requête n'est pas POST ou aucun bouton spécifique n'a été cliqué
+    return render(request, 'pFIONA_sensors/view/sensors_settings.html', {'id': id, 'ip_form': ip_form})
