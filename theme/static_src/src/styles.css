@@ -19,6 +19,13 @@
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Montserrat';
+    src: url('/static/fonts/Montserrat-Bold.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

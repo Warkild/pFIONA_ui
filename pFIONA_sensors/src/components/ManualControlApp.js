@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { render } from "react-dom";
 import ValvePort from "./plugins/ValvePort";
 import {createRoot} from "react-dom/client";
+import Pumps from "./plugins/Pumps";
 
 export default class ManualControlApp extends Component {
   constructor(props) {
@@ -10,8 +11,9 @@ export default class ManualControlApp extends Component {
 
   render() {
     return (
-      <div>
+      <div className={"flex justify-between"}>
         <ValvePort />
+        <Pumps/>
       </div>
     );
   }
