@@ -817,6 +817,26 @@ select {
   position: static;
 }
 
+.fixed {
+  position: fixed;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.relative {
+  position: relative;
+}
+
+.sticky {
+  position: sticky;
+}
+
+.top-0 {
+  top: 0px;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -876,6 +896,22 @@ select {
   height: 100vh;
 }
 
+.h-dvh {
+  height: 100dvh;
+}
+
+.h-lvh {
+  height: 100lvh;
+}
+
+.h-svh {
+  height: 100svh;
+}
+
+.min-h-screen {
+  min-height: 100vh;
+}
+
 .w-1\/2 {
   width: 50%;
 }
@@ -918,6 +954,19 @@ select {
 
 .w-\[100vw\] {
   width: 100vw;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.w-\[1\/6\] {
+  width: 1/6;
+}
+
+.w-max {
+  width: -moz-max-content;
+  width: max-content;
 }
 
 .flex-col {
@@ -1019,6 +1068,11 @@ select {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 
+.bg-gray-800 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
 .bg-gradient-to-br {
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
 }
@@ -1031,6 +1085,10 @@ select {
 
 .to-gray-300 {
   --tw-gradient-to: #d1d5db var(--tw-gradient-to-position);
+}
+
+.fill-inherit {
+  fill: inherit;
 }
 
 .object-cover {
@@ -1112,6 +1170,14 @@ select {
 
 .pt-1 {
   padding-top: 0.25rem;
+}
+
+.pt-12 {
+  padding-top: 3rem;
+}
+
+.pl-\[1\/6\] {
+  padding-left: 1/6;
 }
 
 .font-montserrat {
