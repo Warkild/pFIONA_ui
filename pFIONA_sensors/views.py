@@ -46,7 +46,7 @@ def sensors_data(request, id):
 def sensors_settings(request, id):
     sensor = get_object_or_404(Sensor, pk=id)
     ip_form = SensorIPForm(request.POST or None, instance=sensor, prefix='ip')
-    name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=Sensor, prefix='name_notes')
+    name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')
 
     if request.method == 'POST':
         if 'submit_ip' in request.POST:
