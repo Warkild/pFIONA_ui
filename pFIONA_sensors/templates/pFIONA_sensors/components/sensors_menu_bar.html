@@ -11,25 +11,30 @@
                 <!-- MANUAL MODE -->
                 {% if request|is_sensor_manual_path %}
                     <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
-                        <a class="flex">
+                        <a class="flex" href="{% url 'sensors_manual' id=id %}">
                             <img src="{% static 'img/ico/icons8-joystick-96.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
                             <p class="font-poppins content-around pl-4 font-medium">Manual Mode</p>
                         </a>
                     </li>
                 {% else %}
-
+                    <li class="pl-10 py-5">
+                        <a class="flex" href="{% url 'sensors_manual' id=id %}">
+                            <img src="{% static 'img/ico/icons8-joystick-96.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
+                            <p class="font-poppins content-around pl-4 font-medium text-gray-700">Manual Mode</p>
+                        </a>
+                    </li>
                 {% endif %}
                 <!-- DEPLOY MODE -->
                 {% if request|is_sensor_deploy_path %}
                     <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
-                        <a class="flex">
+                        <a class="flex" href="{% url 'sensors_deploy' id=id %}">
                             <img src="{% static 'img/ico/icons8-ocean-wave-64.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
                             <p class="font-poppins content-around pl-4 font-medium">Deploy Mode</p>
                         </a>
                     </li>
                 {% else %}
                     <li class="pl-10 py-5">
-                        <a class="flex" href="">
+                        <a class="flex" href="{% url 'sensors_deploy' id=id %}">
                             <img src="{% static 'img/ico/icons8-ocean-wave-64.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
                             <p class="font-poppins content-around pl-4 font-medium text-gray-700">Deploy Mode</p>
                         </a>
@@ -38,14 +43,14 @@
                 <!-- DATA MODE -->
                 {% if request|is_sensor_data_path %}
                     <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
-                        <a class="flex">
+                        <a class="flex" href="{% url 'sensors_data' id=id %}">
                             <img src="{% static 'img/ico/icons8-bell-curve-100.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
                             <p class="font-poppins content-around pl-4 font-medium">Data</p>
                         </a>
                     </li>
                 {% else %}
                     <li class="pl-10 py-5">
-                        <a class="flex" href="">
+                        <a class="flex" href="{% url 'sensors_data' id=id %}">
                             <img src="{% static 'img/ico/icons8-bell-curve-100.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
                             <p class="font-poppins content-around pl-4 font-medium text-gray-700">Data</p>
                         </a>
@@ -54,14 +59,14 @@
                 <!-- SETTINGS MODE -->
                 {% if request|is_sensor_settings_path %}
                     <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
-                        <a class="flex">
+                        <a class="flex" href="{% url 'sensors_settings' id=id %}">
                             <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
                             <p class="font-poppins content-around pl-4 font-medium">Settings</p>
                         </a>
                     </li>
                 {% else %}
                     <li class="pl-10 py-5">
-                        <a class="flex" href="">
+                        <a class="flex" href="{% url 'sensors_settings' id=id %}">
                             <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
                             <p class="font-poppins content-around pl-4 font-medium text-gray-700">Settings</p>
                         </a>
