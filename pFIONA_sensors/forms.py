@@ -6,3 +6,15 @@ class SensorForm(ModelForm):
     class Meta:
         model = Sensor
         fields = '__all__'
+
+
+class SensorIPForm(ModelForm):
+    class Meta:
+        model = Sensor
+        fields = ['ip_address']
+
+
+class SensorNameAndNotesForm(ModelForm):
+    class Meta:
+        model = Sensor
+        fields = ['name', 'notes']
