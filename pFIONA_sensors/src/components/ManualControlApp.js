@@ -5,6 +5,7 @@ import {createRoot} from "react-dom/client";
 import Pumps from "./plugins/Pumps";
 import Spectrophotometer from "./plugins/Spectrophotometer";
 import AuxPump from "./plugins/AuxPump";
+import PreEstablishedScan from "./plugins/PreEstablishedScan";
 
 export default class ManualControlApp extends Component {
   constructor(props) {
@@ -18,9 +19,12 @@ export default class ManualControlApp extends Component {
                 <ValvePort/>
                 <Pumps/>
             </div>
-            <div className={"flex flex-row justify-between"}>
+            <div className={"flex flex-row justify-between pb-12"}>
                 <Spectrophotometer/>
                 <AuxPump/>
+            </div>
+            <div className={"flex flex-row justify-between"}>
+                <PreEstablishedScan/>
             </div>
         </div>
 
