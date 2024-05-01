@@ -3,6 +3,7 @@ import { render } from "react-dom";
 import ValvePort from "./plugins/ValvePort";
 import {createRoot} from "react-dom/client";
 import Pumps from "./plugins/Pumps";
+import Spectrophotometer from "./plugins/Spectrophotometer";
 
 export default class ManualControlApp extends Component {
   constructor(props) {
@@ -11,10 +12,17 @@ export default class ManualControlApp extends Component {
 
   render() {
     return (
-      <div className={"flex justify-between"}>
-        <ValvePort />
-        <Pumps/>
-      </div>
+        <div className={"flex flex-col"}>
+            <div className={"flex flex-row justify-between pb-12"}>
+                <ValvePort/>
+                <Pumps/>
+            </div>
+            <div className={"flex flex-row justify-between"}>
+                <Spectrophotometer/>
+            </div>
+        </div>
+
+
     );
   }
 }
