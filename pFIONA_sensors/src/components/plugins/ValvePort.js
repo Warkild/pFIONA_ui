@@ -39,11 +39,11 @@ function ValvePort() {
 
     // Return HTML Code
     return (
-        <div className={"w-1/6"}>
+        <div className={"w-1/6 flex flex-col"}>
             <div className={"mb-5"}>
                 <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>VALVE</h2>
             </div>
-            <div className={"bg-white shadow-lg rounded-2xl py-5 px-8"}>
+            <div className={"bg-white shadow-lg rounded-2xl py-5 px-8 h-full"}>
                 <div className={"flex flex-col pb-5"}>
                     <p className={"font-montserrat text-sm pb-2"}>Current Port</p>
                     <input type="number" className={"text-center remove-arrow rounded-lg bg-gray-200"} value={currentVal} readOnly={true}></input>
@@ -56,6 +56,7 @@ function ValvePort() {
                     <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"} onClick={handleMoveClick}>Move</button>
                     <button className={"bg-blue-600 rounded-lg text-white font-poppins py-1"} onClick={handleMoveAirPortClick}>Move to air port</button>
                 </div>
+                <div className={"h-5"}></div>
             </div>
             <Alert isOpen={isModalOpen} onRequestClose={closeModal} />
         </div>
