@@ -82,9 +82,7 @@ function Spectrophotometer({ addLogMessage }) {
         })
         .then(data => {
             console.log('Success:', data);
-            console.log(Boolean(data.message))
-            console.log(!!data.message)
-            setLightStatus(Boolean(data.message));
+            setLightStatus(data.message === "true");
         })
         .catch(error => {
             console.error('Error:', error);
