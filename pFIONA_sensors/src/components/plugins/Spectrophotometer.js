@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Alert from "./Alert";
 
-function Pumps() {
+function Spectrophotometer() {
 
     // Return HTML Code
     return (
@@ -16,4 +16,4 @@ function Pumps() {
     );
 }
 
-export default Pumps;
+export default Spectrophotometer;
