@@ -4,6 +4,7 @@ import ValvePort from "./plugins/ValvePort";
 import {createRoot} from "react-dom/client";
 import Pumps from "./plugins/Pumps";
 import Spectrophotometer from "./plugins/Spectrophotometer";
+import AuxPump from "./plugins/AuxPump";
 
 export default class ManualControlApp extends Component {
   constructor(props) {
@@ -19,6 +20,7 @@ export default class ManualControlApp extends Component {
             </div>
             <div className={"flex flex-row justify-between"}>
                 <Spectrophotometer/>
+                <AuxPump/>
             </div>
         </div>
 
