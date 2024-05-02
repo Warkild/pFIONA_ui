@@ -34,6 +34,8 @@ function ManualControlApp() {
   );
 }
 
-const appDiv = document.getElementById("app");
-const root = createRoot(appDiv); // Créez une racine.
-root.render(<ManualControlApp />); // Utilisez root.render pour monter votre composant
+const manualControlDiv = document.getElementById("manual_control_app");
+if (manualControlDiv) {
+    const root = createRoot(manualControlDiv);
+    root.render(<ManualControlApp />);
+}
