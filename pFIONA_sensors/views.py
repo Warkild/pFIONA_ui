@@ -52,7 +52,8 @@ def sensors_data(request, id):
 
 @login_required()
 def sensors_reagents(request, id):
-    return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {'id': id})
+    sensor = get_object_or_404(Sensor, pk=id)
+    return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {'id': id, 'ip_address': sensor.ip_address})
 
 
 @login_required
