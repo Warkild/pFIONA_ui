@@ -111,7 +111,7 @@ function Spectrophotometer({ addLogMessage }) {
                 <div className={"flex flex-col"}>
                     <p className={"text-sm mb-2"}>Current status :</p>
                     <div className={"flex flex-row items-center mb-5"}>
-                        <div className={`bg-red-600 w-5 h-5 rounded-full ${lightStatus ? 'bg-green-600' : ''}`}></div>
+                        <div className={` w-5 h-5 rounded-full ${lightStatus ? 'bg-green-600' : 'bg-red-600'}`}></div>
                         <p className={"ml-3"}>{lightStatus ? 'ON' : 'OFF'}</p>
                     </div>
                     <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"}
