@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import Alert from "./Alert";
+import Alert from "../Alert";
 
 function Spectrophotometer({ addLogMessage }) {
 

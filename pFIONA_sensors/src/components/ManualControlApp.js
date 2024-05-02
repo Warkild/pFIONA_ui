@@ -1,11 +1,11 @@
 import React, { Component, useState } from "react";
 import { createRoot } from "react-dom/client";
-import ValvePort from "./plugins/ValvePort";
-import Pumps from "./plugins/Pumps";
-import Spectrophotometer from "./plugins/Spectrophotometer";
-import AuxPump from "./plugins/AuxPump";
-import PreEstablishedScan from "./plugins/PreEstablishedScan";
-import Log from "./plugins/Log";
+import ValvePort from "./plugins/ManualControl/ValvePort";
+import Pumps from "./plugins/ManualControl/Pumps";
+import Spectrophotometer from "./plugins/ManualControl/Spectrophotometer";
+import AuxPump from "./plugins/ManualControl/AuxPump";
+import PreEstablishedScan from "./plugins/ManualControl/PreEstablishedScan";
+import Log from "./plugins/ManualControl/Log";
 
 function ManualControlApp() {
   const [logMessages, setLogMessages] = useState([]);
