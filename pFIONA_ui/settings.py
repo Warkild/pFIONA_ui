@@ -144,4 +144,8 @@ NPM_BIN_PATH = "E:\\nodejs\\npm.cmd"
 LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/sensors/list'
 
-
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
