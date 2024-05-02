@@ -21,3 +21,8 @@ def is_sensor_data_path(request):
 @register.filter
 def is_sensor_settings_path(request):
     return '/sensors/' in request.path and '/settings/' in request.path and request.path.count('/') == 4
+
+
+@register.filter
+def is_sensor_reagents_path(request):
+    return '/sensors/' in request.path and '/reagents/' in request.path and request.path.count('/') == 4

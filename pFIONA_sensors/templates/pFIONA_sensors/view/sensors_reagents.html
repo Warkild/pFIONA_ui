@@ -1,0 +1,17 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Deploy mode - pFIONA</title>
+    {% tailwind_css %}
+</head>
+<body>
+    <div class="flex min-h-screen">
+        {% include "../components/sensors_menu_bar.html" %}
+        <div class="bg-custom-gray-2 w-5/6 p-12">
+            <p>Hello World !</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:id>/deploy/', views.sensors_deploy, name='sensors_deploy'),
     path('<int:id>/data/', views.sensors_data, name='sensors_data'),
     path('<int:id>/settings/', views.sensors_settings, name='sensors_settings'),
+    path('<int:id>/reagents/', views.sensors_reagents, name='sensors_reagents'),
 ]

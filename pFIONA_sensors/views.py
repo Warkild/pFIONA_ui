@@ -35,7 +35,9 @@ def sensors_manual(request, id):
     refresh = RefreshToken.for_user(request.user)
     access_token = str(refresh.access_token)
     refresh_token = str(refresh)
-    return render(request, 'pFIONA_sensors/view/sensors_manual.html', {'id': id, 'ip_address': sensor.ip_address, 'access_token': access_token, 'refresh_token': refresh_token})
+    return render(request, 'pFIONA_sensors/view/sensors_manual.html',
+                  {'id': id, 'ip_address': sensor.ip_address, 'access_token': access_token,
+                   'refresh_token': refresh_token})
 
 
 @login_required()
@@ -46,6 +48,11 @@ def sensors_deploy(request, id):
 @login_required()
 def sensors_data(request, id):
     return render(request, 'pFIONA_sensors/view/sensors_data.html', {'id': id})
+
+
+@login_required()
+def sensors_reagents(request, id):
+    return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {'id': id})
 
 
 @login_required
@@ -66,4 +73,5 @@ def sensors_settings(request, id):
                 ip_form.save()
                 return redirect('sensors_settings', id=id)
     # Ce bloc s'exécute si la requête n'est pas POST ou aucun bouton spécifique n'a été cliqué
-    return render(request, 'pFIONA_sensors/view/sensors_settings.html', {'id': id, 'ip_form': ip_form, 'name_notes_form' : name_notes_form})
+    return render(request, 'pFIONA_sensors/view/sensors_settings.html',
+                  {'id': id, 'ip_form': ip_form, 'name_notes_form': name_notes_form})
