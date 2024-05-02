@@ -29,7 +29,8 @@ def sensors_add(request):
 
 @login_required()
 def sensors_manual(request, id):
-    return render(request, 'pFIONA_sensors/view/sensors_manual.html', {'id': id})
+    sensor = get_object_or_404(Sensor, pk=id)
+    return render(request, 'pFIONA_sensors/view/sensors_manual.html', {'id': id, 'ip_address': sensor.ip_address})
 
 
 @login_required()

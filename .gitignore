@@ -9,3 +9,4 @@ pFIONA_ui/__pycache__/settings.cpython-311.pyc
 /theme/__pycache__
 /pFIONA_sensors/__pycache__
 /pFIONA_sensors/migrations/__pycache__
+/pFIONA_sensors/node_modules
