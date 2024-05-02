@@ -1,11 +1,12 @@
 import React, { Component, useState } from "react";
 import { createRoot } from "react-dom/client";
+import Overview from "./plugins/Reagents/Overview";
 
 function ReagentsApp() {
 
   return (
       <div className={"flex flex-col"}>
-          <p>Reagents app</p>
+          <Overview/>
       </div>
   );
 }
