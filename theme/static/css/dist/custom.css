@@ -12,3 +12,14 @@
     font-family: "Montserrat", sans-serif;
     padding-bottom: 18px;
 }
+.graph-container {
+  flex: 1; /* Permet à chaque graphique de prendre une partie égale de l'espace disponible */
+  min-width: 200px; /* Assure un minimum de largeur pour chaque graphique */
+    max-height: 300px;
+}
+.graph-title {
+  font-size: 14px; /* Taille de la police pour le titre */
+  color: #333; /* Couleur du texte */
+  margin-top: 10px; /* Espace au-dessus du titre */
+  text-align: center; /* Centrage du texte */
+}

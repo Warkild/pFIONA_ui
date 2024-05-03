@@ -1,16 +1,56 @@
-import React, { Component, useState } from "react";
+import React from "react";
+import { Doughnut } from "react-chartjs-2";
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
-function Overview() {
+// Enregistrer les composants nécessaires
+Chart.register(ArcElement, Tooltip, Legend);
 
-  return (
-      <div className={"w-full"}>
-          <div className={"mb-5"}>
-              <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>OVERVIEW</h2>
-          </div>
-          <div className={"flex flex-col font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8"}>
-          </div>
-      </div>
-  );
+function Overview({reagents}) {
+    const validReagents = reagents.filter(reagent => reagent.port !== null);
+
+    return (
+        <div className="w-full">
+            <div className="mb-5">
+                <h2 className="font-poppins font-bold text-gray-500 text-sm">OVERVIEW</h2>
+            </div>
+            <div className="flex flex-row flex-wrap font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
+                {validReagents.map(reagent => (
+                    <div className="graph-container" key={reagent.id}>
+                        <DoughnutChart reagent={reagent} />
+                        <p className={"font-montserrat text-center mt-5"}>{reagent.name}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
+
+function DoughnutChart({ reagent }) {
+    const data = {
+        labels: ['Volume', 'Volume Restant'],
+        datasets: [{
+            data: [reagent.volume, reagent.max_volume - reagent.volume],
+            backgroundColor: ['#FF6384', '#36A2EB'],
+            hoverBackgroundColor: ['#FF6384', '#36A2EB']
+        }]
+    };
+
+    const options = {
+        maintainAspectRatio: false, // Permet au graphique de s'ajuster en hauteur selon le conteneur
+        responsive: true, // Assure que le graphique est réactif
+        plugins: {
+            legend: {
+                display: false // Masque la légende
+            }
+        }
+    };
+
+    return (
+        <div>
+            <Doughnut data={data} options={options} />
+        </div>
+    );
+}
+
 
 export default Overview;

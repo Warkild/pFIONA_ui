@@ -1,10 +1,12 @@
+import json
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import SensorForm, SensorIPForm, SensorNameAndNotesForm
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from pFIONA_sensors.models import Sensor
+from pFIONA_sensors.models import Sensor, Reagent
 
 
 @login_required()
@@ -53,7 +55,27 @@ def sensors_data(request, id):
 @login_required()
 def sensors_reagents(request, id):
     sensor = get_object_or_404(Sensor, pk=id)
-    return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {'id': id, 'ip_address': sensor.ip_address})
+    reagents = Reagent.objects.filter(sensor_id=id)
+
+    # Création de la liste de dictionnaires pour chaque réactif
+    reagents_data = [{
+        'id': reagent.id,
+        'name': reagent.name,
+        'volume': reagent.volume,
+        'max_volume': reagent.max_volume,
+        'port': reagent.port
+    } for reagent in reagents]
+
+    # Sérialisation des données en JSON
+    reagents_json = json.dumps(reagents_data)
+
+    print(reagents_json)
+
+    return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {
+        'id': id,
+        'ip_address': sensor.ip_address,
+        'reagents_json': reagents_json
+    })
 
 
 @login_required

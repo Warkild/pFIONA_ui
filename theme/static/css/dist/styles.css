@@ -1097,6 +1097,10 @@ select {
   flex-direction: column;
 }
 
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
 .content-around {
   align-content: space-around;
 }

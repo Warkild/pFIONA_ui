@@ -6,7 +6,7 @@ function ReagentsApp() {
 
   return (
       <div className={"flex flex-col"}>
-          <Overview/>
+          <Overview reagents={reagents_json}/>
       </div>
   );
 }
