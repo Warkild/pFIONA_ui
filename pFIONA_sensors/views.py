@@ -56,7 +56,9 @@ def sensors_data(request, id):
 def sensors_reagents(request, id):
     sensor = get_object_or_404(Sensor, pk=id)
     reagents = Reagent.objects.filter(sensor_id=id)
-
+    refresh = RefreshToken.for_user(request.user)
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
     # Création de la liste de dictionnaires pour chaque réactif
     reagents_data = [{
         'id': reagent.id,
@@ -69,12 +71,14 @@ def sensors_reagents(request, id):
     # Sérialisation des données en JSON
     reagents_json = json.dumps(reagents_data)
 
-    print(reagents_json)
+    print(access_token)
 
     return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {
         'id': id,
         'ip_address': sensor.ip_address,
-        'reagents_json': reagents_json
+        'reagents_json': reagents_json,
+        'access_token': access_token,
+        'refresh_token': refresh_token
     })
 
 

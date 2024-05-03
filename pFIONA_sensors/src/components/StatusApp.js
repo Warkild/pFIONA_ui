@@ -1,14 +1,16 @@
 import React, {Component, useEffect, useState} from "react";
 import { createRoot } from "react-dom/client";
 
-function StatusApp({ ip }) {
+function StatusApp({ ip, accessToken   }) {
 
     const [connected, setConnected] = useState(false);
 
     const checkStatus = () => {
+        console.log(accessToken);
         fetch(`http://${ip}:5000/sensor/get_state`, {
             method: 'GET',
             headers: {
+                'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
             },
         })
@@ -48,6 +50,7 @@ function StatusApp({ ip }) {
 
 document.querySelectorAll("#status_app").forEach(div => {
     const ip = div.getAttribute('data-ip');
+    const accessToken = div.getAttribute('data-access-token');
     const root = createRoot(div);
-    root.render(<StatusApp ip={ip}/>);
+    root.render(<StatusApp ip={ip} accessToken={accessToken}/>);
 });

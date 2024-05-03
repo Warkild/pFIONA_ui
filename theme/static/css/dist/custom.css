@@ -21,3 +21,6 @@
   margin-top: 10px; /* Espace au-dessus du titre */
   text-align: center; /* Centrage du texte */
 }
+.red_icon {
+    filter: invert(17%) sepia(64%) saturate(4869%) hue-rotate(351deg) brightness(95%) contrast(88%);
+}
