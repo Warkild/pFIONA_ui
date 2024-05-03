@@ -27,11 +27,11 @@ function Overview({reagents}) {
 
 function DoughnutChart({ reagent }) {
     const data = {
-        labels: ['Volume', 'Volume Restant'],
+        labels: ['Volume restant', 'Vide'],
         datasets: [{
             data: [reagent.volume, reagent.max_volume - reagent.volume],
-            backgroundColor: ['#FF6384', '#36A2EB'],
-            hoverBackgroundColor: ['#FF6384', '#36A2EB']
+            backgroundColor: ['#2563eb', '#bcdef1'],
+            hoverBackgroundColor: ['#4c7eec', '#dfedf8']
         }]
     };
 
