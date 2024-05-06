@@ -1,0 +1,23 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Reagent - pFIONA</title>
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'css/dist/custom.css' %}">
+</head>
+<body>
+    <div class="flex min-h-screen">
+        <div class="bg-custom-gray-1 w-1/6 h-dvh flex flex-col justify-between">
+            <div class="font-poppins font-black flex text-4xl mb-16 ml-10 mt-16">
+            <a href="{% url 'sensors_reagents' id=id %}" class="pr-7">&lt;</a>
+            <h1>Edit</h1>
+        </div>
+        </div>
+        <div class="bg-custom-gray-2 w-5/6 p-12">
+            {% include "pFIONA_sensors/form/basic_form.html" with form=reagent_form %}
+        </div>
+    </div>
+</body>
+</html>

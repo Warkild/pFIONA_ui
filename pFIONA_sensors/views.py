@@ -2,11 +2,10 @@ import json
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .forms import SensorForm, SensorIPForm, SensorNameAndNotesForm
+from .forms import SensorForm, SensorIPForm, SensorNameAndNotesForm, ReagentEditForm
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
-
 
 from pFIONA_sensors.models import Sensor, Reagent
 
@@ -37,7 +36,8 @@ def sensors_add(request):
 def sensors_manual(request, id):
     sensor = get_object_or_404(Sensor, pk=id)
 
-    # Utilisation du serializer personnalisé pour générer le token
+    # JWT Token Loading
+
     refresh = RefreshToken.for_user(request.user)
     serializer = CustomTokenObtainPairSerializer()
     token = serializer.get_token(request.user)
@@ -64,10 +64,16 @@ def sensors_data(request, id):
 def sensors_reagents(request, id):
     sensor = get_object_or_404(Sensor, pk=id)
     reagents = Reagent.objects.filter(sensor_id=id)
+
+    # JWT Token Loading
+
     refresh = RefreshToken.for_user(request.user)
-    access_token = str(refresh.access_token)
+    serializer = CustomTokenObtainPairSerializer()
+    token = serializer.get_token(request.user)
+
+    access_token = str(token)
     refresh_token = str(refresh)
-    # Création de la liste de dictionnaires pour chaque réactif
+
     reagents_data = [{
         'id': reagent.id,
         'name': reagent.name,
@@ -76,10 +82,7 @@ def sensors_reagents(request, id):
         'port': reagent.port
     } for reagent in reagents]
 
-    # Sérialisation des données en JSON
     reagents_json = json.dumps(reagents_data)
-
-    print(access_token)
 
     return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {
         'id': id,
@@ -87,6 +90,30 @@ def sensors_reagents(request, id):
         'reagents_json': reagents_json,
         'access_token': access_token,
         'refresh_token': refresh_token
+    })
+
+
+@login_required()
+def sensors_reagent_delete(request, id, reagent_id):
+    reagent = get_object_or_404(Reagent, pk=reagent_id)
+    reagent.delete()
+    return redirect('sensors_reagents', id=id)
+
+
+@login_required()
+def sensors_reagent_edit(request, id, reagent_id):
+    reagent = get_object_or_404(Reagent, pk=reagent_id)
+    reagent_form = ReagentEditForm(request.POST or None, instance=reagent, prefix='reagent')
+
+    if request.method == 'POST':
+        if 'sumbit_reagent' in request.POST:
+            reagent_form = ReagentEditForm(request.POST, instance=reagent, prefix='reagent')
+            if reagent_form.is_valid():
+                reagent_form.save()
+                return redirect('sensors_reagents', id=id)
+    return render(request, 'pfiONA_sensors/view/sensors_reagent_edit.html', {
+        'id': id,
+        'reagent_form': reagent_form,
     })
 
 

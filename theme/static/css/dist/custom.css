@@ -24,3 +24,7 @@
 .red_icon {
     filter: invert(17%) sepia(64%) saturate(4869%) hue-rotate(351deg) brightness(95%) contrast(88%);
 }
+
+.blue_icon {
+    filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%)
+}

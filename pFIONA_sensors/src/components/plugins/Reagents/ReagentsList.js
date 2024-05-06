@@ -28,11 +28,17 @@ function ReagentsList({reagents}) {
                                 <td className={`pl-5 ${reagent.port != null ? 'text-lime-500' : 'text-red-600'}`}>{reagent.port != null ? 'Active' : 'Inactive'}</td>
                                 <td>
                                     <div className={"h-full flex flex-row-reverse pr-5"}>
-                                        <a href="#">
-                                            <img src={"/static/img/ico/icons8-delete-90.svg"} className={"w-6 red_icon"}
+                                        <a href={`${reagent.id}/delete`}>
+                                            <img src={"/static/img/ico/icons8-delete-90.svg"} className={"w-6 red_icon mr-4"}
                                                  alt="Delete" style={{
-                                                    filter: "invert(17%) sepia(64%) saturate(4869%) hue-rotate(351deg) brightness(95%) contrast(88%)"
-                                                 }}/>
+                                                filter: "invert(17%) sepia(64%) saturate(4869%) hue-rotate(351deg) brightness(95%) contrast(88%)"
+                                            }}/>
+                                        </a>
+                                        <a href={`${reagent.id}/edit`}>
+                                            <img src={"/static/img/ico/icons8-edit-384.svg"} className={"w-6 blue_icon mr-4"}
+                                                 alt="Edit" style={{
+                                                filter: "filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%)"
+                                            }}/>
                                         </a>
                                     </div>
                                 </td>
