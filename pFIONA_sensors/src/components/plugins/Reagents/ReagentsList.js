@@ -10,7 +10,7 @@ function ReagentsList({reagents}) {
             <div className={"mb-5"}>
                 <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>REAGENTS LIST</h2>
             </div>
-            <div className={"flex flex-row font-montserrat bg-white shadow-lg rounded-2xl py-5 space-x-8 px-8 justify-between"}>
+            <div className={"flex flex-row font-montserrat bg-white shadow-lg rounded-2xl py-7 space-x-8 px-8 justify-between"}>
                 <div className={"w-full"}>
                     <table className={"w-full"}>
                         <thead>

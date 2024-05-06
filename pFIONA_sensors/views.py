@@ -106,7 +106,9 @@ def sensors_reagent_edit(request, id, reagent_id):
     reagent_form = ReagentEditForm(request.POST or None, instance=reagent, prefix='reagent')
 
     if request.method == 'POST':
+        print('POST')
         if 'sumbit_reagent' in request.POST:
+            print('sumbit reagent')
             reagent_form = ReagentEditForm(request.POST, instance=reagent, prefix='reagent')
             if reagent_form.is_valid():
                 reagent_form.save()
