@@ -1,5 +1,6 @@
 import React, {Component, useEffect, useState} from "react";
 import { createRoot } from "react-dom/client";
+import {waitFor} from "@babel/core/lib/gensync-utils/async";
 
 function StatusApp({ ip, accessToken   }) {
 
@@ -7,6 +8,8 @@ function StatusApp({ ip, accessToken   }) {
 
     const checkStatus = () => {
         console.log(accessToken);
+        console.log(ip)
+        console.log(new Date().toLocaleTimeString())
         fetch(`http://${ip}:5000/sensor/get_state`, {
             method: 'GET',
             headers: {
@@ -15,6 +18,7 @@ function StatusApp({ ip, accessToken   }) {
             },
         })
         .then(response => {
+            console.log(new Date().toLocaleTimeString())
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -34,6 +38,7 @@ function StatusApp({ ip, accessToken   }) {
         checkStatus();
 
         const intervalId = setInterval(() => {
+
             checkStatus();
         }, 5000);
 
