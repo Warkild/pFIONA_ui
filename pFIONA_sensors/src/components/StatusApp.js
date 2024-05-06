@@ -15,7 +15,6 @@ function StatusApp({ ip, accessToken   }) {
             },
         })
         .then(response => {
-            console.log(new Date().toLocaleTimeString())
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
