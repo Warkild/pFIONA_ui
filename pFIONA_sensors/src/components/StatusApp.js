@@ -7,9 +7,6 @@ function StatusApp({ ip, accessToken   }) {
     const [connected, setConnected] = useState(false);
 
     const checkStatus = () => {
-        console.log(accessToken);
-        console.log(ip)
-        console.log(new Date().toLocaleTimeString())
         fetch(`http://${ip}:5000/sensor/get_state`, {
             method: 'GET',
             headers: {
