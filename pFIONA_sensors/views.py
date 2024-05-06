@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import SensorForm, SensorIPForm, SensorNameAndNotesForm
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
+
 
 from pFIONA_sensors.models import Sensor, Reagent
 
@@ -34,9 +36,15 @@ def sensors_add(request):
 @login_required()
 def sensors_manual(request, id):
     sensor = get_object_or_404(Sensor, pk=id)
+
+    # Utilisation du serializer personnalisé pour générer le token
     refresh = RefreshToken.for_user(request.user)
-    access_token = str(refresh.access_token)
+    serializer = CustomTokenObtainPairSerializer()
+    token = serializer.get_token(request.user)
+
+    access_token = str(token)
     refresh_token = str(refresh)
+
     return render(request, 'pFIONA_sensors/view/sensors_manual.html',
                   {'id': id, 'ip_address': sensor.ip_address, 'access_token': access_token,
                    'refresh_token': refresh_token})
