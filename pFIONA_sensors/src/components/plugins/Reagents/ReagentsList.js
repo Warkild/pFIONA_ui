@@ -30,7 +30,7 @@ function ReagentsList({reagents}) {
                                 <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reagent.max_volume}</td>
                                 <td className={`pl-5 ${reagent.port != null ? 'text-lime-500' : 'text-red-600'}`}>{reagent.port != null ? 'Active' : 'Inactive'}</td>
                                 <td>
-                                    <div className={"h-full flex flex-row-reverse pr-5"}>
+                                    <div className={"h-full flex flex-row-reverse pl-5"}>
                                         <a href={`${reagent.id}/delete`}>
                                             <img src={"/static/img/ico/icons8-delete-90.svg"} className={"w-6 red_icon mr-4"}
                                                  alt="Delete" style={{
