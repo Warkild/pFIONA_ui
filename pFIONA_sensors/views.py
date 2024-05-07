@@ -17,9 +17,21 @@ from pFIONA_sensors.models import Sensor, Reagent
 @login_required()
 def sensors_list(request):
     sensors_list = Sensor.objects.all()
+
+    # JWT Token Loading
+
+    refresh = RefreshToken.for_user(request.user)
+    serializer = CustomTokenObtainPairSerializer()
+    token = serializer.get_token(request.user)
+
+    access_token = str(token)
+    refresh_token = str(refresh)
+
     context = {
         'sensors_list': sensors_list,
         'current_path': request.path,
+        'access_token': access_token,
+        'refresh_token': refresh_token,
     }
     return render(request, 'pFIONA_sensors/sensors_list.html', context=context)
 
