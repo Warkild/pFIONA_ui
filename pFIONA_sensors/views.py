@@ -1,11 +1,15 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+
 from .forms import SensorForm, SensorIPForm, SensorNameAndNotesForm, ReagentEditForm
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
+from django.db.models import Q
 
 from pFIONA_sensors.models import Sensor, Reagent
 
@@ -79,7 +83,8 @@ def sensors_reagents(request, id):
         'name': reagent.name,
         'volume': reagent.volume,
         'max_volume': reagent.max_volume,
-        'port': reagent.port
+        'port': reagent.port,
+        'sensor_id': reagent.sensor_id,
     } for reagent in reagents]
 
     reagents_json = json.dumps(reagents_data)
@@ -91,6 +96,28 @@ def sensors_reagents(request, id):
         'access_token': access_token,
         'refresh_token': refresh_token
     })
+
+
+@login_required()
+@csrf_exempt
+def sensors_reagents_valve_update(request, id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+
+            print(data)
+
+            Reagent.objects.filter(sensor_id=id).update(port=None)
+
+            for index, reagent_id in enumerate(data):
+                if reagent_id != 'none':
+                    Reagent.objects.filter(id=int(reagent_id)).update(port=index+1)
+
+            return JsonResponse({'status': 'success', 'message': 'Ports updated successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
 @login_required()

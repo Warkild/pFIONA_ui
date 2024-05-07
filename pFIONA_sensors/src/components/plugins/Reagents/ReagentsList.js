@@ -3,6 +3,8 @@ import Alert from "../Alert";
 
 function ReagentsList({reagents}) {
 
+    const validReagents = reagents.filter(reagent => reagent.max_volume > 0);
+
 
     // Return HTML Code
     return (
@@ -23,7 +25,7 @@ function ReagentsList({reagents}) {
                             </tr>
                         </thead>
                         <tbody>
-                        {reagents.map((reagent) => (
+                        {validReagents.map((reagent) => (
                             <tr key={reagent.id} className={"border border-custom-gray-1"}>
                                 <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reagent.name}</td>
                                 <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reagent.volume}</td>

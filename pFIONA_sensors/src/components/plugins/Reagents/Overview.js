@@ -2,11 +2,10 @@ import React from "react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
-// Enregistrer les composants nécessaires
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Overview({reagents}) {
-    const validReagents = reagents.filter(reagent => reagent.port !== null);
+    const validReagents = reagents.filter(reagent => reagent.port !== null && reagent.max_volume > 0);
 
     return (
         <div className="w-full">
@@ -36,11 +35,11 @@ function DoughnutChart({ reagent }) {
     };
 
     const options = {
-        maintainAspectRatio: false, // Permet au graphique de s'ajuster en hauteur selon le conteneur
-        responsive: true, // Assure que le graphique est réactif
+        maintainAspectRatio: false,
+        responsive: true,
         plugins: {
             legend: {
-                display: false // Masque la légende
+                display: false
             }
         }
     };
