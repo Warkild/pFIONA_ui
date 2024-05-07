@@ -133,7 +133,7 @@ def sensors_reagents_valve_update(request, sensor_id):
 def sensors_reagent_delete(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
     reagent.delete()
-    return redirect('sensors_reagents', id=sensor_id)
+    return redirect('sensors_reagents', sensor_id=sensor_id)
 
 
 @login_required()
@@ -148,7 +148,9 @@ def sensors_reagent_edit(request, sensor_id, reagent_id):
             reagent_form = ReagentEditForm(request.POST, instance=reagent, prefix='reagent')
             if reagent_form.is_valid():
                 reagent_form.save()
-                return redirect('sensors_reagents', id=sensor_id)
+                print("****")
+                print(sensor_id)
+                return redirect('sensors_reagents', sensor_id=sensor_id)
     return render(request, 'pfiONA_sensors/view/sensors_reagent_edit.html', {
         'id': sensor_id,
         'reagent_form': reagent_form,
