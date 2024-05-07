@@ -144,10 +144,10 @@ function Valve({ ip, accessToken, reagents }) {
                         </div>
                     ))}
                 </div>
-                <button onClick={handleSave} className="mt-4 py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-700">Save</button>
+                <button onClick={handleSave} className="bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm">Save</button>
 
             </div>
-            <Alert isOpen={isModalOpen} onRequestClose={closeModal} />
+            <Alert isOpen={isModalOpen} onRequestClose={closeModal} text={"The same reagent is present in two different ports."} />
         </div>
     );
 }
