@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
-from .forms import SensorForm, SensorIPForm, SensorNameAndNotesForm, ReagentEditForm
+from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
@@ -161,20 +161,14 @@ def sensors_reagent_edit(request, id, reagent_id):
 @login_required
 def sensors_settings(request, id):
     sensor = get_object_or_404(Sensor, pk=id)
-    ip_form = SensorIPForm(request.POST or None, instance=sensor, prefix='ip')
     name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')
 
     if request.method == 'POST':
-        if 'submit_ip' in request.POST:
-            ip_form = SensorIPForm(request.POST, instance=sensor, prefix='ip')
-            if ip_form.is_valid():
-                ip_form.save()
-                return redirect('sensors_settings', id=id)
         if 'sumbit_name_notes' in request.POST:
-            ip_form = SensorNameAndNotesForm(request.POST, instance=sensor, prefix='name_notes')
-            if ip_form.is_valid():
-                ip_form.save()
+            name_notes_form = SensorNameAndNotesForm(request.POST, instance=sensor, prefix='name_notes')
+            if name_notes_form.is_valid():
+                name_notes_form.save()
                 return redirect('sensors_settings', id=id)
-    # Ce bloc s'exécute si la requête n'est pas POST ou aucun bouton spécifique n'a été cliqué
+
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
-                  {'id': id, 'ip_form': ip_form, 'name_notes_form': name_notes_form})
+                  {'id': id, 'name_notes_form': name_notes_form, 'sensor': sensor})

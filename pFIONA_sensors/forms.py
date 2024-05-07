@@ -8,12 +8,6 @@ class SensorForm(ModelForm):
         fields = '__all__'
 
 
-class SensorIPForm(ModelForm):
-    class Meta:
-        model = Sensor
-        fields = ['ip_address']
-
-
 class SensorNameAndNotesForm(ModelForm):
     class Meta:
         model = Sensor

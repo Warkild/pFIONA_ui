@@ -14,7 +14,7 @@
 
 {% for field in form.visible_fields %}
   <div class="form-group flex flex-col mb-8">
-    <label for="{{ field.id_for_label }}" class="font-poppins pb-1">{{ field.label }}</label>
+    <label for="{{ field.id_for_label }}" class="font-montserrat text-sm pb-2">{{ field.label }}</label>
     {% if form.is_bound %}
       {% if field.errors %}
         {% render_field field class="form-control is-invalid border-red-700 rounded-lg" %}

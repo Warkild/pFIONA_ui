@@ -12,14 +12,11 @@
         <div class="bg-custom-gray-2 w-5/6 p-12">
             <div>
                 <div class="mb-5">
-                    <h2 class="font-poppins font-bold text-gray-500 text-sm">ADD SENSOR</h2>
+                    <h2 class="font-poppins font-bold text-gray-500 text-sm">IP</h2>
                 </div>
-                <div class="bg-white shadow-lg rounded-2xl py-5 px-8">
-                    <form method="post">
-                        {% csrf_token %}
-                        {% include "pFIONA_sensors/form/sensor_add_form.html" with form=ip_form %}
-                        <button type="submit" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold" name="submit_ip">Change</button>
-                    </form>
+                <div class="bg-white flex flex-col shadow-lg rounded-2xl py-5 px-8">
+                    <label class="font-montserrat text-sm mb-2">IP Address</label>
+                    <input class="remove-arrow rounded-lg bg-gray-200 mb-2" readonly="" value="{{ sensor.ip_address }}"/>
                 </div>
             </div>
             <div class="pt-12">
