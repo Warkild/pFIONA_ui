@@ -37,7 +37,11 @@ function ValvePort() {
         })
         .then(data => {
             console.log('Success:', data);
-            setCurrentVal(data.message)
+            if(data.message === 0) {
+                setCurrentVal('Air')
+            } else {
+                setCurrentVal(data.message)
+            }
         })
         .catch(error => {
             console.error('Error:', error);
