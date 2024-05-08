@@ -28,3 +28,12 @@ class Reagent(models.Model):
 
     class Meta:
         db_table = 'pfiona_reagent'
+
+
+class VolumeToAdd(models.Model):
+    reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE)
+    reagent = models.ForeignKey(Reagent, on_delete=models.CASCADE)
+    volume = models.IntegerField()
+
+    class Meta:
+        db_table = 'pfiona_volumetoadd'
