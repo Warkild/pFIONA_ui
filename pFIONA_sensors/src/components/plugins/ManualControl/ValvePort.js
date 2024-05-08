@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Alert from "../Alert";
 
 function ValvePort() {
     // Get value of current valve in sensor
-    const [currentVal, setCurrentVal] = useState(5);
+    const [currentVal, setCurrentVal] = useState('-');
 
     // Value of selected port
     const [moveToPortValue, setMoveToPortValue] = useState(1);
@@ -21,21 +21,101 @@ function ValvePort() {
         setIsModalOpen(false);
     };
 
-    // Activated when the user click to the button "Move"
-    const handleMoveClick = (e) => {
-        const value = moveToPortValue;
-        if (value <= 0) {
+    const getCurrentPort = () => {
+        fetch(`http://${SENSOR_IP}:5000/valve/get_valve`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            setCurrentVal(data.message)
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+    const handleMoveClick = () => {
+
+        if (moveToPortValue <= 0) {
             setIsModalOpen(true);
         } else {
-            setMoveToPortValue(value);
-            setIsModalOpen(false);
+            // Define the URL for the POST request
+            const url = `http://${SENSOR_IP}:5000/valve/change_valve`;
+
+            // Make a POST request to the specified URL
+            fetch(url, {
+                method: 'POST', // Specify the request method as POST
+                headers: {
+                    'Content-Type': 'application/json', // Set the content type header
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                },
+                body: JSON.stringify({
+                    "valve_number": parseInt(moveToPortValue)
+                }) // Convert the object to a JSON string
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json(); // Parse the response as JSON
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setCurrentVal(moveToPortValue.toString())
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
     };
 
-    // Activated when the user click to the button "Move to air port"
     const handleMoveAirPortClick = () => {
-        console.log("Bouton move air port")
-    }
+        // Define the URL for the POST request
+        const url = `http://${SENSOR_IP}:5000/valve/go_air_port`;
+
+        // Make a POST request to the specified URL
+        fetch(url, {
+            method: 'POST', // Specify the request method as POST
+            headers: {
+                'Content-Type': 'application/json', // Set the content type header
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json(); // Parse the response as JSON
+        })
+        .then(data => {
+            console.log('Success:', data);
+            setCurrentVal('Air')
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+    useEffect(() => {
+        getCurrentPort();
+
+        const intervalId = setInterval(() => {
+
+            getCurrentPort();
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, []);
 
     // Return HTML Code
     return (
@@ -46,7 +126,7 @@ function ValvePort() {
             <div className={"bg-white shadow-lg rounded-2xl py-5 px-8 h-full"}>
                 <div className={"flex flex-col pb-5"}>
                     <p className={"font-montserrat text-sm pb-2"}>Current Port</p>
-                    <input type="number" className={"text-center remove-arrow rounded-lg bg-gray-200"} value={currentVal} readOnly={true}></input>
+                    <input className={"text-center remove-arrow rounded-lg bg-gray-200"} value={currentVal} readOnly={true}></input>
                 </div>
                 <div className={"flex flex-col pb-5"}>
                     <p className={"font-montserrat text-sm pb-2"}>Move to port</p>
