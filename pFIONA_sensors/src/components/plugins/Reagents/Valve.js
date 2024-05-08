@@ -122,6 +122,19 @@ function Valve({ ip, reagents }) {
         setIsModalOpen(false);
     };
 
+    /** AUTOMATION **/
+
+    useEffect(() => {
+        getNbPorts();
+
+        const intervalId = setInterval(() => {
+
+            getNbPorts();
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
     return (
     <div className="w-full">
         <div className="mb-5">
