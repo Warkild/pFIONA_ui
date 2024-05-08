@@ -11,5 +11,6 @@ urlpatterns = [
     path('<int:sensor_id>/reagents/', views.sensors_reagents, name='sensors_reagents'),
     path('<int:sensor_id>/reagents/<int:reagent_id>/delete', views.sensors_reagent_delete, name='sensors_reagent_delete'),
     path('<int:sensor_id>/reagents/<int:reagent_id>/edit', views.sensors_reagent_edit, name='sensors_reagent_edit'),
+    path('<int:sensor_id>/reagents/add', views.sensors_reagent_add, name='sensors_reagent_add'),
     path('<int:sensor_id>/reagents/update_valve', views.sensors_reagents_valve_update, name='update_valve'),
 ]

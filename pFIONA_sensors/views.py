@@ -128,6 +128,25 @@ def sensors_reagent_edit(request, sensor_id, reagent_id):
     })
 
 
+@login_required()
+def sensors_reagent_add(request, sensor_id):
+    if request.method == 'POST':
+        reagent_form = ReagentEditForm(request.POST, prefix='reagent')
+        if reagent_form.is_valid():
+            new_reagent = reagent_form.save(commit=False)
+            new_reagent.sensor_id = sensor_id
+            new_reagent.volume = 0
+            new_reagent.save()
+            return redirect('sensors_reagents', sensor_id=sensor_id)
+    else:
+        reagent_form = ReagentEditForm(prefix='reagent')
+
+    return render(request, 'pfiONA_sensors/view/sensors_reagent_add.html', {
+        'id': sensor_id,
+        'reagent_form': reagent_form,
+    })
+
+
 @login_required
 def sensors_settings(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)

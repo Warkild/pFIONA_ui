@@ -12,11 +12,15 @@ function ReagentsList({reagents}) {
             <div className={"mb-5"}>
                 <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>REAGENTS LIST</h2>
             </div>
-            <div className={"flex flex-row font-montserrat bg-white shadow-lg rounded-2xl py-7 space-x-8 px-8 justify-between"}>
+            <div className={"flex flex-col font-montserrat bg-white shadow-lg rounded-2xl py-7 px-8"}>
+                <div className={"h-10"}>
+                    <a href={`/sensors/${validReagents[0].sensor_id}/reagents/add`}
+                       className={"bg-lime-500 text-white font-poppins px-8 py-1 mb-2 rounded-md hover:bg-lime-300"}>Add reagent</a>
+                </div>
                 <div className={"w-full"}>
                     <table className={"w-full"}>
                         <thead>
-                            <tr className={"border border-custom-gray-1 bg-custom-gray-2"}>
+                        <tr className={"border border-custom-gray-1 bg-custom-gray-2"}>
                                 <th className={"font-montserrat font-medium pt-8 pb-2 pl-5 text-left"}>Name</th>
                                 <th className={"font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left"}>Volume</th>
                                 <th className={"font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left"}>Max Volume</th>
