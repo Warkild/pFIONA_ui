@@ -23,6 +23,7 @@ function Spectrophotometer({ addLogMessage }) {
             method: 'POST', // Specify the request method as POST
             headers: {
                 'Content-Type': 'application/json', // Set the content type header
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
         })
         .then(response => {
@@ -51,6 +52,7 @@ function Spectrophotometer({ addLogMessage }) {
             method: 'POST', // Specify the request method as POST
             headers: {
                 'Content-Type': 'application/json', // Set the content type header
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
         })
         .then(response => {
@@ -68,10 +70,12 @@ function Spectrophotometer({ addLogMessage }) {
         });
     };
     const checkLightStatus = () => {
+        console.log(sessionStorage.getItem('accessToken'))
         fetch(`http://${SENSOR_IP}:5000/lamp/is_active`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
         })
         .then(response => {
