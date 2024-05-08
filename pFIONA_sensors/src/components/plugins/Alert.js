@@ -3,7 +3,7 @@ import Modal from 'react-modal';
 
 Modal.setAppElement('body');  // Assure une meilleure accessibilité
 
-const Alert = ({ isOpen, onRequestClose }) => {
+const Alert = ({ isOpen, onRequestClose, text="" }) => {
     return (
         <Modal
             isOpen={isOpen}
@@ -30,8 +30,11 @@ const Alert = ({ isOpen, onRequestClose }) => {
                 }
             }}
         >
-            <h2>Error</h2>
-            <button onClick={onRequestClose}>Close</button>
+            <div>
+                <h2 className={"text-2xl pb-5"}>Error</h2>
+                <p className={"pb-5"}>{text}</p>
+                <button onClick={onRequestClose} className={"bg-red-600 hover:bg-red-400 rounded-lg text-white font-poppins py-1 px-7 text-sm"}>Close</button>
+            </div>
         </Modal>
     );
 };

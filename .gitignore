@@ -1,5 +1,6 @@
 
 /.idea
+.env
 /auth/__pycache__
 /pFIONA_ui/__pycache__
 pFIONA_ui/__pycache__/settings.cpython-311.pyc

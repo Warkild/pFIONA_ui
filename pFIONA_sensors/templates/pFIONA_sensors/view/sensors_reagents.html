@@ -1,0 +1,27 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reagents - pFIONA</title>
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'css/dist/custom.css' %}">
+</head>
+<body>
+    <div class="flex min-h-screen">
+        {% include "../components/sensors_menu_bar.html" %}
+        <div class="bg-custom-gray-2 w-5/6 p-12">
+            <div id="reagents_app" data-ip='{{ ip_address }}'></div>
+        </div>
+    </div>
+    <script>
+        let reagents_json = {{ reagents_json|safe }}
+    </script>
+    <script>
+        console.log('sensors_reagents.html')
+        console.log('{{ ip_address }}')
+        console.log('{{ access_token }}')
+    </script>
+    <script src="{% static "pFIONA_sensors/main.js" %}"></script>
+</body>
+</html>

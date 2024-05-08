@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import Alert from "./Alert";
+import Alert from "../Alert";
 
 function Spectrophotometer({ addLogMessage }) {
 
@@ -23,6 +23,7 @@ function Spectrophotometer({ addLogMessage }) {
             method: 'POST', // Specify the request method as POST
             headers: {
                 'Content-Type': 'application/json', // Set the content type header
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
         })
         .then(response => {
@@ -51,6 +52,7 @@ function Spectrophotometer({ addLogMessage }) {
             method: 'POST', // Specify the request method as POST
             headers: {
                 'Content-Type': 'application/json', // Set the content type header
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
         })
         .then(response => {
@@ -68,10 +70,12 @@ function Spectrophotometer({ addLogMessage }) {
         });
     };
     const checkLightStatus = () => {
+        console.log(sessionStorage.getItem('accessToken'))
         fetch(`http://${SENSOR_IP}:5000/lamp/is_active`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
         })
         .then(response => {
@@ -111,7 +115,7 @@ function Spectrophotometer({ addLogMessage }) {
                 <div className={"flex flex-col"}>
                     <p className={"text-sm mb-2"}>Current status :</p>
                     <div className={"flex flex-row items-center mb-5"}>
-                        <div className={`bg-red-600 w-5 h-5 rounded-full ${lightStatus ? 'bg-green-600' : ''}`}></div>
+                        <div className={` w-5 h-5 rounded-full ${lightStatus ? 'bg-green-600' : 'bg-red-600'}`}></div>
                         <p className={"ml-3"}>{lightStatus ? 'ON' : 'OFF'}</p>
                     </div>
                     <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"}
