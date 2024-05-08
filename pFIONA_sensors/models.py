@@ -6,7 +6,7 @@ class Reaction(models.Model):
     wait = models.IntegerField()
 
     class Meta:
-        db_table = 'pfiona_reactions'
+        db_table = 'pfiona_reaction'
 
 
 class Sensor(models.Model):
