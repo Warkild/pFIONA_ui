@@ -15,20 +15,9 @@ from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm
 def sensors_list(request):
     sensors_list = Sensor.objects.all()
 
-    # JWT Token Loading
-
-    refresh = RefreshToken.for_user(request.user)
-    serializer = CustomTokenObtainPairSerializer()
-    token = serializer.get_token(request.user)
-
-    access_token = str(token)
-    refresh_token = str(refresh)
-
     context = {
         'sensors_list': sensors_list,
         'current_path': request.path,
-        'access_token': access_token,
-        'refresh_token': refresh_token,
     }
     return render(request, 'pFIONA_sensors/sensors_list.html', context=context)
 
@@ -49,18 +38,11 @@ def sensors_add(request):
 def sensors_manual(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
 
-    # JWT Token Loading
-
-    refresh = RefreshToken.for_user(request.user)
-    serializer = CustomTokenObtainPairSerializer()
-    token = serializer.get_token(request.user)
-
-    access_token = str(token)
-    refresh_token = str(refresh)
-
     return render(request, 'pFIONA_sensors/view/sensors_manual.html',
-                  {'id': sensor_id, 'ip_address': sensor.ip_address, 'access_token': access_token,
-                   'refresh_token': refresh_token})
+                  {
+                    'id': sensor_id,
+                    'ip_address': sensor.ip_address,
+                  })
 
 
 @login_required()
@@ -78,15 +60,6 @@ def sensors_reagents(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     reagents = Reagent.objects.filter(sensor_id=sensor_id)
 
-    # JWT Token Loading
-
-    refresh = RefreshToken.for_user(request.user)
-    serializer = CustomTokenObtainPairSerializer()
-    token = serializer.get_token(request.user)
-
-    access_token = str(token)
-    refresh_token = str(refresh)
-
     reagents_data = [{
         'id': reagent.id,
         'name': reagent.name,
@@ -102,8 +75,6 @@ def sensors_reagents(request, sensor_id):
         'id': sensor_id,
         'ip_address': sensor.ip_address,
         'reagents_json': reagents_json,
-        'access_token': access_token,
-        'refresh_token': refresh_token
     })
 
 

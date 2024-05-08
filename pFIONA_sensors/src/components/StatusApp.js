@@ -1,8 +1,6 @@
-import React, {Component, useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import { createRoot } from "react-dom/client";
-import {waitFor} from "@babel/core/lib/gensync-utils/async";
-
-function StatusApp({ ip, accessToken   }) {
+function StatusApp({ ip }) {
 
     const [connected, setConnected] = useState(false);
 
@@ -10,7 +8,7 @@ function StatusApp({ ip, accessToken   }) {
         fetch(`http://${ip}:5000/sensor/get_state`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 'Content-Type': 'application/json',
             },
         })
@@ -51,7 +49,6 @@ function StatusApp({ ip, accessToken   }) {
 
 document.querySelectorAll("#status_app").forEach(div => {
     const ip = div.getAttribute('data-ip');
-    const accessToken = div.getAttribute('data-access-token');
     const root = createRoot(div);
-    root.render(<StatusApp ip={ip} accessToken={accessToken}/>);
+    root.render(<StatusApp ip={ip}/>);
 });

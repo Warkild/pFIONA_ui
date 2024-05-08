@@ -4,13 +4,13 @@ import Overview from "./plugins/Reagents/Overview";
 import ReagentsList from "./plugins/Reagents/ReagentsList";
 import Valve from "./plugins/Reagents/Valve";
 
-function ReagentsApp({ip, accessToken}) {
+function ReagentsApp({ip}) {
 
   return (
       <div className={"flex flex-col space-y-10"}>
           <Overview reagents={reagents_json}/>
           <ReagentsList reagents={reagents_json}/>
-          <Valve ip={ip} accessToken={accessToken} reagents={reagents_json}/>
+          <Valve ip={ip} reagents={reagents_json}/>
       </div>
   );
 }
@@ -18,7 +18,6 @@ function ReagentsApp({ip, accessToken}) {
 const reagentsDiv = document.getElementById("reagents_app");
 if (reagentsDiv) {
     const ip = reagentsDiv.getAttribute('data-ip');
-    const accessToken = reagentsDiv.getAttribute('data-access-token');
     const root = createRoot(reagentsDiv);
-    root.render(<ReagentsApp ip={ip} accessToken={accessToken}/>);
+    root.render(<ReagentsApp ip={ip}/>);
 }

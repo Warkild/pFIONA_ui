@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Alert from "../Alert";
 
-function Valve({ ip, accessToken, reagents }) {
+function Valve({ ip, reagents }) {
     const [nbPort, setNbPort] = useState(8);
     // Initialise les ports sélectionnés basés sur les réactifs reçus
     const [selectedPorts, setSelectedPorts] = useState(() =>
@@ -16,7 +16,7 @@ function Valve({ ip, accessToken, reagents }) {
         fetch(`http://${ip}:5000/valve/get_numbers_valves`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${accessToken}`,
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 'Content-Type': 'application/json',
             },
         })
@@ -57,7 +57,7 @@ function Valve({ ip, accessToken, reagents }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 },
                 body: JSON.stringify(selectedPorts)
             })
@@ -96,7 +96,7 @@ function Valve({ ip, accessToken, reagents }) {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 },
             })
             .then(response => response.json())
