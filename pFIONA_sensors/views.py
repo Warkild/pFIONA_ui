@@ -7,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
-from pFIONA_sensors.models import Sensor, Reagent
+from pFIONA_sensors.models import Sensor, Reagent, VolumeToAdd, Reaction
 from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm
 
 
@@ -58,6 +58,9 @@ def sensors_data(request, sensor_id):
 @login_required()
 def sensors_reagents(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
+
+    # REAGENTS
+
     reagents = Reagent.objects.filter(sensor_id=sensor_id)
 
     reagents_data = [{
@@ -71,10 +74,26 @@ def sensors_reagents(request, sensor_id):
 
     reagents_json = json.dumps(reagents_data)
 
+    # REACTIONS
+
+    volume_to_adds = VolumeToAdd.objects.filter(reagent__in=reagents)
+    reactions = Reaction.objects.filter(volumetoadd__in=volume_to_adds).distinct()
+
+    reactions_data = [{
+        'id': reaction.id,
+        'name': reaction.name,
+        'wait': reaction.wait,
+    } for reaction in reactions]
+
+    reactions_json = json.dumps(reactions_data)
+
+    # RENDER
+
     return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {
         'id': sensor_id,
         'ip_address': sensor.ip_address,
         'reagents_json': reagents_json,
+        'reactions_json': reactions_json,
     })
 
 
@@ -161,3 +180,9 @@ def sensors_settings(request, sensor_id):
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor})
+
+
+def sensors_reaction_add(request, sensor_id):
+    return render(request, 'pFIONA_sensors/view/sensors_reaction_add.html', {
+        'id' : sensor_id,
+    })

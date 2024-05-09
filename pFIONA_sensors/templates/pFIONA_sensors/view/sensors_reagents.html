@@ -16,11 +16,7 @@
     </div>
     <script>
         let reagents_json = {{ reagents_json|safe }}
-    </script>
-    <script>
-        console.log('sensors_reagents.html')
-        console.log('{{ ip_address }}')
-        console.log('{{ access_token }}')
+        let reactions_json = {{ reactions_json|safe }}
     </script>
     <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>

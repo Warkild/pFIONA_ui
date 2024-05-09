@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import Overview from "./plugins/Reagents/Overview";
 import ReagentsList from "./plugins/Reagents/ReagentsList";
 import Valve from "./plugins/Reagents/Valve";
+import ReactionsList from "./plugins/Reagents/ReactionsList";
 
 function ReagentsApp({ip}) {
 
@@ -11,6 +12,7 @@ function ReagentsApp({ip}) {
           <Overview reagents={reagents_json}/>
           <ReagentsList reagents={reagents_json}/>
           <Valve ip={ip} reagents={reagents_json}/>
+          <ReactionsList ip={ip} reactions={reactions_json}/>
       </div>
   );
 }
