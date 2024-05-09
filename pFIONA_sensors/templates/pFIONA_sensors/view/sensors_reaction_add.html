@@ -16,8 +16,14 @@
         </div>
         </div>
         <div class="bg-custom-gray-2 w-5/6 p-12">
-
+            <div id="main">
+                <div id="reaction_add_app"></div>
+            </div>
         </div>
     </div>
+    <script>
+        let reagents_json = {{ reagents_json|safe }}
+    </script>
+    <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>
 </html>

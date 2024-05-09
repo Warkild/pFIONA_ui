@@ -1,5 +1,7 @@
 import json
 
+from pFIONA_sensors import queries as q
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -40,8 +42,8 @@ def sensors_manual(request, sensor_id):
 
     return render(request, 'pFIONA_sensors/view/sensors_manual.html',
                   {
-                    'id': sensor_id,
-                    'ip_address': sensor.ip_address,
+                      'id': sensor_id,
+                      'ip_address': sensor.ip_address,
                   })
 
 
@@ -182,7 +184,11 @@ def sensors_settings(request, sensor_id):
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor})
 
 
+@login_required()
 def sensors_reaction_add(request, sensor_id):
+    reagents_json = q.get_utils_reagents(sensor_id, return_json=True)
+
     return render(request, 'pFIONA_sensors/view/sensors_reaction_add.html', {
-        'id' : sensor_id,
+        'id': sensor_id,
+        'reagents_json': reagents_json,
     })
