@@ -152,3 +152,38 @@ def update_reaction(reaction_id, name, wait_time, standard_id, standard_concentr
     reaction.save()
 
     return reaction
+
+
+def get_current_reaction_id(sensor_id):
+    """
+    Get current reaction ID
+
+    :param sensor_id: Sensor ID
+
+    :return: Current reaction ID
+    """
+    sensor = models.Sensor.objects.get(id=sensor_id)
+
+    if sensor.actual_reaction is not None:
+        return sensor.actual_reaction.id
+    else:
+        return None
+
+
+def set_current_reaction(sensor_id, reaction_id):
+    """
+    Set current reaction for a sensor in database
+
+    :param sensor_id: Sensor ID
+    :param reaction_id: Reaction ID (or None)
+    """
+
+    sensor = models.Sensor.objects.get(id=sensor_id)
+
+    if reaction_id is not None:
+        reaction = models.Reaction.objects.get(id=reaction_id)
+        sensor.actual_reaction = reaction
+        sensor.save()
+    else:
+        sensor.actual_reaction = None
+        sensor.save()
