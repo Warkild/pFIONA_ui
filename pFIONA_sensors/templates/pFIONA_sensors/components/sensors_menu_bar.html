@@ -56,22 +56,6 @@
                             </a>
                         </li>
                     {% endif %}
-                    <!-- SETTINGS MODE -->
-                    {% if request|is_sensor_settings_path %}
-                        <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
-                            <a class="flex" href="{% url 'sensors_settings' sensor_id=id %}">
-                                <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
-                                <p class="font-poppins content-around pl-4 font-medium">Settings</p>
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="pl-10 py-5">
-                            <a class="flex" href="{% url 'sensors_settings' sensor_id=id %}">
-                                <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
-                                <p class="font-poppins content-around pl-4 font-medium text-gray-700">Settings</p>
-                            </a>
-                        </li>
-                    {% endif %}
                     <!-- REAGENTS -->
                     {% if request|is_sensor_reagents_path %}
                         <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
@@ -85,6 +69,22 @@
                             <a class="flex" href="{% url 'sensors_reagents' sensor_id=id %}">
                                 <img src="{% static 'img/ico/icons8-experiment-100.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
                                 <p class="font-poppins content-around pl-4 font-medium text-gray-700">Reagents & Valve</p>
+                            </a>
+                        </li>
+                    {% endif %}
+                    <!-- SETTINGS MODE -->
+                    {% if request|is_sensor_settings_path %}
+                        <li class="bg-custom-gray-2 border-l-8 border-blue-600 pl-8 py-5">
+                            <a class="flex" href="{% url 'sensors_settings' sensor_id=id %}">
+                                <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(27%) sepia(99%) saturate(1791%) hue-rotate(214deg) brightness(94%) contrast(96%);" class="w-6"/>
+                                <p class="font-poppins content-around pl-4 font-medium">Settings</p>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="pl-10 py-5">
+                            <a class="flex" href="{% url 'sensors_settings' sensor_id=id %}">
+                                <img src="{% static 'img/ico/icons8-settings-512.svg'%}" alt="icons-list" style="filter: invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%);" class="w-6"/>
+                                <p class="font-poppins content-around pl-4 font-medium text-gray-700">Settings</p>
                             </a>
                         </li>
                     {% endif %}
