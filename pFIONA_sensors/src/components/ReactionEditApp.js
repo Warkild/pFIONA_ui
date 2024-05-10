@@ -8,14 +8,14 @@ import Alert from "./plugins/Alert";
  * @returns {JSX.Element}
  * @constructor
  */
-function ReactionAddApp() {
+function ReactionEditApp() {
 
     /**
      * VARIABLES
      */
 
     // List of reagents selected in the UI
-    const [reactionReagents, setReactionReagents] = useState([{ reagentId: "", volume: "" }]);
+    const [reactionReagents, setReactionReagents] = useState([{ reagent_id: "", volume: "" }]);
 
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
@@ -53,7 +53,7 @@ function ReactionAddApp() {
 
     useEffect(() => {
         const lastReagent = reactionReagents[reactionReagents.length - 1];
-        if (lastReagent.reagentId && lastReagent.volume) {
+        if (lastReagent.reagent_id && lastReagent.volume) {
             setReactionReagents([...reactionReagents, { reagent_id: "", volume: "" }]);
         }
     }, [reactionReagents]);
@@ -71,9 +71,10 @@ function ReactionAddApp() {
      * Save the data in the database with Django API
      */
     const handleSave = () => {
-        const reagentData = reactionReagents.map(reagent => [reagent.reagentId, reagent.volume]);
+        const reagentData = reactionReagents.map(reagent => [reagent.reagent_id, reagent.volume]);
         reagentData.pop(); // Remove the last placeholder entry
         const reactionData = {
+            id: reaction_json['id'],
             name: reactionName,
             reagents: reagentData,
             wait_time: reactionWaitTime,
@@ -84,14 +85,14 @@ function ReactionAddApp() {
         if (reactionName === "") {
             setAlertModalText("The reaction must have a name");
             setIsModalOpen(true);
-        } else if (reagentData.length === 0 || reagentData[0].volume === "" || reagentData[0].reagentId === "") {
+        } else if (reagentData.length === 0 || reagentData[0].volume === "" || reagentData[0].reagent_id === "") {
             setAlertModalText("At least one reagent must be correctly entered.");
             setIsModalOpen(true);
         } else if (reactionData.standard_reagent_id === "")  {
             setAlertModalText("Standard Reagent must be selected")
             setIsModalOpen(true)
         } else {
-            const apiUrl = "/sensors/api/add_reaction"; // Your Django API URL
+            const apiUrl = `/sensors/api/edit_reaction`; // Your Django API URL
 
             fetch(apiUrl, {
                 method: 'POST',
@@ -118,10 +119,23 @@ function ReactionAddApp() {
         setIsModalOpen(false);
     };
 
+    useEffect(() => {
+        console.log(reaction_json)
+        setReactionName(reaction_json['name'])
+        setReactionWaitTime(reaction_json['wait'])
+        setStandardConcentration(reaction_json['standard_concentration'])
+        setStandardReagentId(reaction_json['standard_id'])
+        setReactionReagents(reaction_json['actions'].map(action => ({
+            reagent_id: action.reagent_id,
+                volume: action.volume
+        })));
+    }, []);
+
+
     return (
         <div className="w-full">
             <div className="mb-5">
-                <h2 className="font-poppins font-bold text-gray-500 text-sm">ADD REACTION</h2>
+                <h2 className="font-poppins font-bold text-gray-500 text-sm">EDIT REACTION</h2>
             </div>
             <div className="flex flex-row flex-wrap font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
                 <div className={"pb-8 w-full"}>
@@ -139,8 +153,8 @@ function ReactionAddApp() {
                     {reactionReagents.map((item, index) => (
                         <div key={index} className="flex items-center space-x-4">
                             <select
-                                value={item.reagentId}
-                                onChange={(e) => handleChange(index, "reagentId", e.target.value)}
+                                value={item.reagent_id}
+                                onChange={(e) => handleChange(index, "reagent_id", e.target.value)}
                                 className="mt-1 block w-8/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             >
                                 <option value="">Select a Reagent</option>
@@ -216,8 +230,8 @@ function ReactionAddApp() {
     );
 }
 
-const reagentsDiv = document.getElementById("reaction_add_app");
+const reagentsDiv = document.getElementById("reaction_edit_app");
 if (reagentsDiv) {
     const root = createRoot(reagentsDiv);
-    root.render(<ReactionAddApp/>);
+    root.render(<ReactionEditApp/>);
 }

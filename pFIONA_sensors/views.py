@@ -134,6 +134,7 @@ def sensors_reaction_delete(request, sensor_id, reaction_id):
     reaction.delete()
     return redirect('sensors_reagents', sensor_id=sensor_id)
 
+
 @login_required()
 def sensors_reagent_edit(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
@@ -201,6 +202,19 @@ def sensors_reaction_add(request, sensor_id):
 
 
 @login_required()
+def sensors_reaction_edit(request, sensor_id, reaction_id):
+    reagents_json = q.get_utils_reagents(sensor_id, return_json=True)
+
+    reaction_json = q.get_reaction_details(reaction_id)
+
+    return render(request, 'pFIONA_sensors/view/sensors_reaction_edit.html', {
+        'id': sensor_id,
+        'reagents_json': reagents_json,
+        'reaction_json': reaction_json
+    })
+
+
+@login_required()
 @csrf_exempt
 def api_add_reaction(request):
     print(request.body)
@@ -231,6 +245,47 @@ def api_add_reaction(request):
             q.create_volumetoadd(reagent[0], reaction.id, reagent[1], key)
 
         return JsonResponse({'status': 'success', 'message': f'Reaction added successfully!'})
+
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
+@login_required()
+@csrf_exempt
+def api_edit_reaction(request):
+
+    data = json.loads(request.body)
+
+    respect_constraint = True
+
+    # Verifying if data are correct
+
+    if data['name'] == "":
+        respect_constraint = False
+
+    if int(data['wait_time']) <= -1:
+        respect_constraint = False
+
+    if data['id'] == "" :
+        respect_constraint = False
+
+    for reagent in data['reagents']:
+        if reagent[0] == "" or reagent[1] == "":
+            respect_constraint = False
+
+    if data['standard_reagent_id'] == "":
+        respect_constraint = False
+
+    if respect_constraint:
+        reaction = q.update_reaction(data['id'],data['name'], int(data['wait_time']), int(data['standard_reagent_id']),
+                                     float(data['standard_concentration']))
+
+        q.delete_all_volumetoadd(data['id'])
+
+        for key, reagent in enumerate(data['reagents']):
+            q.create_volumetoadd(reagent[0], reaction.id, reagent[1], key)
+
+        return JsonResponse({'status': 'success', 'message': f'Reaction edit successfully!'})
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
