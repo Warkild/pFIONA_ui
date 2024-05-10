@@ -1470,8 +1470,16 @@ select {
   padding-bottom: 0.25rem;
 }
 
+.pb-10 {
+  padding-bottom: 2.5rem;
+}
+
 .pb-12 {
   padding-bottom: 3rem;
+}
+
+.pb-16 {
+  padding-bottom: 4rem;
 }
 
 .pb-2 {
@@ -1548,14 +1556,6 @@ select {
 
 .pt-8 {
   padding-top: 2rem;
-}
-
-.pb-16 {
-  padding-bottom: 4rem;
-}
-
-.pb-10 {
-  padding-bottom: 2.5rem;
 }
 
 .text-left {

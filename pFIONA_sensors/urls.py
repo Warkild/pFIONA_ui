@@ -14,4 +14,5 @@ urlpatterns = [
     path('<int:sensor_id>/reagents/add', views.sensors_reagent_add, name='sensors_reagent_add'),
     path('<int:sensor_id>/reagents/update_valve', views.sensors_reagents_valve_update, name='update_valve'),
     path('<int:sensor_id>/reagents/reaction/add', views.sensors_reaction_add, name='reagent_reaction_add'),
+    path('api/add_reaction', views.api_add_reaction, name='api_add_reaction'),
 ]

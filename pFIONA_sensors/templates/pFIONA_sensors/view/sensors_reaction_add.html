@@ -6,6 +6,17 @@
     <title>Add Reaction - pFIONA</title>
     {% tailwind_css %}
     <link rel="stylesheet" href="{% static 'css/dist/custom.css' %}">
+        <style>
+        .remove-arrow::-webkit-inner-spin-button,
+        .remove-arrow::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .remove-arrow {
+            -moz-appearance: textfield;
+        }
+    </style>
 </head>
 <body>
     <div class="flex min-h-screen">
@@ -22,7 +33,7 @@
         </div>
     </div>
     <script>
-        let reagents_json = {{ reagents_json|safe }}
+        let reagents_json = JSON.parse('{{ reagents_json|safe }}');
     </script>
     <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>
