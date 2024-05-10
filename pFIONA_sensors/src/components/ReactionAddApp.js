@@ -1,43 +1,77 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Alert from "./plugins/Alert";
-import { useNavigate } from 'react-router-dom';
 
+/**
+ * Reaction add application
+ *
+ * @returns {JSX.Element}
+ * @constructor
+ */
 function ReactionAddApp() {
-    const [reagents, setReagents] = useState([{ reagentId: "", volume: "" }]);
+
+    /**
+     * VARIABLES
+     */
+
+    // List of reagents selected in the UI
+    const [reactionReagents, setReactionReagents] = useState([{ reagentId: "", volume: "" }]);
+
+    // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
+
+    // Reaction wait time in the UI
     const [reactionWaitTime, setReactionWaitTime] = useState(0);
+
+    // Reaction standard reagent ID in the UI
     const [standardReagentId, setStandardReagentId] = useState("");
+
+    // Reaction standard concentration in the UI
     const [standardConcentration, setStandardConcentration] = useState(0);
 
+    // Split the list of reagents passed by Django in two lists
     const true_reagents = reagents_json.filter(reagent => reagent.is_standard === false);
     const standard_reagents = reagents_json.filter(reagent => reagent.is_standard === true);
 
 
-
+    /**
+     * Change the list of reagents for the reaction when user interact with the UI
+     *
+     * @param index
+     * @param field
+     * @param value
+     */
     const handleChange = (index, field, value) => {
-        const newReagents = reagents.map((item, i) => {
+        const newReagents = reactionReagents.map((item, i) => {
             if (i === index) {
                 return { ...item, [field]: value };
             }
             return item;
         });
-        setReagents(newReagents);
+        setReactionReagents(newReagents);
     };
 
     useEffect(() => {
-        const lastReagent = reagents[reagents.length - 1];
+        const lastReagent = reactionReagents[reactionReagents.length - 1];
         if (lastReagent.reagentId && lastReagent.volume) {
-            setReagents([...reagents, { reagentId: "", volume: "" }]);
+            setReactionReagents([...reactionReagents, { reagentId: "", volume: "" }]);
         }
-    }, [reagents]);
+    }, [reactionReagents]);
 
+    /**
+     * Remove the reagent when user click on 'remove' button
+     * @param index
+     */
     const handleRemoveReagent = (index) => {
-        setReagents(reagents.filter((_, i) => i !== index));
+        setReactionReagents(reactionReagents.filter((_, i) => i !== index));
     };
 
+
+    /**
+     * Save the data in the database with Django API
+     */
     const handleSave = () => {
-        const reagentData = reagents.map(reagent => [reagent.reagentId, reagent.volume]);
+        const reagentData = reactionReagents.map(reagent => [reagent.reagentId, reagent.volume]);
         reagentData.pop(); // Remove the last placeholder entry
         const reactionData = {
             name: reactionName,
@@ -102,7 +136,7 @@ function ReactionAddApp() {
                 </div>
                 <div className="flex flex-col space-y-4 w-full pb-10">
                     <label>Actions</label>
-                    {reagents.map((item, index) => (
+                    {reactionReagents.map((item, index) => (
                         <div key={index} className="flex items-center space-x-4">
                             <select
                                 value={item.reagentId}
@@ -124,7 +158,7 @@ function ReactionAddApp() {
                                 placeholder="Volume (μL)"
                                 className="mt-1 remove-arrow block w-2/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
-                            {index !== reagents.length - 1 && (
+                            {index !== reactionReagents.length - 1 && (
                                 <button
                                     onClick={() => handleRemoveReagent(index)}
                                     className="text-red-700 px-4 py-2 w-1/12"
