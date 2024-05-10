@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import Alert from "./plugins/Alert";
+import { useNavigate } from 'react-router-dom';
 
 function ReactionAddApp() {
     const [reagents, setReagents] = useState([{ reagentId: "", volume: "" }]);
@@ -11,6 +12,8 @@ function ReactionAddApp() {
 
     const true_reagents = reagents_json.filter(reagent => reagent.is_standard === false);
     const standard_reagents = reagents_json.filter(reagent => reagent.is_standard === true);
+
+
 
     const handleChange = (index, field, value) => {
         const newReagents = reagents.map((item, i) => {
@@ -65,7 +68,10 @@ function ReactionAddApp() {
                 body: JSON.stringify(reactionData)
             })
                 .then(response => response.json())
-                .then(data => console.log("Success:", data))
+                .then(data => {
+                    console.log("Success:", data)
+                    window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
+                })
                 .catch(error => console.error("Error:", error));
         }
     };
