@@ -129,6 +129,12 @@ def sensors_reagent_delete(request, sensor_id, reagent_id):
 
 
 @login_required()
+def sensors_reaction_delete(request, sensor_id, reaction_id):
+    reaction = get_object_or_404(Reaction, pk=reaction_id)
+    reaction.delete()
+    return redirect('sensors_reagents', sensor_id=sensor_id)
+
+@login_required()
 def sensors_reagent_edit(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
     reagent_form = ReagentEditForm(request.POST or None, instance=reagent, prefix='reagent')
