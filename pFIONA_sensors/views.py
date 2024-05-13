@@ -44,17 +44,20 @@ def sensors_manual(request, sensor_id):
                   {
                       'id': sensor_id,
                       'ip_address': sensor.ip_address,
+                      'sensor': sensor,
                   })
 
 
 @login_required()
 def sensors_deploy(request, sensor_id):
-    return render(request, 'pFIONA_sensors/view/sensors_deploy.html', {'id': sensor_id})
+    sensor = get_object_or_404(Sensor, pk=sensor_id)
+    return render(request, 'pFIONA_sensors/view/sensors_deploy.html', {'id': sensor_id, 'sensor': sensor})
 
 
 @login_required()
 def sensors_data(request, sensor_id):
-    return render(request, 'pFIONA_sensors/view/sensors_data.html', {'id': sensor_id})
+    sensor = get_object_or_404(Sensor, pk=sensor_id)
+    return render(request, 'pFIONA_sensors/view/sensors_data.html', {'id': sensor_id, 'sensor': sensor})
 
 
 @login_required()
@@ -96,6 +99,7 @@ def sensors_reagents(request, sensor_id):
         'ip_address': sensor.ip_address,
         'reagents_json': reagents_json,
         'reactions_json': reactions_json,
+        'sensor': sensor,
     })
 
 
