@@ -138,8 +138,8 @@ function ReactionEditApp() {
                 <h2 className="font-poppins font-bold text-gray-500 text-sm">EDIT REACTION</h2>
             </div>
             <div className="flex flex-row flex-wrap font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
-                <div className={"pb-8 w-full"}>
-                    <label>Name</label>
+                <div className={"pb-8 w-full flex flex-col"}>
+                    <label className={"font-montserrat text-sm pb-2"}>Name</label>
                     <input
                         type="text"
                         value={reactionName}
@@ -149,7 +149,7 @@ function ReactionEditApp() {
                     />
                 </div>
                 <div className="flex flex-col space-y-4 w-full pb-10">
-                    <label>Actions</label>
+                    <label className={"font-montserrat text-sm pb-2"}>Actions</label>
                     {reactionReagents.map((item, index) => (
                         <div key={index} className="flex items-center space-x-4">
                             <select
@@ -184,32 +184,37 @@ function ReactionEditApp() {
                     ))}
                 </div>
                 <div className="flex flex-col space-y-4 w-full pb-10">
-                    <label>Standard Reagent</label>
                     <div className={"flex flex-row justify-between"}>
-                        <select
-                            value={standardReagentId}
-                            onChange={(e) => setStandardReagentId(e.target.value)}
-                            className="mt-1 block w-8/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                        >
-                            <option value="">Select Standard Reagent</option>
-                            {standard_reagents.map((reagent) => (
-                                <option key={reagent.id} value={reagent.id}>
-                                    {reagent.name}
-                                </option>
-                            ))}
-                        </select>
-                        <input
-                            type="number"
-                            step="0.001"
-                            value={standardConcentration}
-                            onChange={(e) => setStandardConcentration(e.target.value)}
-                            placeholder="Standard Concentration (molarity)"
-                            className="mt-1 remove-arrow block w-3/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                        />
+                        <div className={"flex flex-col w-8/12"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Standard Reagent</label>
+                            <select
+                                value={standardReagentId}
+                                onChange={(e) => setStandardReagentId(e.target.value)}
+                                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            >
+                                <option value="">Select Standard Reagent</option>
+                                {standard_reagents.map((reagent) => (
+                                    <option key={reagent.id} value={reagent.id}>
+                                        {reagent.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className={"flex flex-col w-3/12"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Standard Concentration</label>
+                            <input
+                                type="number"
+                                step="0.001"
+                                value={standardConcentration}
+                                onChange={(e) => setStandardConcentration(e.target.value)}
+                                placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
                     </div>
                 </div>
-                <div className={"pb-8 w-full"}>
-                    <label>Wait Time</label>
+                <div className={"pb-8 w-full flex flex-col"}>
+                    <label className={"font-montserrat text-sm pb-2"}>Wait Time</label>
                     <input
                         type="number"
                         value={reactionWaitTime}
