@@ -10,6 +10,7 @@ class Sensor(models.Model):
     long = models.FloatField(null=True)
     sample_frequency = models.FloatField(null=True)
     sleep = models.BooleanField(default=False)
+    last_states = models.CharField(max_length=200, null=True)
 
     class Meta:
         db_table = 'pfiona_sensor'
@@ -17,15 +18,14 @@ class Sensor(models.Model):
 
 class Reagent(models.Model):
     name = models.CharField(max_length=100)
-    volume = models.IntegerField()
-    volume_max = models.IntegerField()
+    volume = models.IntegerField(null=True)
+    volume_max = models.IntegerField(null=True)
     port = models.IntegerField(null=True)
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, name="pfiona_sensor")
     is_standard = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'pfiona_reagent'
-
 
 
 class Reaction(models.Model):
