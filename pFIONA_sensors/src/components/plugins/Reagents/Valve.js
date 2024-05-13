@@ -122,6 +122,43 @@ function Valve({ ip, reagents }) {
         setIsModalOpen(false);
     };
 
+    /** AUTOMATION **/
+
+    const checkStatus = () => {
+        fetch(`http://${ip}:5000/sensor/get_state`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            setError(null)
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            setError(-1)
+        });
+    };
+
+    useEffect(() => {
+        checkStatus();
+
+        const intervalId = setInterval(() => {
+
+            checkStatus();
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
     return (
     <div className="w-full">
         <div className="mb-5">
