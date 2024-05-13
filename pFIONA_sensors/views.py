@@ -71,7 +71,7 @@ def sensors_reagents(request, sensor_id):
         'volume': reagent.volume,
         'volume_max': reagent.volume_max,
         'port': reagent.port,
-        'sensor_id': reagent.sensor_id,
+        'sensor_id': reagent.pfiona_sensor_id,
     } for reagent in reagents]
 
     reagents_json = json.dumps(reagents_data)
