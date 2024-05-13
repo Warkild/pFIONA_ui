@@ -4,7 +4,7 @@ from django.db import models
 class Sensor(models.Model):
     name = models.CharField(max_length=100)
     ip_address = models.GenericIPAddressField()
-    notes = models.TextField(null=True)
+    notes = models.TextField(null=True, blank=True)
     actual_reaction = models.ForeignKey('Reaction', on_delete=models.CASCADE, null=True)
     lat = models.FloatField(null=True)
     long = models.FloatField(null=True)

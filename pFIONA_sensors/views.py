@@ -189,7 +189,7 @@ def sensors_settings(request, sensor_id):
             name_notes_form = SensorNameAndNotesForm(request.POST, instance=sensor, prefix='name_notes')
             if name_notes_form.is_valid():
                 name_notes_form.save()
-                return redirect('sensors_settings', id=sensor_id)
+                return redirect('sensors_settings', sensor_id=sensor_id)
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor})
