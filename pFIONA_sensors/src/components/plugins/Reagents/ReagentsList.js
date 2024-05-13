@@ -14,7 +14,7 @@ function ReagentsList({reagents}) {
             </div>
             <div className={"flex flex-col font-montserrat bg-white shadow-lg rounded-2xl py-7 px-8"}>
                 <div className={"h-10"}>
-                    <a href={`/sensors/${validReagents[0].sensor_id}/reagents/add`}
+                    <a href={`add`}
                        className={"bg-lime-500 text-white font-poppins px-8 py-1 mb-2 rounded-md hover:bg-lime-300"}>Add reagent</a>
                 </div>
                 <div className={"w-full"}>

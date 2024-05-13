@@ -63,7 +63,7 @@ def sensors_reagents(request, sensor_id):
 
     # REAGENTS
 
-    reagents = Reagent.objects.filter(sensor_id=sensor_id)
+    reagents = Reagent.objects.filter(pfiona_sensor_id=sensor_id)
 
     reagents_data = [{
         'id': reagent.id,
@@ -78,7 +78,7 @@ def sensors_reagents(request, sensor_id):
 
     # REACTIONS
 
-    volume_to_adds = VolumeToAdd.objects.filter(reagent__in=reagents)
+    volume_to_adds = VolumeToAdd.objects.filter(pfiona_reagent__in=reagents)
     reactions = Reaction.objects.filter(volumetoadd__in=volume_to_adds).distinct()
 
     reactions_data = [{
