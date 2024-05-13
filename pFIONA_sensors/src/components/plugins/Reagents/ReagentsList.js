@@ -3,7 +3,7 @@ import Alert from "../Alert";
 
 function ReagentsList({reagents}) {
 
-    const validReagents = reagents.filter(reagent => reagent.max_volume > 0);
+    const validReagents = reagents.filter(reagent => reagent.volume_max > 0);
 
 
     // Return HTML Code
@@ -33,7 +33,7 @@ function ReagentsList({reagents}) {
                             <tr key={reagent.id} className={"border border-custom-gray-1"}>
                                 <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reagent.name}</td>
                                 <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reagent.volume}</td>
-                                <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reagent.max_volume}</td>
+                                <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reagent.volume_max}</td>
                                 <td className={`pl-5 ${reagent.port != null ? 'text-lime-500' : 'text-red-600'}`}>{reagent.port != null ? 'Active' : 'Inactive'}</td>
                                 <td>
                                     <div className={"h-full flex flex-row-reverse pl-5"}>

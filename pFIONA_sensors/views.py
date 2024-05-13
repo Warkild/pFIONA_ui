@@ -69,7 +69,7 @@ def sensors_reagents(request, sensor_id):
         'id': reagent.id,
         'name': reagent.name,
         'volume': reagent.volume,
-        'max_volume': reagent.max_volume,
+        'volume_max': reagent.volume_max,
         'port': reagent.port,
         'sensor_id': reagent.sensor_id,
     } for reagent in reagents]

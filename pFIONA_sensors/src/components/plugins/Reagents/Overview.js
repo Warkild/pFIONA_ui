@@ -5,7 +5,7 @@ import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 Chart.register(ArcElement, Tooltip, Legend);
 
 function Overview({reagents}) {
-    const validReagents = reagents.filter(reagent => reagent.port !== null && reagent.max_volume > 0);
+    const validReagents = reagents.filter(reagent => reagent.port !== null && reagent.volume_max > 0);
 
     return (
         <div className="w-full">
@@ -28,7 +28,7 @@ function DoughnutChart({ reagent }) {
     const data = {
         labels: ['Reagent', 'Empty'],
         datasets: [{
-            data: [reagent.volume, reagent.max_volume - reagent.volume],
+            data: [reagent.volume, reagent.volume_max - reagent.volume],
             backgroundColor: ['#2563eb', '#bcdef1'],
             hoverBackgroundColor: ['#4c7eec', '#dfedf8']
         }]

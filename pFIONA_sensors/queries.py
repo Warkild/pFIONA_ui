@@ -14,7 +14,7 @@ def get_utils_reagents(sensor_id, return_json=False):
     :return: List of reagents
     """
 
-    reagents = models.Reagent.objects.filter(sensor_id=sensor_id).filter(Q(max_volume__gt=0))
+    reagents = models.Reagent.objects.filter(sensor_id=sensor_id).filter(Q(volume_max__gt=0))
 
     if return_json:
 
@@ -22,7 +22,7 @@ def get_utils_reagents(sensor_id, return_json=False):
             'id': reagent.id,
             'name': reagent.name,
             'volume': reagent.volume,
-            'max_volume': reagent.max_volume,
+            'volume_max': reagent.volume_max,
             'port': reagent.port,
             'sensor_id': reagent.sensor_id,
             'is_standard': bool(reagent.is_standard),
