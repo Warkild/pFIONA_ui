@@ -41,3 +41,36 @@ class VolumeToAdd(models.Model):
 
     class Meta:
         db_table = 'pfiona_volumetoadd'
+
+
+class Spectrum(models.Model):
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE)
+    time = models.ForeignKey('Time', on_delete=models.CASCADE)
+    spectrum_type = models.ForeignKey('SpectrumType', on_delete=models.CASCADE)
+
+    class Meta:
+        db_table = 'pfiona_spectrum'
+
+
+class SpectrumType(models.Model):
+    type = models.CharField(max_length=100)
+
+    class Meta:
+        db_table = 'pfiona_spectrumtype'
+
+
+class Time(models.Model):
+    time = models.IntegerField()
+
+    class Meta:
+        db_table = 'pfiona_time'
+
+
+class Values(models.Model):
+    value = models.FloatField()
+    spectrum = models.ForeignKey(Spectrum, on_delete=models.CASCADE)
+    wavelength = models.FloatField()
+
+    class Meta:
+        db_table = 'pfiona_values'
+        unique_together = (('spectrum', 'wavelength'),)
