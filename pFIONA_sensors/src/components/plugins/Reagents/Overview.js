@@ -13,6 +13,7 @@ function Overview({reagents}) {
                 <h2 className="font-poppins font-bold text-gray-500 text-sm">OVERVIEW</h2>
             </div>
             <div className="flex flex-row flex-wrap font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
+                {validReagents.length === 0 && <p className={"text-red-700"}>There is no active reagent</p>}
                 {validReagents.map(reagent => (
                     <div className="graph-container" key={reagent.id}>
                         <DoughnutChart reagent={reagent} />
