@@ -78,7 +78,7 @@ def create_volumetoadd(reagent_id, reaction_id, volume, order):
 
     :return: Volumetoadd object
     """
-    volumetoadd = models.VolumeToAdd.objects.create(reagent_id=reagent_id, reaction_id=reaction_id, volume=volume,
+    volumetoadd = models.VolumeToAdd.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id, volume=volume,
                                                     order=order)
     volumetoadd.save()
 
@@ -100,10 +100,10 @@ def get_reaction_details(reaction_id):
 
     # Get the volumetoadd to have the full reaction details
 
-    volumetoadd_list = models.VolumeToAdd.objects.filter(reaction=reaction.id).order_by('order')
+    volumetoadd_list = models.VolumeToAdd.objects.filter(pfiona_reaction_id=reaction.id).order_by('order')
 
     volumetoadd_json = [{
-        'reagent_id': volumetoadd.reagent_id,
+        'reagent_id': volumetoadd.pfiona_reagent_id,
         'volume': volumetoadd.volume
     } for volumetoadd in volumetoadd_list]
 
@@ -128,7 +128,7 @@ def delete_all_volumetoadd(reaction_id):
     :param reaction_id: Reaction ID
     """
 
-    models.VolumeToAdd.objects.filter(reaction_id=reaction_id).delete()
+    models.VolumeToAdd.objects.filter(pfiona_reaction_id=reaction_id).delete()
 
 
 def update_reaction(reaction_id, name, wait_time, standard_id, standard_concentration):
