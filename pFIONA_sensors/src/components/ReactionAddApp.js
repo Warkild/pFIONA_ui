@@ -91,7 +91,7 @@ function ReactionAddApp() {
             setAlertModalText("Standard Reagent must be selected")
             setIsModalOpen(true)
         } else {
-            const apiUrl = "/sensors/api/add_reaction"; // Your Django API URL
+            const apiUrl = "/api/add_reaction"; // Your Django API URL
 
             fetch(apiUrl, {
                 method: 'POST',

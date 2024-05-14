@@ -92,7 +92,7 @@ function ReactionEditApp() {
             setAlertModalText("Standard Reagent must be selected")
             setIsModalOpen(true)
         } else {
-            const apiUrl = `/sensors/api/edit_reaction`; // Your Django API URL
+            const apiUrl = `/api/edit_reaction`; // Your Django API URL
 
             fetch(apiUrl, {
                 method: 'POST',
