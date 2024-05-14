@@ -6,7 +6,7 @@ function CurrentReaction({ reactions }) {  // Assume sensor_id is passed as a pr
     const [selectedReactionId, setSelectedReactionId] = useState("");
 
     useEffect(() => {
-        fetch(`/sensors/api/get_current_reaction_id?sensor_id=${sensor_id}`)
+        fetch(`/api/get_current_reaction/${sensor_id}`)
             .then(response => response.json())
             .then(data => {
                 setCurrentReactionId(data.reaction_id);

@@ -23,3 +23,15 @@ def api_set_current_reaction(request, sensor_id):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+
+@login_required()
+@csrf_exempt
+def api_get_current_reaction(request, sensor_id):
+    try:
+        current_reaction_id = q.get_current_reaction_id(sensor_id)
+        return JsonResponse({'status': 'success', 'reaction_id': current_reaction_id})
+
+    except Exception as e:
+
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

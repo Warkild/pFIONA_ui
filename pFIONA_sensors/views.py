@@ -303,20 +303,3 @@ def api_edit_reaction(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
-
-@login_required()
-@csrf_exempt
-def api_get_current_reaction_id(request):
-    data = json.loads(request.GET.get('sensor_id'))
-
-    respect_constraint = True
-
-    if data == "":
-        respect_constraint = False
-
-    if respect_constraint:
-        current_reaction_id = q.get_current_reaction_id(data)
-        return JsonResponse({'status': 'success', 'reaction_id': current_reaction_id})
-
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)

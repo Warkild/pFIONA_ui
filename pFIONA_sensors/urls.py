@@ -21,5 +21,4 @@ urlpatterns = [
          name='sensors_reaction_edit'),
     path('api/add_reaction', views.api_add_reaction, name='api_add_reaction'),
     path('api/edit_reaction', views.api_edit_reaction, name='api_edit_reaction'),
-    path('api/get_current_reaction_id', views.api_get_current_reaction_id, name='api_get_current_reaction_id'),
 ]
