@@ -52,7 +52,7 @@ class VolumeToAdd(models.Model):
 class Spectrum(models.Model):
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, name="pfiona_sensor")
     time = models.ForeignKey('Time', on_delete=models.CASCADE, name="pfiona_time")
-    spectrum_type = models.ForeignKey('SpectrumType', on_delete=models.CASCADE, name="pfiona_spectrum_type")
+    spectrumtype = models.ForeignKey('SpectrumType', on_delete=models.CASCADE, name="pfiona_spectrumtype")
 
     class Meta:
         db_table = 'pfiona_spectrum'
