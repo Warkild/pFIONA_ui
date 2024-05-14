@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     'widget_tweaks',
-    'pFIONA_sensors'
+    'pFIONA_sensors',
+    "pFIONA_api"
 ]
 
 MIDDLEWARE = [

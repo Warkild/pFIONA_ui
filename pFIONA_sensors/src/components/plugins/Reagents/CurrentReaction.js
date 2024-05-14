@@ -19,7 +19,7 @@ function CurrentReaction({ reactions }) {  // Assume sensor_id is passed as a pr
         // Préparer l'ID de la réaction ou null si rien n'est sélectionné
         const payload = { reaction_id: selectedReactionId || null };
 
-        fetch(`/sensors/${sensor_id}/api/set_current_reaction`, {
+        fetch(`/api/set_current_reaction/${sensor_id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
