@@ -1,3 +1,4 @@
+import csv
 import json
 
 from django.db import transaction
@@ -5,13 +6,13 @@ from django.db import transaction
 from pFIONA_sensors import queries as q, models
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
-from pFIONA_sensors.models import Sensor, Reagent, VolumeToAdd, Reaction
+from pFIONA_sensors.models import Sensor, Reagent, VolumeToAdd, Reaction, Spectrum
 from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm
 
 
@@ -251,3 +252,45 @@ def sensors_reaction_edit(request, sensor_id, reaction_id):
         'reagents_json': reagents_json,
         'reaction_json': reaction_json
     })
+
+
+@login_required()
+def export_spectra_csv(request):
+    start_timestamp_ms = request.GET.get('start')
+    end_timestamp_ms = request.GET.get('end')
+
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="spectra.csv"'},
+    )
+    writer = csv.writer(response)
+
+    print(f"start_timestamp_ms: {start_timestamp_ms}, end_timestamp_ms: {end_timestamp_ms}")
+
+    if start_timestamp_ms and end_timestamp_ms:
+        # Convertir les timestamps de millisecondes en secondes
+        start_timestamp = int(start_timestamp_ms) // 1000
+        end_timestamp = int(end_timestamp_ms) // 1000
+
+        print(f"start_timestamp: {start_timestamp}, end_timestamp: {end_timestamp}")
+
+        # Filtre les spectres selon les timestamps de début et de fin
+        query = Spectrum.objects.filter(
+            pfiona_time__timestamp__gte=start_timestamp,
+            pfiona_time__timestamp__lte=end_timestamp
+        ).select_related('pfiona_spectrumtype').prefetch_related('value_set')
+    else:
+        query = Spectrum.objects.all().select_related('pfiona_spectrumtype').prefetch_related('value_set')
+
+    spectra = query
+    all_wavelengths = sorted(set(value.wavelength for spectrum in spectra for value in spectrum.value_set.all()))
+    header = ['SpectrumType'] + [str(wl) for wl in all_wavelengths]
+    writer.writerow(header)
+
+    for spectrum in spectra:
+        spectrum_type = spectrum.pfiona_spectrumtype.type
+        values_dict = {value.wavelength: value.value for value in spectrum.value_set.all()}
+        row = [spectrum_type] + [values_dict.get(wl, '') for wl in all_wavelengths]
+        writer.writerow(row)
+
+    return response
