@@ -145,14 +145,10 @@ def sensors_reagent_edit(request, sensor_id, reagent_id):
     reagent_form = ReagentEditForm(request.POST or None, instance=reagent, prefix='reagent')
 
     if request.method == 'POST':
-        print('POST')
         if 'submit_reagent' in request.POST:
-            print('submit reagent')
             reagent_form = ReagentEditForm(request.POST, instance=reagent, prefix='reagent')
             if reagent_form.is_valid():
                 reagent_form.save()
-                print("****")
-                print(sensor_id)
                 return redirect('sensors_reagents', sensor_id=sensor_id)
     return render(request, 'pfiONA_sensors/view/sensors_reagent_edit.html', {
         'id': sensor_id,
@@ -166,7 +162,7 @@ def sensors_reagent_add(request, sensor_id):
         reagent_form = ReagentEditForm(request.POST, prefix='reagent')
         if reagent_form.is_valid():
             new_reagent = reagent_form.save(commit=False)
-            new_reagent.sensor_id = sensor_id
+            new_reagent.pfiona_sensor_id = sensor_id
             new_reagent.volume = 0
             new_reagent.save()
             return redirect('sensors_reagents', sensor_id=sensor_id)

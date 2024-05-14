@@ -17,7 +17,7 @@ class SensorNameAndNotesForm(ModelForm):
 class ReagentEditForm(ModelForm):
     class Meta:
         model = Reagent
-        fields = ['name', 'volume_max']
+        fields = ['name', 'volume_max', 'is_standard']
 
 
 class SensorLatLongForm(ModelForm):
