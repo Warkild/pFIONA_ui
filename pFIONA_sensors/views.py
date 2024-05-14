@@ -10,7 +10,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
 from pFIONA_sensors.models import Sensor, Reagent, VolumeToAdd, Reaction
-from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm
+from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm
 
 
 @login_required()
@@ -183,16 +183,26 @@ def sensors_reagent_add(request, sensor_id):
 def sensors_settings(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')
+    lat_long_form = SensorLatLongForm(request.POST or None, instance=sensor, prefix='lat_long')
 
     if request.method == 'POST':
+        print("********************")
+        print(f"{request.method}")
+        print(f"{request.POST}")
         if 'submit_name_notes' in request.POST:
             name_notes_form = SensorNameAndNotesForm(request.POST, instance=sensor, prefix='name_notes')
             if name_notes_form.is_valid():
                 name_notes_form.save()
                 return redirect('sensors_settings', sensor_id=sensor_id)
+        if 'submit_lat_long' in request.POST:
+            lat_long_form = SensorLatLongForm(request.POST, instance=sensor, prefix='lat_long')
+            print(lat_long_form.is_valid())
+            if lat_long_form.is_valid():
+                lat_long_form.save()
+                return redirect('sensors_settings', sensor_id=sensor_id)
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
-                  {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor})
+                  {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor, 'lat_long_form': lat_long_form})
 
 
 @login_required()

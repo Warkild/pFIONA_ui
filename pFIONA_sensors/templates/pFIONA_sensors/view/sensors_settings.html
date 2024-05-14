@@ -24,10 +24,22 @@
                     <h2 class="font-poppins font-bold text-gray-500 text-sm">NAME & NOTES</h2>
                 </div>
                 <div class="bg-white shadow-lg rounded-2xl py-5 px-8">
-                    <form method="post">
+                    <form method="post" id="name_notes">
                         {% csrf_token %}
                         {% include "pFIONA_sensors/form/basic_form.html" with form=name_notes_form %}
                         <button type="submit" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold" name="submit_name_notes">Save</button>
+                    </form>
+                </div>
+            </div>
+            <div class="pt-12">
+                <div class="mb-5">
+                    <h2 class="font-poppins font-bold text-gray-500 text-sm">CURRENT POSITION</h2>
+                </div>
+                <div class="bg-white shadow-lg rounded-2xl py-5 px-8">
+                    <form method="post" id="lat_long">
+                        {% csrf_token %}
+                        {% include "pFIONA_sensors/form/basic_form.html" with form=lat_long_form %}
+                        <button type="submit" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold" name="submit_lat_long">Save</button>
                     </form>
                 </div>
             </div>
