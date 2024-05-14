@@ -60,9 +60,9 @@ function ExportSpec() {
                 </div>
                 <div>
                     {startDate && endDate && endDate > startDate ? (
-                        <button onClick={handleSubmit} className={"bg-lime-500 text-white font-poppins px-8 py-1 mb-2 rounded-md hover:bg-lime-300"}>Valider</button>
+                        <button onClick={handleSubmit} className={"bg-lime-500 text-white font-poppins px-8 py-1 mb-2 rounded-md hover:bg-lime-300"}>Export</button>
                     ): (
-                        <button className={"bg-gray-300 font-poppins px-8 py-1 mb-2 rounded-md"}>Valider</button>
+                        <button className={"bg-gray-300 font-poppins px-8 py-1 mb-2 rounded-md"}>Export</button>
                     )}
                 </div>
             </div>

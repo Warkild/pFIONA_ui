@@ -63,7 +63,7 @@ function CurrentReaction({ reactions }) {  // Assume sensor_id is passed as a pr
                 </select>
                 <div className={"pt-5"}>
                     <button onClick={handleSave}
-                            className="bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm">
+                            className="bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400">
                         Save
                     </button>
                 </div>
