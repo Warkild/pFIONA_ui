@@ -60,7 +60,7 @@ def sensors_deploy(request, sensor_id):
 @login_required()
 def sensors_data(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
-    return render(request, 'pFIONA_sensors/view/sensors_data.html', {'id': sensor_id, 'sensor': sensor})
+    return render(request, 'pFIONA_sensors/view/sensors_data.html', {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,})
 
 
 @login_required()
