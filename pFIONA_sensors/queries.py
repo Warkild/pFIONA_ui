@@ -78,7 +78,8 @@ def create_volumetoadd(reagent_id, reaction_id, volume, order):
 
     :return: Volumetoadd object
     """
-    volumetoadd = models.VolumeToAdd.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id, volume=volume,
+    volumetoadd = models.VolumeToAdd.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id,
+                                                    volume=volume,
                                                     order=order)
     volumetoadd.save()
 
@@ -187,3 +188,25 @@ def set_current_reaction(sensor_id, reaction_id):
     else:
         sensor.actual_reaction = None
         sensor.save()
+
+
+def get_reactions_associated_reagent(reagent_id):
+    """
+    Get all reactions associated with a reagent and those where the reagent is used as the standard reagent
+
+    :param reagent_id: Reagent ID
+
+    :return: List of reactions
+    """
+
+    volume_to_adds = models.VolumeToAdd.objects.filter(pfiona_reagent_id=reagent_id)
+    reaction_ids = set(vta.pfiona_reaction_id for vta in volume_to_adds)
+
+    standard_reactions = models.Reaction.objects.filter(standard_id=reagent_id)
+    standard_reaction_ids = set(reaction.id for reaction in standard_reactions)
+
+    combined_reaction_ids = reaction_ids.union(standard_reaction_ids)
+
+    reactions = list(models.Reaction.objects.filter(id__in=combined_reaction_ids))
+
+    return reactions

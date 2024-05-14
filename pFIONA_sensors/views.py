@@ -1,6 +1,8 @@
 import json
 
-from pFIONA_sensors import queries as q
+from django.db import transaction
+
+from pFIONA_sensors import queries as q, models
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -128,7 +130,33 @@ def sensors_reagents_valve_update(request, sensor_id):
 @login_required()
 def sensors_reagent_delete(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
-    reagent.delete()
+    reactions = q.get_reactions_associated_reagent(reagent_id)
+
+    return render(request, 'pFIONA_sensors/view/sensors_reagent_delete.html', {
+        'sensor_id': sensor_id,
+        'reagent': reagent,
+        'reactions': reactions,
+    })
+
+
+@login_required()
+def sensors_reagent_deletion(request, sensor_id, reagent_id):
+    reagent = get_object_or_404(Reagent, pk=reagent_id)
+
+    with transaction.atomic():
+        standard_reactions = Reaction.objects.filter(standard_id=reagent_id)
+        standard_reaction_ids = set(standard_reactions.values_list('id', flat=True))
+
+        volume_to_adds = VolumeToAdd.objects.filter(pfiona_reagent_id=reagent_id)
+        reaction_ids_from_volume_to_add = set(vta.pfiona_reaction_id for vta in volume_to_adds)
+        reaction_ids = standard_reaction_ids.union(reaction_ids_from_volume_to_add)
+
+        Sensor.objects.filter(actual_reaction_id__in=reaction_ids).update(actual_reaction=None)
+
+        Reaction.objects.filter(id__in=reaction_ids).delete()
+
+        reagent.delete()
+
     return redirect('sensors_reagents', sensor_id=sensor_id)
 
 
@@ -198,7 +226,8 @@ def sensors_settings(request, sensor_id):
                 return redirect('sensors_settings', sensor_id=sensor_id)
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
-                  {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor, 'lat_long_form': lat_long_form})
+                  {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor,
+                   'lat_long_form': lat_long_form})
 
 
 @login_required()

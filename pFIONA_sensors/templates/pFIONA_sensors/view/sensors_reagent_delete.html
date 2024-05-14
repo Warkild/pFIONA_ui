@@ -1,0 +1,48 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Delete Reagent - pFIONA</title>
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'css/dist/custom.css' %}">
+
+    </style>
+</head>
+<body>
+    <div class="flex min-h-screen">
+        <div class="bg-custom-gray-1 w-1/6 h-dvh flex flex-col justify-between">
+            <div class="font-poppins font-black flex text-4xl mb-16 ml-10 mt-16">
+            <a href="{% url 'sensors_reagents' sensor_id=sensor_id %}" class="pr-7">&lt;</a>
+            <h1>Delete</h1>
+        </div>
+        </div>
+        <div class="bg-custom-gray-2 w-5/6 p-12">
+            <div>
+                <div class="mb-5">
+                    <h2 class="font-poppins font-bold text-gray-500 text-sm">DELETE</h2>
+                </div>
+                <div class="bg-white flex flex-col space-y-3 shadow-lg rounded-2xl py-5 px-8 font-montserrat">
+                    <p class="">You are going to delete : <strong>{{ reagent.name }}</strong></p>
+                    {% if reactions %}
+                        <div class="flex flex-row">
+                            <img src="{% static 'img/ico/icons8-warning-red-512.svg' %}" alt="Warning icon" class="w-6 h-6">
+                            <p class=""><strong>The followed reactions will be also deleted</strong></p>
+                        </div>
+                        <ul>
+                            {% for reaction in reactions %}
+                                <li>- {{ reaction.name }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <p class="text-red-600 font-bold">This cannot be undone</p>
+                    <div class="flex flex-row justify-between">
+                        <a class="w-8/12 text-center text-gray-700 bg-gray-200 rounded-lg py-2 font-bold" href="{% url 'sensors_reagents' sensor_id=sensor_id %}">Cancel</a>
+                        <a class="w-3/12 text-center text-white bg-red-600 rounded-lg py-2 font-bold" href="{% url 'sensors_reagent_deletion' sensor_id=sensor_id reagent_id=reagent.id %}">Delete anyway</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

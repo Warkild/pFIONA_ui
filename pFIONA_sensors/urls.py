@@ -19,4 +19,6 @@ urlpatterns = [
          name='sensors_reaction_delete'),
     path('<int:sensor_id>/reagents/reaction/<int:reaction_id>/edit', views.sensors_reaction_edit,
          name='sensors_reaction_edit'),
+    path('<int:sensor_id>/reagents/<int:reagent_id>/deletion', views.sensors_reagent_deletion,
+         name='sensors_reagent_deletion'),
 ]

@@ -36,7 +36,7 @@ function ExportSpec() {
                     <div className={"flex flex-col-reverse"}>
                         {startDate && endDate && startDate > endDate && (
                             <div className={"flex flex-row h-min"}>
-                                <img src={"/static/img/ico/icons8-warning-512.svg"} alt="Warning" className={"w-6 h-6 mr-2"} />
+                                <img src={"/static/img/ico/icons8-warning-yellow-512.svg"} alt="Warning" className={"w-6 h-6 mr-2"} />
                                 <p>Start date must be less or equal than end date</p>
                             </div>
                         )}
