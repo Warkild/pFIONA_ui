@@ -320,22 +320,3 @@ def api_get_current_reaction_id(request):
 
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
-
-
-@login_required()
-@csrf_exempt
-def api_set_current_reaction(request, sensor_id):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body.decode('utf-8'))
-
-            if data['reaction_id'] is not None:
-                q.set_current_reaction(sensor_id, data['reaction_id'])
-            else:
-                q.set_current_reaction(sensor_id, None)
-
-            return JsonResponse({'status': 'success', 'message': 'Current reaction updated successfully'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)

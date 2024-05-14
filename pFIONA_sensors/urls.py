@@ -22,5 +22,4 @@ urlpatterns = [
     path('api/add_reaction', views.api_add_reaction, name='api_add_reaction'),
     path('api/edit_reaction', views.api_edit_reaction, name='api_edit_reaction'),
     path('api/get_current_reaction_id', views.api_get_current_reaction_id, name='api_get_current_reaction_id'),
-    path('<int:sensor_id>/api/set_current_reaction', views.api_set_current_reaction, name='api_set_current_reaction'),
 ]
