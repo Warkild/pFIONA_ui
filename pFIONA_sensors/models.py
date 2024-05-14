@@ -46,6 +46,7 @@ class VolumeToAdd(models.Model):
 
     class Meta:
         db_table = 'pfiona_volumetoadd'
+        unique_together = ('pfiona_reaction', 'pfiona_reagent')
 
 
 class Spectrum(models.Model):
