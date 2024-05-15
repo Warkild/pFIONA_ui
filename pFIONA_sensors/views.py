@@ -1,4 +1,5 @@
 import csv
+import datetime
 import json
 
 from django.db import transaction
@@ -60,7 +61,8 @@ def sensors_deploy(request, sensor_id):
 @login_required()
 def sensors_data(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
-    return render(request, 'pFIONA_sensors/view/sensors_data.html', {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,})
+    return render(request, 'pFIONA_sensors/view/sensors_data.html',
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, })
 
 
 @login_required()
@@ -265,32 +267,27 @@ def export_spectra_csv(request):
     )
     writer = csv.writer(response)
 
-    print(f"start_timestamp_ms: {start_timestamp_ms}, end_timestamp_ms: {end_timestamp_ms}")
-
     if start_timestamp_ms and end_timestamp_ms:
-        # Convertir les timestamps de millisecondes en secondes
         start_timestamp = int(start_timestamp_ms) // 1000
         end_timestamp = int(end_timestamp_ms) // 1000
 
-        print(f"start_timestamp: {start_timestamp}, end_timestamp: {end_timestamp}")
-
-        # Filtre les spectres selon les timestamps de début et de fin
         query = Spectrum.objects.filter(
             pfiona_time__timestamp__gte=start_timestamp,
             pfiona_time__timestamp__lte=end_timestamp
-        ).select_related('pfiona_spectrumtype').prefetch_related('value_set')
+        ).select_related('pfiona_spectrumtype', 'pfiona_time')
     else:
-        query = Spectrum.objects.all().select_related('pfiona_spectrumtype').prefetch_related('value_set')
+        query = Spectrum.objects.all().select_related('pfiona_spectrumtype', 'pfiona_time')
 
     spectra = query
     all_wavelengths = sorted(set(value.wavelength for spectrum in spectra for value in spectrum.value_set.all()))
-    header = ['SpectrumType'] + [str(wl) for wl in all_wavelengths]
+    header = ['SpectrumType', 'Timestamp (Local Time)'] + [str(wl) for wl in all_wavelengths]
     writer.writerow(header)
 
     for spectrum in spectra:
         spectrum_type = spectrum.pfiona_spectrumtype.type
+        local_datetime = datetime.datetime.fromtimestamp(spectrum.pfiona_time.timestamp).strftime('%m/%d/%Y %H:%M:%S')
         values_dict = {value.wavelength: value.value for value in spectrum.value_set.all()}
-        row = [spectrum_type] + [values_dict.get(wl, '') for wl in all_wavelengths]
+        row = [spectrum_type, local_datetime] + [values_dict.get(wl, '') for wl in all_wavelengths]
         writer.writerow(row)
 
     return response
