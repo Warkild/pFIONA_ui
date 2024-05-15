@@ -195,7 +195,7 @@ function Valve({ ip, reagents }) {
                             </div>
                         ))}
                     </div>
-                    <button onClick={handleSave} className="bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm">{saveText}</button>
+                    <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-400 rounded-lg text-white font-poppins py-2 px-7 text-sm">{saveText}</button>
                 </>
             ) : (
                 <p>You must be connected to the sensor to modify the ports</p>
