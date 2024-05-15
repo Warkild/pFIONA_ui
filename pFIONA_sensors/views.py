@@ -294,3 +294,11 @@ def export_spectra_csv(request):
         writer.writerow(row)
 
     return response
+
+@login_required
+def prepare_export_spectra_csv(request):
+    return render(request, "prepare_export.html", {
+        'sensor_id': request.GET.get('sensor_id', ''),
+        'start': request.GET.get('start', ''),
+        'end': request.GET.get('end', '')
+    })

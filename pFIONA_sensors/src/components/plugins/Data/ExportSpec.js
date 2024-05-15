@@ -23,12 +23,11 @@ function ExportSpec() {
 
     const handleSubmit = () => {
         if (startDate && endDate && endDate > startDate) {
-            window.location.href = `http://127.0.0.1:8000/sensors/export-spectra/?start=${startDate}&end=${endDate}&sensor_id=${sensor_id}`;
+            window.open(`http://127.0.0.1:8000/sensors/prepare-export-spectra/?start=${startDate}&end=${endDate}&sensor_id=${sensor_id}`, '_blank');
         } else {
-            alert("ERROR");
+            alert("ERROR: Please ensure that the end date is greater than the start date and that both dates are selected.");
         }
     };
-
 
     return (
         <div className={"w-full"}>

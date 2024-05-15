@@ -22,4 +22,6 @@ urlpatterns = [
     path('<int:sensor_id>/reagents/<int:reagent_id>/deletion', views.sensors_reagent_deletion,
          name='sensors_reagent_deletion'),
     path('export-spectra/', views.export_spectra_csv, name='export-spectra'),
+    path('prepare-export-spectra/', views.prepare_export_spectra_csv, name='prepare-export-spectra'),
+
 ]
