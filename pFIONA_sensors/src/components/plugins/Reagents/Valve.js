@@ -13,6 +13,7 @@ function Valve({ ip, reagents }) {
         })
     );
     const [error, setError] = useState(-1);  // Ajout d'un état pour gérer les erreurs
+    const [saveText, setSaveText] = useState("Save");
 
     const getNbPorts = () => {
         fetch(`http://${ip}:5000/valve/get_numbers_valves`, {
@@ -56,8 +57,8 @@ function Valve({ ip, reagents }) {
     };
 
     const handleSave = () => {
-
         if(checkForDuplicates(selectedPorts)) {
+            setSaveText("Saving...")
             fetch(`http://127.0.0.1:8000/sensors/${reagents[0].sensor_id}/reagents/update_valve`, {
                 method: 'POST',
                 headers: {
@@ -97,7 +98,7 @@ function Valve({ ip, reagents }) {
     /** UPDATE REAGENTS **/
 
     function sensorUpdateReagent() {
-         fetch(`http://${ip}:5000/sensor/reloading_reagents`, {
+         fetch(`http://${ip}:5000/sensor/reload_reagents`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -194,7 +195,7 @@ function Valve({ ip, reagents }) {
                             </div>
                         ))}
                     </div>
-                    <button onClick={handleSave} className="bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm">Save</button>
+                    <button onClick={handleSave} className="bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm">{saveText}</button>
                 </>
             ) : (
                 <p>You must be connected to the sensor to modify the ports</p>

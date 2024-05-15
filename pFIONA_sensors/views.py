@@ -117,7 +117,7 @@ def sensors_reagents_valve_update(request, sensor_id):
 
             print(data)
 
-            Reagent.objects.filter(sensor_id=sensor_id).update(port=None)
+            Reagent.objects.filter(pfiona_sensor_id=sensor_id).update(port=None)
 
             for index, reagent_id in enumerate(data):
                 if reagent_id != 'none':
