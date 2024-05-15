@@ -3,6 +3,8 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+
 import pFIONA_sensors.queries as q
 
 
@@ -29,12 +31,13 @@ def api_set_current_reaction(request, sensor_id):
 @csrf_exempt
 def api_get_current_reaction(request, sensor_id):
     try:
-        current_reaction_id = q.get_current_reaction_id(sensor_id)
-        return JsonResponse({'status': 'success', 'reaction_id': current_reaction_id})
+        current_reaction = q.get_current_reaction(sensor_id)
+        return JsonResponse({'status': 'success', 'reaction_id': current_reaction.id, 'reaction_name': current_reaction.name})
 
     except Exception as e:
 
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 @login_required()
 @csrf_exempt
@@ -111,3 +114,27 @@ def api_edit_reaction(request):
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_last_spectrum_all_type_view(request):
+    # Récupérer les paramètres de la requête
+    reaction_name = request.GET.get('reaction_name')
+    timestamp = request.GET.get('timestamp', None)
+
+    # Validation des paramètres
+    if not reaction_name or not timestamp:
+        return JsonResponse({'error': 'Missing required parameters.'}, status=400)
+
+    # Conversion du timestamp en entier
+    try:
+        timestamp = int(timestamp)
+    except ValueError:
+        return JsonResponse({'error': 'Invalid timestamp format.'}, status=400)
+
+    # Appel de la fonction pour récupérer les données
+    result = q.get_last_spectrum_all_type(reaction_name, timestamp)
+
+    # Renvoyer les données en format JSON
+    return JsonResponse(result)

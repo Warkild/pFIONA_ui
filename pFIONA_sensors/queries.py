@@ -155,18 +155,18 @@ def update_reaction(reaction_id, name, wait_time, standard_id, standard_concentr
     return reaction
 
 
-def get_current_reaction_id(sensor_id):
+def get_current_reaction(sensor_id):
     """
-    Get current reaction ID
+    Get current reaction
 
     :param sensor_id: Sensor ID
 
-    :return: Current reaction ID
+    :return: Current reaction
     """
     sensor = models.Sensor.objects.get(id=sensor_id)
 
     if sensor.actual_reaction is not None:
-        return sensor.actual_reaction.id
+        return sensor.actual_reaction
     else:
         return None
 
@@ -210,3 +210,56 @@ def get_reactions_associated_reagent(reagent_id):
     reactions = list(models.Reaction.objects.filter(id__in=combined_reaction_ids))
 
     return reactions
+
+
+def get_last_spectrum_all_type(reaction_name, timestamp):
+    # Filtrer les types de spectre qui commencent par reaction_name
+    matching_spectrum_types = models.SpectrumType.objects.filter(type__startswith=reaction_name)
+    print(f"Matching spectrum types: {matching_spectrum_types}")
+
+    # Dictionnaire pour stocker le dernier spectre de chaque type
+    last_spectra = {}
+
+    # Dictionnaire pour stocker les résultats complexes
+    complex_results = {
+        'wavelengths': [],
+        'spectra': {}
+    }
+
+    # Initialisation pour collecter les wavelengths une seule fois
+    wavelengths_collected = False
+
+    # Parcourir chaque type de spectre trouvé
+    for spectrum_type in matching_spectrum_types:
+        # Trouver le dernier spectre pour ce type avant le timestamp donné
+        last_spectrum = models.Spectrum.objects.filter(
+            pfiona_spectrumtype=spectrum_type,
+            pfiona_time__timestamp__lte=timestamp
+        ).order_by('-pfiona_time__timestamp').first()  # Prendre le premier après tri décroissant par timestamp
+        print(f"last_spectrum: {last_spectrum} for spectrum_type: {spectrum_type}")
+
+        # Si un spectre est trouvé, procéder au stockage détaillé
+        if last_spectrum:
+            last_spectra[spectrum_type.type] = last_spectrum
+            spectrum_details = {
+                'Spectrum ID': last_spectrum.id,
+                'Timestamp': last_spectrum.pfiona_time.timestamp,
+                'Values': []
+            }
+
+            # Récupérer et stocker les valeurs associées à ce spectre
+            associated_values = models.Value.objects.filter(pfiona_spectrum=last_spectrum)
+            for value in associated_values:
+                spectrum_details['Values'].append(value.value)
+
+                # Collecter les wavelengths une seule fois
+                if not wavelengths_collected:
+                    complex_results['wavelengths'].append(value.wavelength)
+
+            # Après la première collection de wavelengths, éviter de les récolter à nouveau
+            wavelengths_collected = True
+
+            # Stocker les détails du spectre dans le dictionnaire de résultats complexes
+            complex_results['spectra'][spectrum_type.type] = spectrum_details
+
+    return complex_results
