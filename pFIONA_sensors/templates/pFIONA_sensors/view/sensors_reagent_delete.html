@@ -22,18 +22,26 @@
                 <div class="mb-5">
                     <h2 class="font-poppins font-bold text-gray-500 text-sm">DELETE</h2>
                 </div>
-                <div class="bg-white flex flex-col space-y-3 shadow-lg rounded-2xl py-5 px-8 font-montserrat">
+                <div class="bg-white flex flex-col space-y-5 shadow-lg rounded-2xl py-8 px-8 font-montserrat">
                     <p class="">You are going to delete : <strong>{{ reagent.name }}</strong></p>
                     {% if reactions %}
-                        <div class="flex flex-row">
-                            <img src="{% static 'img/ico/icons8-warning-red-512.svg' %}" alt="Warning icon" class="w-6 h-6">
-                            <p class=""><strong>The followed reactions will be also deleted</strong></p>
+                        <div>
+                             <div class="flex flex-row">
+                                <img src="{% static 'img/ico/icons8-warning-red-512.svg' %}" alt="Warning icon" class="w-6 h-6">
+                                <p class=""><strong>The followed reactions will be also deleted</strong></p>
+                            </div>
+                            <ul>
+                                {% for reaction in reactions %}
+                                    <li>- {{ reaction.name }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <ul>
-                            {% for reaction in reactions %}
-                                <li>- {{ reaction.name }}</li>
-                            {% endfor %}
-                        </ul>
+                    {% endif %}
+                    {% if reagent.port %}
+                        <div class="flex flex-row">
+                                <img src="{% static 'img/ico/icons8-warning-red-512.svg' %}" alt="Warning icon" class="w-6 h-6">
+                                <p class=""><strong>The reagent is currently active in the sensor</strong></p>
+                            </div>
                     {% endif %}
                     <p class="text-red-600 font-bold">This cannot be undone</p>
                     <div class="flex flex-row justify-between">
