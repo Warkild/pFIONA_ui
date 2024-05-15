@@ -260,6 +260,7 @@ def sensors_reaction_edit(request, sensor_id, reaction_id):
 def export_spectra_csv(request):
     start_timestamp_ms = request.GET.get('start')
     end_timestamp_ms = request.GET.get('end')
+    sensor_id = request.GET.get('sensor_id')
 
     response = HttpResponse(
         content_type='text/csv',
@@ -273,7 +274,8 @@ def export_spectra_csv(request):
 
         query = Spectrum.objects.filter(
             pfiona_time__timestamp__gte=start_timestamp,
-            pfiona_time__timestamp__lte=end_timestamp
+            pfiona_time__timestamp__lte=end_timestamp,
+            pfiona_sensor=sensor_id
         ).select_related('pfiona_spectrumtype', 'pfiona_time')
     else:
         query = Spectrum.objects.all().select_related('pfiona_spectrumtype', 'pfiona_time')

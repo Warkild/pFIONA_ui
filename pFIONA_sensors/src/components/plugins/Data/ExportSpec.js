@@ -22,16 +22,13 @@ function ExportSpec() {
     };
 
     const handleSubmit = () => {
-        console.log("***")
-        console.log(startDate)
-        console.log(endDate)
-        console.log(endDate > startDate)
         if (startDate && endDate && endDate > startDate) {
-            window.location.href = `http://127.0.0.1:8000/sensors/export-spectra/?start=${startDate}&end=${endDate}`;
+            window.location.href = `http://127.0.0.1:8000/sensors/export-spectra/?start=${startDate}&end=${endDate}&sensor_id=${sensor_id}`;
         } else {
             alert("ERROR");
         }
     };
+
 
     return (
         <div className={"w-full"}>
