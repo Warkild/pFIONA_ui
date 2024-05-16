@@ -78,8 +78,8 @@ def create_step(reagent_id, reaction_id, number, order):
     :return: Step object
     """
     step = models.Step.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id,
-                                             number=number,
-                                             order=order)
+                                      number=number,
+                                      order=order)
     step.save()
 
     return step
@@ -260,3 +260,7 @@ def get_last_spectrum_all_type(reaction_name, timestamp):
             complex_results['spectra'][spectrum_type.type] = spectrum_details
 
     return complex_results
+
+
+def get_reagent(reagent_id):
+    return models.Reagent.objects.get(id=reagent_id)

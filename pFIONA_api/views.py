@@ -197,3 +197,38 @@ def api_get_last_spectrum_all_type_view(request):
 
     # Renvoyer les données en format JSON
     return JsonResponse(result)
+
+
+def api_get_validity_reaction_to_set_as_current_reaction(request):
+    try:
+        reaction_id = request.GET.get('reaction_id')
+
+        if not reaction_id:
+            raise ValueError("Missing reaction_id parameter")
+
+        reaction_detail = q.get_reaction_details(reaction_id)
+
+        reaction_detail_json = json.loads(reaction_detail)
+
+        if not reaction_detail:
+            raise ValueError("Reaction not found")
+
+        valid = True
+
+        for action in reaction_detail_json['actions']:
+            if action['reagent_id'] is None:
+                pass
+            else:
+                if q.get_reagent(action['reagent_id']).port is None:
+                    valid = False
+
+        if q.get_reagent(reaction_detail_json['standard_id']).port is None:
+            valid = False
+
+        return JsonResponse({'status': 'success', 'data': valid})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred: {}'.format(str(e))},
+                            status=500)
