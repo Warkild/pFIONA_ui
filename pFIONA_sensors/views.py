@@ -165,8 +165,13 @@ def sensors_reagent_deletion(request, sensor_id, reagent_id):
 
 @login_required()
 def sensors_reaction_delete(request, sensor_id, reaction_id):
+    sensor = get_object_or_404(Sensor, pk=sensor_id)
+    sensor.actual_reaction_id = None
+    sensor.save()
+
     reaction = get_object_or_404(Reaction, pk=reaction_id)
     reaction.delete()
+
     return redirect('sensors_reagents', sensor_id=sensor_id)
 
 
