@@ -77,6 +77,9 @@ def api_add_reaction(request):
                 # Nothing selected
                 raise ValidationError('Step cannot be empty')
 
+        if len(reagent_id) == 0:
+            raise ValidationError('You must specify at least one reagent')
+
         if data['standard_reagent_id'] == "":
             raise ValidationError('Standard reagent cannot be empty')
 
@@ -141,6 +144,9 @@ def api_edit_reaction(request):
             else:
                 # Nothing selected
                 raise ValidationError('Step cannot be empty')
+
+        if len(reagent_id) == 0:
+            raise ValidationError('You must specify at least one reagent')
 
         if data['standard_reagent_id'] == "":
             raise ValidationError('Standard reagent cannot be empty')
