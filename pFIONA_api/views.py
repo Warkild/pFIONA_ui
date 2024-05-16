@@ -153,7 +153,7 @@ def api_edit_reaction(request):
         # All validations passed, proceed to update the reaction
 
         reaction = q.update_reaction(data['id'], data['name'], int(data['standard_reagent_id']),
-                                     int(data['standard_concentration']))
+                                     float(data['standard_concentration']))
 
         q.delete_all_step(data['id'])
 
