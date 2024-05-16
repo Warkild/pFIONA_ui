@@ -81,16 +81,6 @@ function ReactionAddApp() {
             standard_concentration: standardConcentration
         };
 
-        if (reactionName === "") {
-            setAlertModalText("The reaction must have a name");
-            setIsModalOpen(true);
-        } else if (reagentData.length === 0 || reagentData[0].volume === "" || reagentData[0].reagentId === "") {
-            setAlertModalText("At least one reagent must be correctly entered.");
-            setIsModalOpen(true);
-        } else if (reactionData.standard_reagent_id === "")  {
-            setAlertModalText("Standard Reagent must be selected")
-            setIsModalOpen(true)
-        } else {
             const apiUrl = "/api/add_reaction"; // Your Django API URL
 
             fetch(apiUrl, {
@@ -101,13 +91,27 @@ function ReactionAddApp() {
                 },
                 body: JSON.stringify(reactionData)
             })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Success:", data)
-                    window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
-                })
-                .catch(error => console.error("Error:", error));
+                .then(response => response.json().then(data => {
+        if (!response.ok) {
+            // Throw an error with the message from the server
+            throw new Error(data.message || 'Unknown error');
         }
+        return data;
+    }))
+    .then(data => {
+        if (data.status === 'error') {
+            setAlertModalText(data.message);
+            setIsModalOpen(true);
+        } else {
+            console.log("Success:", data);
+            window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        setAlertModalText(error.message); // Use error.message to show the message from Django
+        setIsModalOpen(true);
+    });
     };
 
     /** ALERT BOX **/

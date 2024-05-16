@@ -32,7 +32,8 @@ def api_set_current_reaction(request, sensor_id):
 def api_get_current_reaction(request, sensor_id):
     try:
         current_reaction = q.get_current_reaction(sensor_id)
-        return JsonResponse({'status': 'success', 'reaction_id': current_reaction.id, 'reaction_name': current_reaction.name})
+        return JsonResponse(
+            {'status': 'success', 'reaction_id': current_reaction.id, 'reaction_name': current_reaction.name})
 
     except Exception as e:
 
@@ -46,21 +47,34 @@ def api_add_reaction(request):
     data = json.loads(request.body)
 
     respect_constraint = True
+    error_text = ""
 
     # Verifying if data are correct
 
     if data['name'] == "":
         respect_constraint = False
+        error_text = 'Name cannot be empty'
 
     if int(data['wait_time']) <= -1:
         respect_constraint = False
+        error_text = 'Waiting time cannot be negative'
 
     for reagent in data['reagents']:
         if reagent[0] == "" or reagent[1] == "":
             respect_constraint = False
+            error_text = 'Reagent cannot be empty'
 
     if data['standard_reagent_id'] == "":
         respect_constraint = False
+        error_text = 'Standard reagent cannot be empty'
+
+    reagent_ids = []
+    for reagent in data['reagents']:
+        if reagent[0] in reagent_ids:
+            respect_constraint = False
+            error_text = "You can't add 2 times the same reagent"
+        else:
+            reagent_ids.append(reagent[0])
 
     if respect_constraint:
         reaction = q.create_reaction(data['name'], int(data['wait_time']), int(data['standard_reagent_id']),
@@ -72,7 +86,7 @@ def api_add_reaction(request):
         return JsonResponse({'status': 'success', 'message': f'Reaction added successfully!'})
 
     else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+        return JsonResponse({'status': 'error', 'message': f'{error_text}'}, status=400)
 
 
 @login_required()
