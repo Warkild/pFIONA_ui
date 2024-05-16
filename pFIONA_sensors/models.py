@@ -30,7 +30,7 @@ class Reagent(models.Model):
 
 class Reaction(models.Model):
     name = models.CharField(max_length=100)
-    wait = models.IntegerField()
+    wait = models.IntegerField(null=True)
     standard = models.ForeignKey(Reagent, on_delete=models.CASCADE, null=True, name="standard")
     standard_concentration = models.FloatField(default=0)
 
