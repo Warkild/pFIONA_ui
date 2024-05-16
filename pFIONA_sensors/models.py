@@ -45,7 +45,6 @@ class Step(models.Model):
 
     class Meta:
         db_table = 'pfiona_step'
-        unique_together = ('pfiona_reaction', 'pfiona_reagent')
 
 
 class Spectrum(models.Model):

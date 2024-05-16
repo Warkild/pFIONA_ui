@@ -70,8 +70,6 @@ def api_add_reaction(request):
                     raise ValidationError('Reagent volume cannot be empty')
                 if int(step[1]) <= 0:
                     raise ValidationError('Reagent volume cannot be negative or nul')
-                if step[0] in reagent_id:
-                    raise ValidationError("You can't add the same reagent more than once")
                 reagent_id.append(step[0])
             else:
                 # Nothing selected
@@ -138,8 +136,6 @@ def api_edit_reaction(request):
                     raise ValidationError('Reagent volume cannot be empty')
                 if int(step[1]) <= 0:
                     raise ValidationError('Reagent volume cannot be negative or nul')
-                if step[0] in reagent_id:
-                    raise ValidationError("You can't add the same reagent more than once")
                 reagent_id.append(step[0])
             else:
                 # Nothing selected
