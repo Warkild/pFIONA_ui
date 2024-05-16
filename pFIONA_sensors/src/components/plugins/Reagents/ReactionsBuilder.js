@@ -1,13 +1,13 @@
 import React from 'react';
 
-function ReactionsList({reactions}) {
+function ReactionsBuilder({reactions}) {
 
 
     // Return HTML Code
     return (
         <div className={"w-full"}>
             <div className={"mb-5"}>
-                <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>REACTIONS LIST</h2>
+                <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>REACTIONS BUILDER</h2>
             </div>
             <div className={"flex flex-col font-montserrat bg-white shadow-lg rounded-2xl py-7 px-8"}>
                 <div className={"h-10"}>
@@ -65,4 +65,4 @@ function ReactionsList({reactions}) {
     );
 }
 
-export default ReactionsList;
+export default ReactionsBuilder;

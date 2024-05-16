@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
+import React, {useEffect, useState} from "react";
+import {createRoot} from "react-dom/client";
 import Alert from "./plugins/Alert";
 
 /**
@@ -14,8 +14,8 @@ function ReactionEditApp() {
      * VARIABLES
      */
 
-    // List of reagents selected in the UI
-    const [reactionReagents, setReactionReagents] = useState([{ reagent_id: "", volume: "" }]);
+        // List of reagents selected in the UI
+    const [reactionReagents, setReactionReagents] = useState([{reagent_id: "", volume: ""}]);
 
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
@@ -44,7 +44,7 @@ function ReactionEditApp() {
     const handleChange = (index, field, value) => {
         const newReagents = reactionReagents.map((item, i) => {
             if (i === index) {
-                return { ...item, [field]: value };
+                return {...item, [field]: value};
             }
             return item;
         });
@@ -54,7 +54,7 @@ function ReactionEditApp() {
     useEffect(() => {
         const lastReagent = reactionReagents[reactionReagents.length - 1];
         if (lastReagent.reagent_id && lastReagent.volume) {
-            setReactionReagents([...reactionReagents, { reagent_id: "", volume: "" }]);
+            setReactionReagents([...reactionReagents, {reagent_id: "", volume: ""}]);
         }
     }, [reactionReagents]);
 
@@ -82,33 +82,38 @@ function ReactionEditApp() {
             standard_concentration: standardConcentration
         };
 
-        if (reactionName === "") {
-            setAlertModalText("The reaction must have a name");
-            setIsModalOpen(true);
-        } else if (reagentData.length === 0 || reagentData[0].volume === "" || reagentData[0].reagent_id === "") {
-            setAlertModalText("At least one reagent must be correctly entered.");
-            setIsModalOpen(true);
-        } else if (reactionData.standard_reagent_id === "")  {
-            setAlertModalText("Standard Reagent must be selected")
-            setIsModalOpen(true)
-        } else {
-            const apiUrl = `/api/edit_reaction`; // Your Django API URL
+        const apiUrl = "/api/edit_reaction"; // Your Django API URL
 
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Add other headers here if needed, like authentication tokens
-                },
-                body: JSON.stringify(reactionData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Success:", data)
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add other headers here if needed, like authentication tokens
+            },
+            body: JSON.stringify(reactionData)
+        })
+            .then(response => response.json().then(data => {
+                if (!response.ok) {
+                    // Throw an error with the message from the server
+                    throw new Error(data.message || 'Unknown error');
+                }
+                return data;
+            }))
+            .then(data => {
+                if (data.status === 'error') {
+                    setAlertModalText(data.message);
+                    setIsModalOpen(true);
+                } else {
+                    console.log("Success:", data);
                     window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
-                })
-                .catch(error => console.error("Error:", error));
-        }
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                setAlertModalText(error.message); // Use error.message to show the message from Django
+                setIsModalOpen(true);
+            });
+
     };
 
     /** ALERT BOX **/
@@ -127,7 +132,7 @@ function ReactionEditApp() {
         setStandardReagentId(reaction_json['standard_id'])
         setReactionReagents(reaction_json['actions'].map(action => ({
             reagent_id: action.reagent_id,
-                volume: action.volume
+            volume: action.volume
         })));
     }, []);
 

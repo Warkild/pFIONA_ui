@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
@@ -43,90 +44,107 @@ def api_get_current_reaction(request, sensor_id):
 @login_required()
 @csrf_exempt
 def api_add_reaction(request):
-    print(request.body)
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
 
-    respect_constraint = True
-    error_text = ""
+        # Validation of data
+        if data['name'] == "":
+            raise ValidationError('Name cannot be empty')
 
-    # Verifying if data are correct
+        if int(data['wait_time']) <= -1:
+            raise ValidationError('Waiting time cannot be negative')
 
-    if data['name'] == "":
-        respect_constraint = False
-        error_text = 'Name cannot be empty'
+        if len(data['reagents']) == 0:
+            raise ValidationError('You need to specify at least one reagent')
 
-    if int(data['wait_time']) <= -1:
-        respect_constraint = False
-        error_text = 'Waiting time cannot be negative'
+        reagent_ids = set()
+        for reagent in data['reagents']:
+            print(f"Reagent: {reagent}")
+            reagent_id = reagent[0]
+            volume = reagent[1]
+            if not reagent_id or not volume:
+                raise ValidationError('All reagents must be specified with non-empty ID and volume')
+            if int(volume) <= 0:
+                raise ValidationError('The volume of reagent cannot be negative or null')
+            if reagent_id in reagent_ids:
+                raise ValidationError("You can't add the same reagent more than once")
+            if volume == "":
+                raise ValidationError('The volume of reagent cannot be empty')
+            reagent_ids.add(reagent_id)
 
-    for reagent in data['reagents']:
-        if reagent[0] == "" or reagent[1] == "":
-            respect_constraint = False
-            error_text = 'Reagent cannot be empty'
+        if data['standard_reagent_id'] == "":
+            raise ValidationError('Standard reagent cannot be empty')
 
-    if data['standard_reagent_id'] == "":
-        respect_constraint = False
-        error_text = 'Standard reagent cannot be empty'
+        if float(data["standard_concentration"]) <= 0:
+            raise ValidationError('Standard concentration cannot be negative')
 
-    reagent_ids = []
-    for reagent in data['reagents']:
-        if reagent[0] in reagent_ids:
-            respect_constraint = False
-            error_text = "You can't add 2 times the same reagent"
-        else:
-            reagent_ids.append(reagent[0])
-
-    if respect_constraint:
+        # All validations passed, proceed to create the reaction
         reaction = q.create_reaction(data['name'], int(data['wait_time']), int(data['standard_reagent_id']),
                                      float(data['standard_concentration']))
 
         for key, reagent in enumerate(data['reagents']):
             q.create_volumetoadd(reagent[0], reaction.id, reagent[1], key)
 
-        return JsonResponse({'status': 'success', 'message': f'Reaction added successfully!'})
+        return JsonResponse({'status': 'success', 'message': 'Reaction added successfully!'})
 
-    else:
-        return JsonResponse({'status': 'error', 'message': f'{error_text}'}, status=400)
+    except ValidationError as e:
+        # Return an error message if validation fails
+        return JsonResponse({'status': 'error', 'message': str(e.message)}, status=400)
+    except Exception as e:
+        # Catch other unexpected errors
+        return JsonResponse({'status': 'error', 'message': f'An unexpected error occurred: {str(e.message)}'},
+                            status=500)
 
 
 @login_required()
 @csrf_exempt
 def api_edit_reaction(request):
-    data = json.loads(request.body)
+    try:
+        data = json.loads(request.body)
 
-    respect_constraint = True
+        if data['name'] == "":
+            raise ValidationError('Name cannot be empty')
 
-    # Verifying if data are correct
+        wait_time = int(data['wait_time'])
+        if wait_time <= -1:
+            raise ValidationError('Waiting time cannot be negative')
 
-    if data['name'] == "":
-        respect_constraint = False
+        if len(data['reagents']) == 0:
+            raise ValidationError('You need to specify at least one reagent')
 
-    if int(data['wait_time']) <= -1:
-        respect_constraint = False
+        reagent_ids = set()
+        for reagent in data['reagents']:
+            reagent_id, volume = reagent
+            if not reagent_id or volume == "":
+                raise ValidationError('All reagents must be specified with non-empty ID and volume')
+            volume = int(volume)
+            if volume <= 0:
+                raise ValidationError('The volume of reagent cannot be negative or null')
+            if reagent_id in reagent_ids:
+                raise ValidationError("You can't add the same reagent more than once")
+            reagent_ids.add(reagent_id)
 
-    if data['id'] == "":
-        respect_constraint = False
+        if data['standard_reagent_id'] == "":
+            raise ValidationError('Standard reagent cannot be empty')
 
-    for reagent in data['reagents']:
-        if reagent[0] == "" or reagent[1] == "":
-            respect_constraint = False
+        standard_concentration = float(data["standard_concentration"])
+        if standard_concentration <= 0:
+            raise ValidationError('Standard concentration cannot be negative')
 
-    if data['standard_reagent_id'] == "":
-        respect_constraint = False
-
-    if respect_constraint:
-        reaction = q.update_reaction(data['id'], data['name'], int(data['wait_time']), int(data['standard_reagent_id']),
-                                     float(data['standard_concentration']))
+        reaction = q.update_reaction(data['id'], data['name'], wait_time, int(data['standard_reagent_id']),
+                                     standard_concentration)
 
         q.delete_all_volumetoadd(data['id'])
 
         for key, reagent in enumerate(data['reagents']):
             q.create_volumetoadd(reagent[0], reaction.id, reagent[1], key)
 
-        return JsonResponse({'status': 'success', 'message': f'Reaction edit successfully!'})
+        return JsonResponse({'status': 'success', 'message': 'Reaction edited successfully!'})
 
-    else:
-        return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+    except ValidationError as e:
+        return JsonResponse({'status': 'error', 'message': str(e.message)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred: ' + str(e.message)}, status=500)
 
 
 @login_required

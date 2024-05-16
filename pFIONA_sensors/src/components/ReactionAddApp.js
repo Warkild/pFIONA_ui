@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
+import React, {useEffect, useState} from "react";
+import {createRoot} from "react-dom/client";
 import Alert from "./plugins/Alert";
 
 /**
@@ -14,8 +14,8 @@ function ReactionAddApp() {
      * VARIABLES
      */
 
-    // List of reagents selected in the UI
-    const [reactionReagents, setReactionReagents] = useState([{ reagentId: "", volume: "" }]);
+        // List of reagents selected in the UI
+    const [reactionReagents, setReactionReagents] = useState([{reagentId: "", volume: ""}]);
 
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
@@ -44,7 +44,7 @@ function ReactionAddApp() {
     const handleChange = (index, field, value) => {
         const newReagents = reactionReagents.map((item, i) => {
             if (i === index) {
-                return { ...item, [field]: value };
+                return {...item, [field]: value};
             }
             return item;
         });
@@ -54,7 +54,7 @@ function ReactionAddApp() {
     useEffect(() => {
         const lastReagent = reactionReagents[reactionReagents.length - 1];
         if (lastReagent.reagentId && lastReagent.volume) {
-            setReactionReagents([...reactionReagents, { reagent_id: "", volume: "" }]);
+            setReactionReagents([...reactionReagents, {reagent_id: "", volume: ""}]);
         }
     }, [reactionReagents]);
 
@@ -81,37 +81,37 @@ function ReactionAddApp() {
             standard_concentration: standardConcentration
         };
 
-            const apiUrl = "/api/add_reaction"; // Your Django API URL
+        const apiUrl = "/api/add_reaction"; // Your Django API URL
 
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Add other headers here if needed, like authentication tokens
-                },
-                body: JSON.stringify(reactionData)
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add other headers here if needed, like authentication tokens
+            },
+            body: JSON.stringify(reactionData)
+        })
+            .then(response => response.json().then(data => {
+                if (!response.ok) {
+                    // Throw an error with the message from the server
+                    throw new Error(data.message || 'Unknown error');
+                }
+                return data;
+            }))
+            .then(data => {
+                if (data.status === 'error') {
+                    setAlertModalText(data.message);
+                    setIsModalOpen(true);
+                } else {
+                    console.log("Success:", data);
+                    window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
+                }
             })
-                .then(response => response.json().then(data => {
-        if (!response.ok) {
-            // Throw an error with the message from the server
-            throw new Error(data.message || 'Unknown error');
-        }
-        return data;
-    }))
-    .then(data => {
-        if (data.status === 'error') {
-            setAlertModalText(data.message);
-            setIsModalOpen(true);
-        } else {
-            console.log("Success:", data);
-            window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
-        }
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        setAlertModalText(error.message); // Use error.message to show the message from Django
-        setIsModalOpen(true);
-    });
+            .catch(error => {
+                console.error("Error:", error);
+                setAlertModalText(error.message); // Use error.message to show the message from Django
+                setIsModalOpen(true);
+            });
     };
 
     /** ALERT BOX **/
