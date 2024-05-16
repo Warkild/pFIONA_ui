@@ -83,7 +83,7 @@ def api_add_reaction(request):
                                      float(data['standard_concentration']))
 
         for key, reagent in enumerate(data['reagents']):
-            q.create_volumetoadd(reagent[0], reaction.id, reagent[1], key)
+            q.create_step(reagent[0], reaction.id, reagent[1], key)
 
         return JsonResponse({'status': 'success', 'message': 'Reaction added successfully!'})
 
@@ -134,10 +134,10 @@ def api_edit_reaction(request):
         reaction = q.update_reaction(data['id'], data['name'], wait_time, int(data['standard_reagent_id']),
                                      standard_concentration)
 
-        q.delete_all_volumetoadd(data['id'])
+        q.delete_all_step(data['id'])
 
         for key, reagent in enumerate(data['reagents']):
-            q.create_volumetoadd(reagent[0], reaction.id, reagent[1], key)
+            q.create_step(reagent[0], reaction.id, reagent[1], key)
 
         return JsonResponse({'status': 'success', 'message': 'Reaction edited successfully!'})
 

@@ -67,28 +67,28 @@ def create_reaction(name, wait_time, standard_id, standard_concentration):
     return reaction
 
 
-def create_volumetoadd(reagent_id, reaction_id, volume, order):
+def create_step(reagent_id, reaction_id, volume, order):
     """
-    Create a volumetoadd object in database
+    Create a step object in database
 
     :param reagent_id: Reagent ID
     :param reaction_id: Reaction ID
     :param volume: Volume to add
     :param order: Order of the action in reaction
 
-    :return: Volumetoadd object
+    :return: Step object
     """
-    volumetoadd = models.VolumeToAdd.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id,
-                                                    volume=volume,
-                                                    order=order)
-    volumetoadd.save()
+    step = models.Step.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id,
+                                             volume=volume,
+                                             order=order)
+    step.save()
 
-    return volumetoadd
+    return step
 
 
 def get_reaction_details(reaction_id):
     """
-    Get reaction details with the reaction and volumetoadd details
+    Get reaction details with the reaction and step details
 
     :param reaction_id: Reaction ID
 
@@ -99,14 +99,14 @@ def get_reaction_details(reaction_id):
 
     reaction = models.Reaction.objects.filter(id=reaction_id).get()
 
-    # Get the volumetoadd to have the full reaction details
+    # Get the step to have the full reaction details
 
-    volumetoadd_list = models.VolumeToAdd.objects.filter(pfiona_reaction_id=reaction.id).order_by('order')
+    step_list = models.Step.objects.filter(pfiona_reaction_id=reaction.id).order_by('order')
 
-    volumetoadd_json = [{
-        'reagent_id': volumetoadd.pfiona_reagent_id,
-        'volume': volumetoadd.volume
-    } for volumetoadd in volumetoadd_list]
+    step_json = [{
+        'reagent_id': step.pfiona_reagent_id,
+        'volume': step.volume
+    } for step in step_list]
 
     # Create an object with all the information about the reaction
 
@@ -116,20 +116,20 @@ def get_reaction_details(reaction_id):
         'wait': reaction.wait,
         'standard_id': reaction.standard.id,
         'standard_concentration': reaction.standard_concentration,
-        'actions': volumetoadd_json
+        'actions': step_json
     })
 
     return reaction_json
 
 
-def delete_all_volumetoadd(reaction_id):
+def delete_all_step(reaction_id):
     """
-    Delete all volumetoadd object in database associated with a specific reaction id
+    Delete all step object in database associated with a specific reaction id
 
     :param reaction_id: Reaction ID
     """
 
-    models.VolumeToAdd.objects.filter(pfiona_reaction_id=reaction_id).delete()
+    models.Step.objects.filter(pfiona_reaction_id=reaction_id).delete()
 
 
 def update_reaction(reaction_id, name, wait_time, standard_id, standard_concentration):
@@ -199,7 +199,7 @@ def get_reactions_associated_reagent(reagent_id):
     :return: List of reactions
     """
 
-    volume_to_adds = models.VolumeToAdd.objects.filter(pfiona_reagent_id=reagent_id)
+    volume_to_adds = models.Step.objects.filter(pfiona_reagent_id=reagent_id)
     reaction_ids = set(vta.pfiona_reaction_id for vta in volume_to_adds)
 
     standard_reactions = models.Reaction.objects.filter(standard_id=reagent_id)

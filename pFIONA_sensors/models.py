@@ -38,14 +38,14 @@ class Reaction(models.Model):
         db_table = 'pfiona_reaction'
 
 
-class VolumeToAdd(models.Model):
+class Step(models.Model):
     reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE, name="pfiona_reaction")
-    reagent = models.ForeignKey(Reagent, on_delete=models.CASCADE, name="pfiona_reagent")
-    volume = models.IntegerField()
+    reagent = models.ForeignKey(Reagent, on_delete=models.CASCADE, name="pfiona_reagent", null=True)
+    number = models.IntegerField()
     order = models.IntegerField(default=0)
 
     class Meta:
-        db_table = 'pfiona_volumetoadd'
+        db_table = 'pfiona_step'
         unique_together = ('pfiona_reaction', 'pfiona_reagent')
 
 

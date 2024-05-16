@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
-from pFIONA_sensors.models import Sensor, Reagent, VolumeToAdd, Reaction, Spectrum
+from pFIONA_sensors.models import Sensor, Reagent, Step, Reaction, Spectrum
 from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm
 
 
@@ -87,8 +87,8 @@ def sensors_reagents(request, sensor_id):
 
     # REACTIONS
 
-    volume_to_adds = VolumeToAdd.objects.filter(pfiona_reagent__in=reagents)
-    reactions = Reaction.objects.filter(volumetoadd__in=volume_to_adds).distinct()
+    volume_to_adds = Step.objects.filter(pfiona_reagent__in=reagents)
+    reactions = Reaction.objects.filter(step__in=volume_to_adds).distinct()
 
     reactions_data = [{
         'id': reaction.id,
@@ -151,7 +151,7 @@ def sensors_reagent_deletion(request, sensor_id, reagent_id):
         standard_reactions = Reaction.objects.filter(standard_id=reagent_id)
         standard_reaction_ids = set(standard_reactions.values_list('id', flat=True))
 
-        volume_to_adds = VolumeToAdd.objects.filter(pfiona_reagent_id=reagent_id)
+        volume_to_adds = Step.objects.filter(pfiona_reagent_id=reagent_id)
         reaction_ids_from_volume_to_add = set(vta.pfiona_reaction_id for vta in volume_to_adds)
         reaction_ids = standard_reaction_ids.union(reaction_ids_from_volume_to_add)
 
