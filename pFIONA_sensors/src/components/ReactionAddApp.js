@@ -19,7 +19,7 @@ function ReactionAddApp() {
      */
 
         // List of reagents selected in the UI
-    const [reactionReagents, setReactionReagents] = useState([{reagentId: "", volume: ""}]);
+    const [reactionReagents, setReactionReagents] = useState([{reagentId: "", number: ""}]);
 
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
@@ -54,8 +54,8 @@ function ReactionAddApp() {
 
     useEffect(() => {
         const lastReagent = reactionReagents[reactionReagents.length - 1];
-        if (lastReagent.reagentId && lastReagent.volume) {
-            setReactionReagents([...reactionReagents, {reagent_id: "", volume: ""}]);
+        if (lastReagent.reagentId && lastReagent.number) {
+            setReactionReagents([...reactionReagents, {reagent_id: "", number: ""}]);
         }
     }, [reactionReagents]);
 
@@ -72,7 +72,7 @@ function ReactionAddApp() {
      * Save the data in the database with Django API
      */
     const handleSave = () => {
-        const reagentData = reactionReagents.map(reagent => [reagent.reagentId, reagent.volume]);
+        const reagentData = reactionReagents.map(reagent => [reagent.reagentId, reagent.number]);
         reagentData.pop(); // Remove the last placeholder entry
         const reactionData = {
             name: reactionName,
@@ -158,8 +158,8 @@ function ReactionAddApp() {
                             <div className={"w-1/12"}></div>
                             <input
                                 type="number"
-                                value={item.volume}
-                                onChange={(e) => handleChange(index, "volume", e.target.value)}
+                                value={item.number}
+                                onChange={(e) => handleChange(index, "number", e.target.value)}
                                 placeholder="Volume (μL) / Time (s)"
                                 className="mt-1 remove-arrow block w-2/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
