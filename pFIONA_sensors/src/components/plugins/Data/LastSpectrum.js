@@ -12,6 +12,7 @@ function LastSpectrum() {
         labels: [],
         datasets: []
     });
+    const [error, setError] = useState(null);
 
     const chartOptions = {
         animation: {
@@ -38,22 +39,21 @@ function LastSpectrum() {
             .then(response => response.json())
             .then(data => {
                 setCurrentReactionName(data.reaction_name);
-                setLoading(false);
             })
             .catch(error => {
                 console.error("Error fetching current reaction id:", error);
-                setLoading(false);
+                setError(`Error fetching current reaction id: ${error.message}`)
             });
     }, [sensorId]);
 
     // Fetch last 5 spectra data once current reaction name is available
     useEffect(() => {
-        if (!loading && currentReactionName) {
+        if (currentReactionName) {
             const timestamp = new Date().getTime();
             fetch(`/api/get_last_spectrum_all_type_view?reaction_name=${currentReactionName}&timestamp=${timestamp}`)
                 .then(response => response.json())
                 .then(data => {
-                    if (data && data.spectra) {
+                    if (data && JSON.stringify(data.spectra) !== '{}') {
                         const wavelengths = data.wavelengths;
                         const datasets = Object.entries(data.spectra).map(([type, spectrum], index) => {
                             return {
@@ -68,22 +68,33 @@ function LastSpectrum() {
                             labels: wavelengths,
                             datasets
                         });
+                        setLoading(false)
+                    } else {
+                        setError(`There is no spectrum in database associated with the current reaction of sensor (${currentReactionName})`)
                     }
                 })
                 .catch(error => console.error("Error fetching spectra data:", error));
         }
-    }, [currentReactionName, loading]);
+    }, [currentReactionName]);
 
     return (
         <div className="w-full">
             <div className="mb-5">
-                <h2 className="font-poppins font-bold text-gray-500 text-sm">LAST SPECTRUM</h2>
+                <h2 className="font-poppins font-bold text-gray-500 text-sm">LAST SPECTRUM OF CURRENT REACTION</h2>
             </div>
             <div className="flex flex-col font-montserrat bg-white shadow-lg rounded-2xl py-7 px-8">
-                {!loading && chartData ? (
-                    <Line data={chartData} options={chartOptions} />
+                {!error ? (
+                    <>
+                        {!loading && chartData ? (
+                            <Line data={chartData} options={chartOptions} />
+                        ) : (
+                            <p>Loading...</p>
+                        )}
+                    </>
                 ) : (
-                    <p>Loading...</p>
+                    <>
+                        <p>{error}</p>
+                    </>
                 )}
             </div>
         </div>
