@@ -46,6 +46,7 @@ def api_get_current_reaction(request, sensor_id):
 def api_add_reaction(request):
     try:
         data = json.loads(request.body)
+        print(data)
 
         # Validation of data
         if data['name'] == "":
@@ -54,23 +55,30 @@ def api_add_reaction(request):
         if int(data['wait_time']) <= -1:
             raise ValidationError('Waiting time cannot be negative')
 
-        if len(data['reagents']) == 0:
+        if len(data['steps']) == 0:
             raise ValidationError('You need to specify at least one reagent')
 
-        reagent_ids = set()
-        for reagent in data['reagents']:
-            print(f"Reagent: {reagent}")
-            reagent_id = reagent[0]
-            volume = reagent[1]
-            if not reagent_id or not volume:
-                raise ValidationError('All reagents must be specified with non-empty ID and volume')
-            if int(volume) <= 0:
-                raise ValidationError('The volume of reagent cannot be negative or null')
-            if reagent_id in reagent_ids:
-                raise ValidationError("You can't add the same reagent more than once")
-            if volume == "":
-                raise ValidationError('The volume of reagent cannot be empty')
-            reagent_ids.add(reagent_id)
+        reagent_id = []
+        for step in data["steps"]:
+            # Receive the step to format ["reagent_id/wait, volume/wait_time"]
+            if step[0] == "w":
+                # Wait time
+                if step[1] == "":
+                    raise ValidationError('Wait time cannot be empty')
+                if int(step[1]) < 0:
+                    raise ValidationError('Wait time cannot be negative')
+            elif step[0] != "":
+                # Reagent
+                if step[1] == "":
+                    raise ValidationError('Reagent volume cannot be empty')
+                if int(step[1]) <= 0:
+                    raise ValidationError('Reagent volume cannot be negative or nul')
+                if step[0] in reagent_id:
+                    raise ValidationError("You can't add the same reagent more than once")
+                reagent_id.append(step[0])
+            else:
+                # Nothing selected
+                raise ValidationError('Step cannot be empty')
 
         if data['standard_reagent_id'] == "":
             raise ValidationError('Standard reagent cannot be empty')
@@ -82,8 +90,13 @@ def api_add_reaction(request):
         reaction = q.create_reaction(data['name'], int(data['wait_time']), int(data['standard_reagent_id']),
                                      float(data['standard_concentration']))
 
-        for key, reagent in enumerate(data['reagents']):
-            q.create_step(reagent[0], reaction.id, reagent[1], key)
+        for key, step in enumerate(data['steps']):
+            if step[0] == "w":
+                # Wait Time
+                q.create_step(None, reaction.id, step[1], key)
+            else:
+                # Reagent
+                q.create_step(step[0], reaction.id, step[1], key)
 
         return JsonResponse({'status': 'success', 'message': 'Reaction added successfully!'})
 
@@ -144,7 +157,8 @@ def api_edit_reaction(request):
     except ValidationError as e:
         return JsonResponse({'status': 'error', 'message': str(e.message)}, status=400)
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred: ' + str(e.message)}, status=500)
+        return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred: ' + str(e.message)},
+                            status=500)
 
 
 @login_required

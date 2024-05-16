@@ -67,19 +67,19 @@ def create_reaction(name, wait_time, standard_id, standard_concentration):
     return reaction
 
 
-def create_step(reagent_id, reaction_id, volume, order):
+def create_step(reagent_id, reaction_id, number, order):
     """
     Create a step object in database
 
-    :param reagent_id: Reagent ID
+    :param reagent_id: Reagent ID (or null if waiting time)
     :param reaction_id: Reaction ID
-    :param volume: Volume to add
+    :param number: Volume to add / Waiting time (depends on param reagent_id)
     :param order: Order of the action in reaction
 
     :return: Step object
     """
     step = models.Step.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id,
-                                             volume=volume,
+                                             number=number,
                                              order=order)
     step.save()
 

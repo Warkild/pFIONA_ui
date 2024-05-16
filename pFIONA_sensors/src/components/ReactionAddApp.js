@@ -14,6 +14,10 @@ function ReactionAddApp() {
      * VARIABLES
      */
 
+    /**
+     * TODO: 16/05/2024 : Kylian à changer les volumetoadd en steps, code à modifier pour plus de visibilité en lecture
+     */
+
         // List of reagents selected in the UI
     const [reactionReagents, setReactionReagents] = useState([{reagentId: "", volume: ""}]);
 
@@ -75,7 +79,7 @@ function ReactionAddApp() {
         reagentData.pop(); // Remove the last placeholder entry
         const reactionData = {
             name: reactionName,
-            reagents: reagentData,
+            steps: reagentData,
             wait_time: reactionWaitTime,
             standard_reagent_id: standardReagentId,
             standard_concentration: standardConcentration
@@ -148,9 +152,10 @@ function ReactionAddApp() {
                                 className="mt-1 block w-8/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             >
                                 <option value="">Select a Reagent</option>
+                                <option value="w">Wait</option>
                                 {true_reagents.map((reagent) => (
                                     <option key={reagent.id} value={reagent.id}>
-                                        {reagent.name}
+                                        Add {reagent.name}
                                     </option>
                                 ))}
                             </select>
@@ -159,7 +164,7 @@ function ReactionAddApp() {
                                 type="number"
                                 value={item.volume}
                                 onChange={(e) => handleChange(index, "volume", e.target.value)}
-                                placeholder="Volume (μL)"
+                                placeholder="Volume (μL) / Time (s)"
                                 className="mt-1 remove-arrow block w-2/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
                             {index !== reactionReagents.length - 1 && (
