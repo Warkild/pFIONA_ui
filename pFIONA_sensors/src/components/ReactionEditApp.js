@@ -14,8 +14,8 @@ function ReactionEditApp() {
      * VARIABLES
      */
 
-        // List of reagents selected in the UI
-    const [reactionReagents, setReactionReagents] = useState([{reagent_id: "", volume: ""}]);
+    // List of reagents selected in the UI
+    const [reactionReagents, setReactionReagents] = useState([{reagent_id: "", number: ""}]);
 
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
@@ -53,8 +53,8 @@ function ReactionEditApp() {
 
     useEffect(() => {
         const lastReagent = reactionReagents[reactionReagents.length - 1];
-        if (lastReagent.reagent_id && lastReagent.volume) {
-            setReactionReagents([...reactionReagents, {reagent_id: "", volume: ""}]);
+        if (lastReagent.reagent_id && lastReagent.number) {
+            setReactionReagents([...reactionReagents, {reagent_id: "", number: ""}]);
         }
     }, [reactionReagents]);
 
@@ -71,12 +71,12 @@ function ReactionEditApp() {
      * Save the data in the database with Django API
      */
     const handleSave = () => {
-        const reagentData = reactionReagents.map(reagent => [reagent.reagent_id, reagent.volume]);
+        const reagentData = reactionReagents.map(reagent => [reagent.reagent_id, reagent.number]);
         reagentData.pop(); // Remove the last placeholder entry
         const reactionData = {
             id: reaction_json['id'],
             name: reactionName,
-            reagents: reagentData,
+            steps: reagentData,
             wait_time: reactionWaitTime,
             standard_reagent_id: standardReagentId,
             standard_concentration: standardConcentration
@@ -131,8 +131,8 @@ function ReactionEditApp() {
         setStandardConcentration(reaction_json['standard_concentration'])
         setStandardReagentId(reaction_json['standard_id'])
         setReactionReagents(reaction_json['actions'].map(action => ({
-            reagent_id: action.reagent_id,
-            volume: action.volume
+            reagent_id: action.reagent_id || "w",
+            number: action.number
         })));
     }, []);
 
@@ -163,6 +163,7 @@ function ReactionEditApp() {
                                 className="mt-1 block w-8/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             >
                                 <option value="">Select a Reagent</option>
+                                <option value="w">Wait</option>
                                 {true_reagents.map((reagent) => (
                                     <option key={reagent.id} value={reagent.id}>
                                         {reagent.name}
@@ -172,8 +173,8 @@ function ReactionEditApp() {
                             <div className={"w-1/12"}></div>
                             <input
                                 type="number"
-                                value={item.volume}
-                                onChange={(e) => handleChange(index, "volume", e.target.value)}
+                                value={item.number}
+                                onChange={(e) => handleChange(index, "number", e.target.value)}
                                 placeholder="Volume (μL)"
                                 className="mt-1 remove-arrow block w-2/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />

@@ -105,7 +105,7 @@ def get_reaction_details(reaction_id):
 
     step_json = [{
         'reagent_id': step.pfiona_reagent_id,
-        'volume': step.volume
+        'number': step.number
     } for step in step_list]
 
     # Create an object with all the information about the reaction
