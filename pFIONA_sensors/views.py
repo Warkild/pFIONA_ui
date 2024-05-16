@@ -93,7 +93,6 @@ def sensors_reagents(request, sensor_id):
     reactions_data = [{
         'id': reaction.id,
         'name': reaction.name,
-        'wait': reaction.wait,
     } for reaction in reactions]
 
     reactions_json = json.dumps(reactions_data)

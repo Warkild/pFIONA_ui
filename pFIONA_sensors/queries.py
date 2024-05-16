@@ -37,25 +37,24 @@ def get_utils_reagents(sensor_id, return_json=False):
         return reagents
 
 
-def create_reaction(name, wait_time, standard_id, standard_concentration):
+def create_reaction(name, standard_id, standard_concentration):
     """
     Create a reaction in database
 
     :param name: Name of reaction
-    :param wait_time: Wait time of reaction
     :param standard_id: Standard ID of reaction
     :param standard_concentration: Standard concentration of reaction
 
     :return: Reaction object
     """
 
-    print(f"Add {name}, {wait_time}, {standard_id}, {standard_concentration}")
+    print(f"Add {name}, {standard_id}, {standard_concentration}")
 
     standard = models.Reagent.objects.get(id=standard_id)
 
     print(f"Find standard {standard}")
 
-    reaction = models.Reaction.objects.create(name=name, wait=wait_time, standard_concentration=standard_concentration,
+    reaction = models.Reaction.objects.create(name=name, standard_concentration=standard_concentration,
                                               standard=standard)
 
     print(f"Reaction created: {reaction}")
@@ -113,7 +112,6 @@ def get_reaction_details(reaction_id):
     reaction_json = json.dumps({
         'id': reaction.id,
         'name': reaction.name,
-        'wait': reaction.wait,
         'standard_id': reaction.standard.id,
         'standard_concentration': reaction.standard_concentration,
         'actions': step_json
@@ -132,7 +130,7 @@ def delete_all_step(reaction_id):
     models.Step.objects.filter(pfiona_reaction_id=reaction_id).delete()
 
 
-def update_reaction(reaction_id, name, wait_time, standard_id, standard_concentration):
+def update_reaction(reaction_id, name, standard_id, standard_concentration):
     """
     Update a reaction in database
 
@@ -147,7 +145,6 @@ def update_reaction(reaction_id, name, wait_time, standard_id, standard_concentr
 
     reaction = models.Reaction.objects.get(id=reaction_id)
     reaction.name = name
-    reaction.wait = wait_time
     reaction.standard_concentration = standard_concentration
     reaction.standard_id = standard_id
     reaction.save()

@@ -24,9 +24,6 @@ function ReactionAddApp() {
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
 
-    // Reaction wait time in the UI
-    const [reactionWaitTime, setReactionWaitTime] = useState(0);
-
     // Reaction standard reagent ID in the UI
     const [standardReagentId, setStandardReagentId] = useState("");
 
@@ -80,7 +77,6 @@ function ReactionAddApp() {
         const reactionData = {
             name: reactionName,
             steps: reagentData,
-            wait_time: reactionWaitTime,
             standard_reagent_id: standardReagentId,
             standard_concentration: standardConcentration
         };
@@ -207,16 +203,6 @@ function ReactionAddApp() {
                             />
                         </div>
                     </div>
-                </div>
-                <div className={"pb-8 w-full flex flex-col"}>
-                    <label className={"font-montserrat text-sm pb-2"}>Wait Time</label>
-                    <input
-                        type="number"
-                        value={reactionWaitTime}
-                        onChange={(e) => setReactionWaitTime(e.target.value)}
-                        placeholder="Reaction Wait Time"
-                        className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                    />
                 </div>
                 <button
                     onClick={handleSave}

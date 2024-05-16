@@ -52,9 +52,6 @@ def api_add_reaction(request):
         if data['name'] == "":
             raise ValidationError('Name cannot be empty')
 
-        if int(data['wait_time']) <= -1:
-            raise ValidationError('Waiting time cannot be negative')
-
         if len(data['steps']) == 0:
             raise ValidationError('You need to specify at least one reagent')
 
@@ -87,7 +84,7 @@ def api_add_reaction(request):
             raise ValidationError('Standard concentration cannot be negative')
 
         # All validations passed, proceed to create the reaction
-        reaction = q.create_reaction(data['name'], int(data['wait_time']), int(data['standard_reagent_id']),
+        reaction = q.create_reaction(data['name'], int(data['standard_reagent_id']),
                                      float(data['standard_concentration']))
 
         for key, step in enumerate(data['steps']):
@@ -119,9 +116,6 @@ def api_edit_reaction(request):
         # Validation of data
         if data['name'] == "":
             raise ValidationError('Name cannot be empty')
-
-        if int(data['wait_time']) <= -1:
-            raise ValidationError('Waiting time cannot be negative')
 
         if len(data['steps']) == 0:
             raise ValidationError('You need to specify at least one reagent')
@@ -156,7 +150,7 @@ def api_edit_reaction(request):
 
         # All validations passed, proceed to update the reaction
 
-        reaction = q.update_reaction(data['id'], data['name'], data['wait_time'], int(data['standard_reagent_id']),
+        reaction = q.update_reaction(data['id'], data['name'], int(data['standard_reagent_id']),
                                      int(data['standard_concentration']))
 
         q.delete_all_step(data['id'])

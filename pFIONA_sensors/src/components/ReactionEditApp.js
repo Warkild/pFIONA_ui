@@ -20,9 +20,6 @@ function ReactionEditApp() {
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
 
-    // Reaction wait time in the UI
-    const [reactionWaitTime, setReactionWaitTime] = useState(0);
-
     // Reaction standard reagent ID in the UI
     const [standardReagentId, setStandardReagentId] = useState("");
 
@@ -77,7 +74,6 @@ function ReactionEditApp() {
             id: reaction_json['id'],
             name: reactionName,
             steps: reagentData,
-            wait_time: reactionWaitTime,
             standard_reagent_id: standardReagentId,
             standard_concentration: standardConcentration
         };
@@ -127,7 +123,6 @@ function ReactionEditApp() {
     useEffect(() => {
         console.log(reaction_json)
         setReactionName(reaction_json['name'])
-        setReactionWaitTime(reaction_json['wait'])
         setStandardConcentration(reaction_json['standard_concentration'])
         setStandardReagentId(reaction_json['standard_id'])
         setReactionReagents(reaction_json['actions'].map(action => ({
@@ -218,16 +213,6 @@ function ReactionEditApp() {
                             />
                         </div>
                     </div>
-                </div>
-                <div className={"pb-8 w-full flex flex-col"}>
-                    <label className={"font-montserrat text-sm pb-2"}>Wait Time</label>
-                    <input
-                        type="number"
-                        value={reactionWaitTime}
-                        onChange={(e) => setReactionWaitTime(e.target.value)}
-                        placeholder="Reaction Wait Time"
-                        className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                    />
                 </div>
                 <button
                     onClick={handleSave}

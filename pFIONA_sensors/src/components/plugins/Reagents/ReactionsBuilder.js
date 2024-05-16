@@ -20,7 +20,6 @@ function ReactionsBuilder({reactions}) {
                         <thead>
                         <tr className={"border border-custom-gray-1 bg-custom-gray-2"}>
                             <th className={"font-montserrat font-medium pt-8 pb-2 pl-5 text-left"}>Name</th>
-                            <th className={"font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left"}>Wait</th>
                             <th className={"w-1/12"}></th>
                         </tr>
                         </thead>
@@ -29,7 +28,6 @@ function ReactionsBuilder({reactions}) {
                             {reactions.map((reaction) => (
                                 <tr key={reaction.id} className={"border border-custom-gray-1"}>
                                     <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reaction.name}</td>
-                                    <td className={"font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5"}>{reaction.wait}</td>
                                     <td>
                                         <div className={"h-full flex flex-row-reverse pl-5"}>
                                             <a href={`reaction/${reaction.id}/delete`}>
