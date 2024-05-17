@@ -32,6 +32,7 @@ class Reaction(models.Model):
     name = models.CharField(max_length=100)
     standard = models.ForeignKey(Reagent, on_delete=models.CASCADE, null=True, name="standard")
     standard_concentration = models.FloatField(default=0)
+    volume_of_mixture = models.FloatField(default=0)
 
     class Meta:
         db_table = 'pfiona_reaction'
