@@ -6,7 +6,6 @@ ChartJS.register(...registerables);
 
 function LastSpectrum() {
     const [loading, setLoading] = useState(true);
-    const [sensorId, setSensorId] = useState(1); // Mettre à jour en fonction de vos besoins
     const [currentReactionName, setCurrentReactionName] = useState(null);
     const [chartData, setChartData] = useState({
         labels: [],
@@ -35,16 +34,24 @@ function LastSpectrum() {
 
     // Fetch current reaction name
     useEffect(() => {
-        fetch(`/api/get_current_reaction/${sensorId}`)
-            .then(response => response.json())
+        fetch(`/api/get_current_reaction/${sensor_id}`)
+            .then(response => {
+                if (!response.ok) {
+                    // If the HTTP status indicates an error, throw an error to jump to the catch block
+                    return response.json().then(errData => {
+                        throw new Error(errData.message);
+                    });
+                }
+                return response.json(); // Proceed with parsing the response body as JSON if status is OK
+            })
             .then(data => {
                 setCurrentReactionName(data.reaction_name);
             })
             .catch(error => {
+                setError(`You have not set the current reaction of sensor`);
                 console.error("Error fetching current reaction id:", error);
-                setError(`Error fetching current reaction id: ${error.message}`)
             });
-    }, [sensorId]);
+    }, [sensor_id]);
 
     // Fetch last 5 spectra data once current reaction name is available
     useEffect(() => {
