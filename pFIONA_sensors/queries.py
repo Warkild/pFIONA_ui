@@ -3,6 +3,27 @@ from django.db.models import Q
 import pFIONA_sensors.models as models
 import json
 
+state_dict = {'Boot': 0,
+              'Flush': 1,
+              'Mix': 2,
+              'Change_Valve': 3,
+              'Scan': 4,
+              'Pump_Sample_from_ocean': 5,
+              'Push_to_flow_cell': 6,
+              'Dilution': 7,
+              'Wait': 8,
+              'Darkspectrum': 9,
+              'Idle': 10,
+              'Reference_spectrum': 11,
+              'Blank_spectrum': 12,
+              'Sample_spectrum': 13,
+              'Standard_spectrum': 14,
+              'Deployed': 15,
+              'Sleep': 16,
+              'Shutdown': 17,
+              'Error': 18,
+              }
+
 
 def get_utils_reagents(sensor_id, return_json=False):
     """
@@ -264,3 +285,25 @@ def get_last_spectrum_all_type(reaction_name, timestamp):
 
 def get_reagent(reagent_id):
     return models.Reagent.objects.get(id=reagent_id)
+
+
+def is_deployed(sensor_id):
+    states = models.Sensor.objects.get(id=sensor_id).last_states
+    states_tab = json.loads(states)
+    return state_dict['Deployed'] in states_tab
+
+
+def is_sleeping(sensor_id):
+    states = models.Sensor.objects.get(id=sensor_id).last_states
+    states_tab = json.loads(states)
+    return state_dict['Sleep'] in states_tab
+
+
+def get_sensor_sleep(sensor_id):
+    return models.Sensor.objects.get(id=sensor_id).sleep
+
+
+def set_sensor_sleep(sensor_id, sleep):
+    sensor = models.Sensor.objects.get(id=sensor_id)
+    sensor.sleep = sleep
+    sensor.save()

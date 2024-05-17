@@ -49,6 +49,7 @@ function StatusApp({ ip }) {
 
 document.querySelectorAll("#status_app").forEach(div => {
     const ip = div.getAttribute('data-ip');
+    console.log(ip)
     const root = createRoot(div);
     root.render(<StatusApp ip={ip}/>);
 });

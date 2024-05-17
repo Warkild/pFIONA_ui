@@ -10,4 +10,8 @@ urlpatterns = [
          name='api_get_last_spectrum_all_type_view'),
     path('get_validity_reaction_to_set_as_current_reaction', views.api_get_validity_reaction_to_set_as_current_reaction,
          name="api_get_validity_reaction_to_set_as_current_reaction"),
+    path('is_deployed', views.api_is_deployed, name='api_is_deployed'),
+    path('is_sleeping', views.api_is_sleeping, name='api_is_sleeping'),
+    path('get_sensor_sleep', views.api_get_sleep, name='api_get_sleep'),
+    path('set_sensor_sleep', views.api_set_sleep, name='api_set_sleep'),
 ]

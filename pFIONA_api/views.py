@@ -199,6 +199,9 @@ def api_get_last_spectrum_all_type_view(request):
     return JsonResponse(result)
 
 
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
 def api_get_validity_reaction_to_set_as_current_reaction(request):
     try:
         reaction_id = request.GET.get('reaction_id')
@@ -231,4 +234,98 @@ def api_get_validity_reaction_to_set_as_current_reaction(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred: {}'.format(str(e))},
+                            status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_is_sleeping(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        is_sleeping = q.is_sleeping(sensor_id)
+
+        return JsonResponse({'status': 'success', 'data': is_sleeping})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_is_deployed(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        is_deployed = q.is_deployed(sensor_id)
+
+        return JsonResponse({'status': 'success', 'data': is_deployed})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_sleep(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        sleep = q.get_sensor_sleep(sensor_id)
+
+        return JsonResponse({'status': 'success', 'data': sleep})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required()
+@require_http_methods(['POST'])
+@csrf_exempt
+def api_set_sleep(request):
+    try:
+        data = json.loads(request.body)
+
+        if 'sensor_id' not in data:
+            raise ValueError("Missing sensor_id parameter")
+        if 'sleep' not in data:
+            raise ValueError("Missing sleep parameter")
+        if not q.models.Sensor.objects.filter(id=data['sensor_id']).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        q.set_sensor_sleep(data['sensor_id'], data['sleep'])
+
+        return JsonResponse({'status': 'success', 'message': 'Reaction added successfully!'})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': f'An unexpected error occurred: {str(e.message)}'},
                             status=500)

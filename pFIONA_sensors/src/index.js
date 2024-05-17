@@ -4,6 +4,7 @@ import ReagentsApp from "./components/ReagentsApp"
 import ReactionAddApp from "./components/ReactionAddApp"
 import ReactionEditApp from "./components/ReactionEditApp"
 import DataApp from "./components/DataApp"
+import DeployApp from "./components/DeployApp"
 
 // Fonction pour obtenir les JWT tokens
 function fetchAndStoreJwt() {
