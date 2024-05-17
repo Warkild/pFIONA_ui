@@ -166,25 +166,35 @@ function DeployBasicSettings({}) {
                 <h2 className="font-poppins font-bold text-gray-500 text-sm">BASIC SETTINGS</h2>
             </div>
             <div className="font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
-                <div>
+                <div className={"mb-4"}>
                     <label>
                         <input
                             type="checkbox"
+                            className={"form-checkbox focus:outline-none rounded-lg mr-3"}
                             checked={sleep} // Controls the checked property based on the sleep state
                             onChange={handleSleepChange} // Updates the state when checkbox is toggled
                         />
                         Sleep Mode
                     </label>
                 </div>
+                <div className={"flex flex-col mb-5"}>
+                    <label>
+                        Sample Frequency (min)
+                    </label>
+                    <input
+                        type="number"
+                        className={"remove-arrow border-gray-600 rounded-lg"}
+                    />
+                </div>
                 {isDeployed && initialSleep !== sleep && (
-                    <div className={"flex flex-row h-min pt-3"}>
+                    <div className={"flex flex-row h-min mb-5"}>
                         <img src={"/static/img/ico/icons8-warning-yellow-512.svg"} alt="Warning"
                              className={"w-6 h-6 mr-2"}/>
                         <p>Warning: The following changes will be made in the next cycle</p>
                     </div>
                 )}
                 <div>
-                    <button onClick={save}>Save</button>
+                    <button onClick={save} className={"bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"}>Save</button>
                 </div>
             </div>
         </div>
