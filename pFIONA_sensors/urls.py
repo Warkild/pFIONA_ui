@@ -19,8 +19,9 @@ urlpatterns = [
          name='sensors_reaction_delete'),
     path('<int:sensor_id>/reagents/reaction/<int:reaction_id>/edit', views.sensors_reaction_edit,
          name='sensors_reaction_edit'),
-    path('api/add_reaction', views.api_add_reaction, name='api_add_reaction'),
-    path('api/edit_reaction', views.api_edit_reaction, name='api_edit_reaction'),
-    path('api/get_current_reaction_id', views.api_get_current_reaction_id, name='api_get_current_reaction_id'),
-    path('<int:sensor_id>/api/set_current_reaction', views.api_set_current_reaction, name='api_set_current_reaction'),
+    path('<int:sensor_id>/reagents/<int:reagent_id>/deletion', views.sensors_reagent_deletion,
+         name='sensors_reagent_deletion'),
+    path('export-spectra/', views.export_spectra_csv, name='export-spectra'),
+    path('prepare-export-spectra/', views.prepare_export_spectra_csv, name='prepare-export-spectra'),
+
 ]

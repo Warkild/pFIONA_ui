@@ -13,12 +13,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
-load_dotenv()
 
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -30,7 +29,6 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -45,7 +43,8 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',
     'widget_tweaks',
-    'pFIONA_sensors'
+    'pFIONA_sensors',
+    "pFIONA_api"
 ]
 
 MIDDLEWARE = [
@@ -78,21 +77,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pFIONA_ui.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+from decouple import config, Csv
+
+# Load environment
+ENVIRONMENT = config('ENVIRONMENT', default='development')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pFIONA_dev_db',
-        'USER': 'postgres',
-        'PASSWORD': 'admin',
-        "HOST": "127.0.0.1",
-        "PORT": "5432",
+        'NAME': config('DB_NAME_DEV' if ENVIRONMENT == 'development' else 'DB_NAME_PROD'),
+        'USER': config('DB_USER_DEV' if ENVIRONMENT == 'development' else 'DB_USER_PROD'),
+        'PASSWORD': config('DB_PASSWORD_DEV' if ENVIRONMENT == 'development' else 'DB_PASSWORD_PROD'),
+        'HOST': config('DB_HOST_DEV' if ENVIRONMENT == 'development' else 'DB_HOST_PROD'),
+        'PORT': config('DB_PORT_DEV' if ENVIRONMENT == 'development' else 'DB_PORT_PROD'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -112,7 +114,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -123,7 +124,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/

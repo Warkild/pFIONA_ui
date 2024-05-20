@@ -10,8 +10,14 @@
     <div class="flex min-h-screen">
         {% include "../components/sensors_menu_bar.html" %}
         <div class="bg-custom-gray-2 w-5/6 p-12">
-            <p>Hello World !</p>
+             <div id="main">
+                 <div id="data_app"></div>
+             </div>
         </div>
     </div>
+    <script>
+        let sensor_id = {{ id }}
+    </script>
+    <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>
 </html>

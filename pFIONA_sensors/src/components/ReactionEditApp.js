@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { createRoot } from "react-dom/client";
+import React, {useEffect, useState} from "react";
+import {createRoot} from "react-dom/client";
 import Alert from "./plugins/Alert";
 
 /**
@@ -15,13 +15,10 @@ function ReactionEditApp() {
      */
 
     // List of reagents selected in the UI
-    const [reactionReagents, setReactionReagents] = useState([{ reagent_id: "", volume: "" }]);
+    const [reactionReagents, setReactionReagents] = useState([{reagent_id: "", number: ""}]);
 
     // Reaction name in the UI
     const [reactionName, setReactionName] = useState("");
-
-    // Reaction wait time in the UI
-    const [reactionWaitTime, setReactionWaitTime] = useState(0);
 
     // Reaction standard reagent ID in the UI
     const [standardReagentId, setStandardReagentId] = useState("");
@@ -32,6 +29,10 @@ function ReactionEditApp() {
     // Split the list of reagents passed by Django in two lists
     const true_reagents = reagents_json.filter(reagent => reagent.is_standard === false);
     const standard_reagents = reagents_json.filter(reagent => reagent.is_standard === true);
+
+    // Volumes
+    const [volumeOfMixture, setVolumeOfMixture] = useState(0);
+    const [volumeToPushToFlowCell, setVolumeToPushToFlowCell] = useState(0);
 
 
     /**
@@ -44,7 +45,7 @@ function ReactionEditApp() {
     const handleChange = (index, field, value) => {
         const newReagents = reactionReagents.map((item, i) => {
             if (i === index) {
-                return { ...item, [field]: value };
+                return {...item, [field]: value};
             }
             return item;
         });
@@ -53,8 +54,8 @@ function ReactionEditApp() {
 
     useEffect(() => {
         const lastReagent = reactionReagents[reactionReagents.length - 1];
-        if (lastReagent.reagent_id && lastReagent.volume) {
-            setReactionReagents([...reactionReagents, { reagent_id: "", volume: "" }]);
+        if (lastReagent.reagent_id && lastReagent.number) {
+            setReactionReagents([...reactionReagents, {reagent_id: "", number: ""}]);
         }
     }, [reactionReagents]);
 
@@ -71,44 +72,50 @@ function ReactionEditApp() {
      * Save the data in the database with Django API
      */
     const handleSave = () => {
-        const reagentData = reactionReagents.map(reagent => [reagent.reagent_id, reagent.volume]);
+        const reagentData = reactionReagents.map(reagent => [reagent.reagent_id, reagent.number]);
         reagentData.pop(); // Remove the last placeholder entry
         const reactionData = {
             id: reaction_json['id'],
             name: reactionName,
-            reagents: reagentData,
-            wait_time: reactionWaitTime,
+            steps: reagentData,
             standard_reagent_id: standardReagentId,
-            standard_concentration: standardConcentration
+            standard_concentration: standardConcentration,
+            volume_of_mixture: volumeOfMixture,
+            volume_to_push_to_flow_cell: volumeToPushToFlowCell,
         };
 
-        if (reactionName === "") {
-            setAlertModalText("The reaction must have a name");
-            setIsModalOpen(true);
-        } else if (reagentData.length === 0 || reagentData[0].volume === "" || reagentData[0].reagent_id === "") {
-            setAlertModalText("At least one reagent must be correctly entered.");
-            setIsModalOpen(true);
-        } else if (reactionData.standard_reagent_id === "")  {
-            setAlertModalText("Standard Reagent must be selected")
-            setIsModalOpen(true)
-        } else {
-            const apiUrl = `/sensors/api/edit_reaction`; // Your Django API URL
+        const apiUrl = "/api/edit_reaction"; // Your Django API URL
 
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    // Add other headers here if needed, like authentication tokens
-                },
-                body: JSON.stringify(reactionData)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Success:", data)
+        fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add other headers here if needed, like authentication tokens
+            },
+            body: JSON.stringify(reactionData)
+        })
+            .then(response => response.json().then(data => {
+                if (!response.ok) {
+                    // Throw an error with the message from the server
+                    throw new Error(data.message || 'Unknown error');
+                }
+                return data;
+            }))
+            .then(data => {
+                if (data.status === 'error') {
+                    setAlertModalText(data.message);
+                    setIsModalOpen(true);
+                } else {
+                    console.log("Success:", data);
                     window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
-                })
-                .catch(error => console.error("Error:", error));
-        }
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                setAlertModalText(error.message); // Use error.message to show the message from Django
+                setIsModalOpen(true);
+            });
+
     };
 
     /** ALERT BOX **/
@@ -122,13 +129,14 @@ function ReactionEditApp() {
     useEffect(() => {
         console.log(reaction_json)
         setReactionName(reaction_json['name'])
-        setReactionWaitTime(reaction_json['wait'])
         setStandardConcentration(reaction_json['standard_concentration'])
         setStandardReagentId(reaction_json['standard_id'])
         setReactionReagents(reaction_json['actions'].map(action => ({
-            reagent_id: action.reagent_id,
-                volume: action.volume
+            reagent_id: action.reagent_id || "w",
+            number: action.number
         })));
+        setVolumeOfMixture(reaction_json['volume_of_mixture'])
+        setVolumeToPushToFlowCell(reaction_json['volume_to_push_to_flow_cell'])
     }, []);
 
 
@@ -158,6 +166,7 @@ function ReactionEditApp() {
                                 className="mt-1 block w-8/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             >
                                 <option value="">Select a Reagent</option>
+                                <option value="w">Wait</option>
                                 {true_reagents.map((reagent) => (
                                     <option key={reagent.id} value={reagent.id}>
                                         {reagent.name}
@@ -167,8 +176,8 @@ function ReactionEditApp() {
                             <div className={"w-1/12"}></div>
                             <input
                                 type="number"
-                                value={item.volume}
-                                onChange={(e) => handleChange(index, "volume", e.target.value)}
+                                value={item.number}
+                                onChange={(e) => handleChange(index, "number", e.target.value)}
                                 placeholder="Volume (μL)"
                                 className="mt-1 remove-arrow block w-2/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
@@ -213,15 +222,31 @@ function ReactionEditApp() {
                         </div>
                     </div>
                 </div>
-                <div className={"pb-8 w-full flex flex-col"}>
-                    <label className={"font-montserrat text-sm pb-2"}>Wait Time</label>
-                    <input
-                        type="number"
-                        value={reactionWaitTime}
-                        onChange={(e) => setReactionWaitTime(e.target.value)}
-                        placeholder="Reaction Wait Time"
-                        className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                    />
+                <div className="flex flex-col space-y-4 w-full pb-10">
+                    <div className={"flex flex-row justify-between"}>
+                        <div className={"flex flex-col w-5/12"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Volume of mixture (μL)</label>
+                            <input
+                                type="number"
+                                step="0.001"
+                                value={volumeOfMixture}
+                                onChange={(e) => setVolumeOfMixture(e.target.value)}
+                                placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                        <div className={"flex flex-col w-5/12"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Volume to push to flow cell (μL)</label>
+                            <input
+                                type="number"
+                                step="0.001"
+                                value={volumeToPushToFlowCell}
+                                onChange={(e) => setVolumeToPushToFlowCell(e.target.value)}
+                                placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                    </div>
                 </div>
                 <button
                     onClick={handleSave}
