@@ -309,7 +309,7 @@ def api_get_sleep(request):
 @login_required()
 @require_http_methods(['POST'])
 @csrf_exempt
-def api_set_sleep(request):
+def api_set_sensor_general_settings(request):
     try:
         data = json.loads(request.body)
 
@@ -317,15 +317,41 @@ def api_set_sleep(request):
             raise ValueError("Missing sensor_id parameter")
         if 'sleep' not in data:
             raise ValueError("Missing sleep parameter")
+        if 'sample_frequency' not in data:
+            raise ValueError("Missing sample_frequency parameter")
         if not q.models.Sensor.objects.filter(id=data['sensor_id']).exists():
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
         q.set_sensor_sleep(data['sensor_id'], data['sleep'])
+        q.set_sample_frequency(data['sensor_id'], data['sample_frequency'])
 
-        return JsonResponse({'status': 'success', 'message': 'Reaction added successfully!'})
+        return JsonResponse({'status': 'success', 'message': 'Settings change successfully!'})
 
     except ValueError as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': f'An unexpected error occurred: {str(e.message)}'},
                             status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_sample_frequency(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        sample_frequency = q.get_sensor_sample_frequency(sensor_id)
+
+        return JsonResponse({'status': 'success', 'data': sample_frequency})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

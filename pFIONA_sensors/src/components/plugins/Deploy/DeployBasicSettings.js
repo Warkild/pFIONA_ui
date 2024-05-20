@@ -115,17 +115,54 @@ function DeployBasicSettings({}) {
             setSleep(data.data)
         })
         .catch(error => {
-            setErrorMessageSleeping(`There is an error : ${error.message}`)
             console.error('Error:', error);
         });
     };
 
-    const saveSensorSleep = () => {
+    /** SAMPLE FREQUENCY **/
+
+    const [initialSampleFrequency, setInitialSampleFrequency] = useState();
+    const [sampleFrequency, setSampleFrequency] = useState();
+
+    const getSensorSampleFrequency = () => {
+        fetch(`/api/get_sensor_sample_frequency?sensor_id=${sensor_id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            setInitialSampleFrequency(data.data)
+            setSampleFrequency(data.data)
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
+    const handleSampleFrequencyChange = (event) => {
+        setSampleFrequency(event.target.value);
+        console.log(event.target.value)
+    };
+
+    /** SAVE **/
+
+    const [save, setSave] = useState(false);
+
+    const saveSensorSettings = () => {
         const data = {
             sleep: sleep,
+            sample_frequency: sampleFrequency,
             sensor_id: sensor_id,
         }
-        fetch(`/api/set_sensor_sleep`, {
+        fetch(`/api/set_sensor_general_settings`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -141,6 +178,9 @@ function DeployBasicSettings({}) {
         .then(data => {
             console.log('Success:', data);
             setInitialSleep(sleep)
+            setInitialSampleFrequency(sampleFrequency)
+            setSave(true)
+            setTimeout(() => setSave(false), 5000);
         })
         .catch(error => {
             setErrorMessageSleeping(`There is an error : ${error.message}`)
@@ -148,15 +188,12 @@ function DeployBasicSettings({}) {
         });
     };
 
+    /** LOADING **/
+
     useEffect(() => {
-        getSensorSleep()
+        getSensorSleep();
+        getSensorSampleFrequency();
     }, []);
-
-    /** SAVE **/
-
-    const save = () => {
-        saveSensorSleep()
-    }
 
 
 
@@ -184,17 +221,26 @@ function DeployBasicSettings({}) {
                     <input
                         type="number"
                         className={"remove-arrow border-gray-600 rounded-lg"}
+                        onChange={handleSampleFrequencyChange}
+                        value={sampleFrequency}
                     />
                 </div>
-                {isDeployed && initialSleep !== sleep && (
-                    <div className={"flex flex-row h-min mb-5"}>
+                {isDeployed && (initialSleep !== sleep || initialSampleFrequency !== sampleFrequency) && (
+                    <div className={"flex flex-row items-center h-min mb-5"}>
                         <img src={"/static/img/ico/icons8-warning-yellow-512.svg"} alt="Warning"
                              className={"w-6 h-6 mr-2"}/>
                         <p>Warning: The following changes will be made in the next cycle</p>
                     </div>
                 )}
-                <div>
-                    <button onClick={save} className={"bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"}>Save</button>
+                <div className={"flex flex-row items-center"}>
+                    <button onClick={saveSensorSettings} className={"bg-blue-600 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"}>Save</button>
+                    {save &&
+                        <div className={"flex flex-row h-min items-center pl-2"}>
+                            <img src={"/static/img/ico/icons8-checked-512.svg"} alt="Checked"
+                                 className={"w-6 h-6 mr-2"}/>
+                            <p>Save in database</p>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

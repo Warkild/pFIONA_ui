@@ -13,5 +13,6 @@ urlpatterns = [
     path('is_deployed', views.api_is_deployed, name='api_is_deployed'),
     path('is_sleeping', views.api_is_sleeping, name='api_is_sleeping'),
     path('get_sensor_sleep', views.api_get_sleep, name='api_get_sleep'),
-    path('set_sensor_sleep', views.api_set_sleep, name='api_set_sleep'),
+    path('get_sensor_sample_frequency', views.api_get_sample_frequency, name='api_get_sample_frequency'),
+    path('set_sensor_general_settings', views.api_set_sensor_general_settings, name='api_set_sensor_general_settings'),
 ]

@@ -307,3 +307,13 @@ def set_sensor_sleep(sensor_id, sleep):
     sensor = models.Sensor.objects.get(id=sensor_id)
     sensor.sleep = sleep
     sensor.save()
+
+
+def get_sensor_sample_frequency(sensor_id):
+    return models.Sensor.objects.get(id=sensor_id).sample_frequency
+
+
+def set_sample_frequency(sensor_id, sample_frequency):
+    sensor = models.Sensor.objects.get(id=sensor_id)
+    sensor.sample_frequency = sample_frequency
+    sensor.save()
