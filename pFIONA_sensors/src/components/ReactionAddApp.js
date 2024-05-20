@@ -34,6 +34,10 @@ function ReactionAddApp() {
     const true_reagents = reagents_json.filter(reagent => reagent.is_standard === false);
     const standard_reagents = reagents_json.filter(reagent => reagent.is_standard === true);
 
+    // Volumes
+    const [volumeOfMixture, setVolumeOfMixture] = useState(300);
+    const [volumeToPushToFlowCell, setVolumeToPushToFlowCell] = useState(300);
+
 
     /**
      * Change the list of reagents for the reaction when user interact with the UI
@@ -78,7 +82,9 @@ function ReactionAddApp() {
             name: reactionName,
             steps: reagentData,
             standard_reagent_id: standardReagentId,
-            standard_concentration: standardConcentration
+            standard_concentration: standardConcentration,
+            volume_of_mixture: volumeOfMixture,
+            volume_to_push_to_flow_cell: volumeToPushToFlowCell,
         };
 
         const apiUrl = "/api/add_reaction"; // Your Django API URL
@@ -198,6 +204,32 @@ function ReactionAddApp() {
                                 step="0.001"
                                 value={standardConcentration}
                                 onChange={(e) => setStandardConcentration(e.target.value)}
+                                placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col space-y-4 w-full pb-10">
+                    <div className={"flex flex-row justify-between"}>
+                        <div className={"flex flex-col w-5/12"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Volume of mixture (μL)</label>
+                            <input
+                                type="number"
+                                step="0.001"
+                                value={volumeOfMixture}
+                                onChange={(e) => setVolumeOfMixture(e.target.value)}
+                                placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                        <div className={"flex flex-col w-5/12"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Volume to push to flow cell (μL)</label>
+                            <input
+                                type="number"
+                                step="0.001"
+                                value={volumeToPushToFlowCell}
+                                onChange={(e) => setVolumeToPushToFlowCell(e.target.value)}
                                 placeholder="Standard Concentration (molarity)"
                                 className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />

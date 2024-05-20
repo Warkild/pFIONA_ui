@@ -84,9 +84,18 @@ def api_add_reaction(request):
         if float(data["standard_concentration"]) <= 0:
             raise ValidationError('Standard concentration cannot be negative')
 
+        if float(data["volume_of_mixture"]) <= 0:
+            raise ValidationError('Volume of mixture cannot be negative')
+
+        if float(data["volume_to_push_to_flow_cell"]) <= 0:
+            raise ValidationError('Volume of flow cell cannot be negative')
+
+        if float(data["volume_of_mixture"]) < float(data["volume_to_push_to_flow_cell"]):
+            raise ValidationError('Volume of mixture must be greater than volume of flow cell')
+
         # All validations passed, proceed to create the reaction
         reaction = q.create_reaction(data['name'], int(data['standard_reagent_id']),
-                                     float(data['standard_concentration']))
+                                     float(data['standard_concentration']), float(data['volume_of_mixture']), float(data['volume_to_push_to_flow_cell']))
 
         for key, step in enumerate(data['steps']):
             if step[0] == "w":
@@ -150,10 +159,19 @@ def api_edit_reaction(request):
         if float(data["standard_concentration"]) <= 0:
             raise ValidationError('Standard concentration cannot be negative')
 
+        if float(data["volume_of_mixture"]) <= 0:
+            raise ValidationError('Volume of mixture cannot be negative')
+
+        if float(data["volume_to_push_to_flow_cell"]) <= 0:
+            raise ValidationError('Volume of flow cell cannot be negative')
+
+        if float(data["volume_of_mixture"]) < float(data["volume_to_push_to_flow_cell"]):
+            raise ValidationError('Volume of mixture must be greater than volume of flow cell')
+
         # All validations passed, proceed to update the reaction
 
         reaction = q.update_reaction(data['id'], data['name'], int(data['standard_reagent_id']),
-                                     float(data['standard_concentration']))
+                                     float(data['standard_concentration']), float(data['volume_of_mixture']), float(data['volume_to_push_to_flow_cell']))
 
         q.delete_all_step(data['id'])
 

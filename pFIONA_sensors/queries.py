@@ -58,31 +58,26 @@ def get_utils_reagents(sensor_id, return_json=False):
         return reagents
 
 
-def create_reaction(name, standard_id, standard_concentration):
+def create_reaction(name, standard_id, standard_concentration, volume_of_mixture, volume_to_push_to_flow_cell):
     """
     Create a reaction in database
 
     :param name: Name of reaction
     :param standard_id: Standard ID of reaction
     :param standard_concentration: Standard concentration of reaction
+    :param volume_of_mixture: Volume of mixture of reaction
+    :param volume_to_push_to_flow_cell: Volume to push to flow cell of reaction
 
     :return: Reaction object
     """
 
-    print(f"Add {name}, {standard_id}, {standard_concentration}")
-
     standard = models.Reagent.objects.get(id=standard_id)
 
-    print(f"Find standard {standard}")
-
     reaction = models.Reaction.objects.create(name=name, standard_concentration=standard_concentration,
-                                              standard=standard)
-
-    print(f"Reaction created: {reaction}")
+                                              standard=standard, volume_of_mixture=volume_of_mixture,
+                                              volume_to_push_to_flow_cell=volume_to_push_to_flow_cell)
 
     reaction.save()
-
-    print("Reaction saved")
 
     return reaction
 
@@ -135,7 +130,9 @@ def get_reaction_details(reaction_id):
         'name': reaction.name,
         'standard_id': reaction.standard.id,
         'standard_concentration': reaction.standard_concentration,
-        'actions': step_json
+        'actions': step_json,
+        'volume_of_mixture': reaction.volume_of_mixture,
+        'volume_to_push_to_flow_cell': reaction.volume_to_push_to_flow_cell,
     })
 
     return reaction_json
@@ -151,15 +148,17 @@ def delete_all_step(reaction_id):
     models.Step.objects.filter(pfiona_reaction_id=reaction_id).delete()
 
 
-def update_reaction(reaction_id, name, standard_id, standard_concentration):
+def update_reaction(reaction_id, name, standard_id, standard_concentration, volume_of_mixture,
+                    volume_to_push_to_flow_cell):
     """
     Update a reaction in database
 
     :param reaction_id: Reaction ID
     :param name: Name of reaction
-    :param wait_time: Wait time of reaction
     :param standard_id: Standard ID of reaction
     :param standard_concentration: Standard concentration of reaction
+    :param volume_of_mixture: Volume of mixture of reaction
+    :param volume_to_push_to_flow_cell: Volume to push to flow cell of reaction
 
     :return: Reaction object
     """
@@ -168,6 +167,8 @@ def update_reaction(reaction_id, name, standard_id, standard_concentration):
     reaction.name = name
     reaction.standard_concentration = standard_concentration
     reaction.standard_id = standard_id
+    reaction.volume_of_mixture = volume_of_mixture
+    reaction.volume_to_push_to_flow_cell = volume_to_push_to_flow_cell
     reaction.save()
 
     return reaction
