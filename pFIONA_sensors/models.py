@@ -8,7 +8,7 @@ class Sensor(models.Model):
     actual_reaction = models.ForeignKey('Reaction', on_delete=models.CASCADE, null=True)
     lat = models.FloatField(null=True)
     long = models.FloatField(null=True)
-    sample_frequency = models.FloatField(null=True)
+    sample_frequency = models.FloatField(null=False, default=60)
     sleep = models.BooleanField(default=False)
     last_states = models.CharField(max_length=200, null=True)
 
