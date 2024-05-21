@@ -80,3 +80,11 @@ class Value(models.Model):
     class Meta:
         db_table = 'pfiona_value'
         unique_together = (('pfiona_spectrum', 'wavelength'),)
+
+
+class WavelengthMonitored(models.Model):
+    reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE, name="pfiona_reaction")
+    wavelength = models.FloatField()
+
+    class Meta:
+        db_table = 'pfiona_wavelength_monitored'
