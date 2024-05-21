@@ -34,6 +34,7 @@ class Reaction(models.Model):
     standard_concentration = models.FloatField(default=0)
     volume_of_mixture = models.FloatField(default=0)
     volume_to_push_to_flow_cell = models.FloatField(default=0)
+    reaction_time = models.IntegerField(default=30)
 
     class Meta:
         db_table = 'pfiona_reaction'
@@ -87,4 +88,4 @@ class WavelengthMonitored(models.Model):
     wavelength = models.FloatField()
 
     class Meta:
-        db_table = 'pfiona_wavelength_monitored'
+        db_table = 'pfiona_wavelengthmonitored'
