@@ -38,6 +38,9 @@ function ReactionAddApp() {
     const [volumeOfMixture, setVolumeOfMixture] = useState(300);
     const [volumeToPushToFlowCell, setVolumeToPushToFlowCell] = useState(300);
 
+    // Monitored Wavelength
+    const [wavelengthMonitored, setWavelengthMonitored] = useState("");
+
 
     /**
      * Change the list of reagents for the reaction when user interact with the UI
@@ -85,6 +88,7 @@ function ReactionAddApp() {
             standard_concentration: standardConcentration,
             volume_of_mixture: volumeOfMixture,
             volume_to_push_to_flow_cell: volumeToPushToFlowCell,
+            monitored_wavelength: wavelengthMonitored,
         };
 
         const apiUrl = "/api/add_reaction"; // Your Django API URL
@@ -231,6 +235,20 @@ function ReactionAddApp() {
                                 value={volumeToPushToFlowCell}
                                 onChange={(e) => setVolumeToPushToFlowCell(e.target.value)}
                                 placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col space-y-4 w-full pb-10">
+                    <div className={"flex flex-row justify-between"}>
+                        <div className={"flex flex-col w-full"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Monitored wavelength (nm) (separated by " ; " (exemple : 880;1050))</label>
+                            <input
+                                type="text"
+                                value={wavelengthMonitored}
+                                onChange={(e) => setWavelengthMonitored(e.target.value)}
+                                placeholder="Monitored wavelength (nm) (separated by ' ; ' (exemple : 880;1050))"
                                 className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
                         </div>

@@ -1,4 +1,5 @@
 import json
+import re
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -93,9 +94,20 @@ def api_add_reaction(request):
         if float(data["volume_of_mixture"]) < float(data["volume_to_push_to_flow_cell"]):
             raise ValidationError('Volume of mixture must be greater than volume of flow cell')
 
+        if data['monitored_wavelength'] == "":
+            raise ValidationError('Monitored wavelength cannot be empty')
+
+        if not bool(re.compile(r'^[0-9;]*$').match(data['monitored_wavelength'])):
+            raise ValidationError('Unknown monitored wavelength format')
+
         # All validations passed, proceed to create the reaction
+
+        elements = data['monitored_wavelength'].split(';')
+        wavelength_monitored = list(set([int(e) for e in elements if e]))
+
         reaction = q.create_reaction(data['name'], int(data['standard_reagent_id']),
-                                     float(data['standard_concentration']), float(data['volume_of_mixture']), float(data['volume_to_push_to_flow_cell']))
+                                     float(data['standard_concentration']), float(data['volume_of_mixture']),
+                                     float(data['volume_to_push_to_flow_cell']))
 
         for key, step in enumerate(data['steps']):
             if step[0] == "w":
@@ -104,6 +116,9 @@ def api_add_reaction(request):
             else:
                 # Reagent
                 q.create_step(step[0], reaction.id, step[1], key)
+
+        for wavelength in wavelength_monitored:
+            q.create_monitored_wavelength(reaction_id=reaction.id, wavelength=wavelength)
 
         return JsonResponse({'status': 'success', 'message': 'Reaction added successfully!'})
 

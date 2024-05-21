@@ -101,6 +101,14 @@ def create_step(reagent_id, reaction_id, number, order):
     return step
 
 
+def create_monitored_wavelength(reaction_id, wavelength):
+    monitored_wavelength = models.WavelengthMonitored.objects.create(pfiona_reaction_id=reaction_id,
+                                                                     wavelength=wavelength)
+    monitored_wavelength.save()
+
+    return monitored_wavelength
+
+
 def get_reaction_details(reaction_id):
     """
     Get reaction details with the reaction and step details
