@@ -34,6 +34,9 @@ function ReactionEditApp() {
     const [volumeOfMixture, setVolumeOfMixture] = useState(0);
     const [volumeToPushToFlowCell, setVolumeToPushToFlowCell] = useState(0);
 
+    // Monitored Wavelength
+    const [wavelengthMonitored, setWavelengthMonitored] = useState("");
+
 
     /**
      * Change the list of reagents for the reaction when user interact with the UI
@@ -82,6 +85,7 @@ function ReactionEditApp() {
             standard_concentration: standardConcentration,
             volume_of_mixture: volumeOfMixture,
             volume_to_push_to_flow_cell: volumeToPushToFlowCell,
+            monitored_wavelength: wavelengthMonitored,
         };
 
         const apiUrl = "/api/edit_reaction"; // Your Django API URL
@@ -137,6 +141,7 @@ function ReactionEditApp() {
         })));
         setVolumeOfMixture(reaction_json['volume_of_mixture'])
         setVolumeToPushToFlowCell(reaction_json['volume_to_push_to_flow_cell'])
+        setWavelengthMonitored(reaction_json['monitored_wavelengths'].join(';'))
     }, []);
 
 
@@ -178,7 +183,7 @@ function ReactionEditApp() {
                                 type="number"
                                 value={item.number}
                                 onChange={(e) => handleChange(index, "number", e.target.value)}
-                                placeholder="Volume (μL)"
+                                placeholder="Volume (μL) / Time (s)"
                                 className="mt-1 remove-arrow block w-2/12 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
                             {index !== reactionReagents.length - 1 && (
@@ -243,6 +248,21 @@ function ReactionEditApp() {
                                 value={volumeToPushToFlowCell}
                                 onChange={(e) => setVolumeToPushToFlowCell(e.target.value)}
                                 placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col space-y-4 w-full pb-10">
+                    <div className={"flex flex-row justify-between"}>
+                        <div className={"flex flex-col w-full"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Monitored wavelength (nm) (separated by "
+                                ; " (exemple : 880;1050))</label>
+                            <input
+                                type="text"
+                                value={wavelengthMonitored}
+                                onChange={(e) => setWavelengthMonitored(e.target.value)}
+                                placeholder="Monitored wavelength (nm) (separated by ' ; ' (exemple : 880;1050))"
                                 className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
                         </div>
