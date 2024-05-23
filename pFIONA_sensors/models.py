@@ -11,6 +11,14 @@ class Sensor(models.Model):
     sample_frequency = models.FloatField(null=False, default=60)
     sleep = models.BooleanField(default=False)
     last_states = models.CharField(max_length=200, null=True)
+    scans_to_average = models.IntegerField(null=True)
+    boxcar_width = models.IntegerField(null=True)
+    time_to_wait_for_lamp = models.IntegerField(null=True)
+    time_between_2_measure = models.IntegerField(null=True)
+    flush_flow_rate = models.IntegerField(null=True)
+    flush_volume = models.IntegerField(null=True)
+    max_flow_rate = models.IntegerField(null=True)
+    max_aspirate_volume = models.IntegerField(null=True)
 
     class Meta:
         db_table = 'pfiona_sensor'
