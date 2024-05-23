@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import Alert from "../Alert";
 
-function ValvePort() {
+function ValvePort({inAction, setInAction}) {
     // Get value of current valve in sensor
     const [currentVal, setCurrentVal] = useState('-');
 
@@ -137,12 +137,29 @@ function ValvePort() {
                     <input type="number" className={"text-center remove-arrow rounded-lg"} value={moveToPortValue} onChange={handleMoveToPortChange}></input>
                 </div>
                 <div className={"flex flex-col"}>
-                    <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"} onClick={handleMoveClick}>Move</button>
-                    <button className={"bg-blue-600 rounded-lg text-white font-poppins py-1"} onClick={handleMoveAirPortClick}>Move to air port</button>
+                    {!inAction ? (
+                        <>
+                            <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"}
+                                    onClick={handleMoveClick}>Move
+                            </button>
+                            <button className={"bg-blue-600 rounded-lg text-white font-poppins py-1"}
+                                    onClick={handleMoveAirPortClick}>Move to air port
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button className={"bg-gray-200 rounded-lg text-gray-700 font-poppins py-2 mb-5"}
+                                    >Move
+                            </button>
+                            <button className={"bg-gray-200 rounded-lg text-gray-700 font-poppins py-1"}
+                                    >Move to air port
+                            </button>
+                        </>
+                    )}
                 </div>
                 <div className={"h-5"}></div>
             </div>
-            <Alert isOpen={isModalOpen} onRequestClose={closeModal} />
+            <Alert isOpen={isModalOpen} onRequestClose={closeModal}/>
         </div>
 
     );

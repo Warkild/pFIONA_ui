@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import Alert from "../Alert";
 
-function Pumps() {
+function Pumps({inAction, setInAction}) {
 
     /**
      * VARIABLES
      */
 
-        // Pump 1
+    // Pump 1
     const [volumePump1, setVolumePump1] = useState(0);
     const [flowRatePump1, setFlowRatePump1] = useState(0);
     const [aspirateDispensePump1, setAspirateDispensePump1] = useState(true); // default true : dispense
@@ -16,6 +16,14 @@ function Pumps() {
     const [volumePump2, setVolumePump2] = useState(0);
     const [flowRatePump2, setFlowRatePump2] = useState(0);
     const [aspirateDispensePump2, setAspirateDispensePump2] = useState(false); // default false : aspirate
+
+    // Button logic
+    const [runningPump1, setRunningPump1] = useState(false)
+    const [runningPump2, setRunningPump2] = useState(false)
+    const [runningPumpBoth, setRunningBoth] = useState(false)
+    const [slewingPump1, setSlewingPump1] = useState(false)
+    const [slewingPump2, setSlewingPump2] = useState(false)
+    const [slewingPumpBoth, setSlewingPumpBoth] = useState(false)
 
     /**
      * ALERT MESSAGE
@@ -40,6 +48,8 @@ function Pumps() {
     const runPump1 = () => {
         try {
             checkValuesPump1();
+            setInAction(true)
+            setRunningPump1(true)
             console.log("SUCCESS");
         } catch (error) {
             setAlertModalText(error.message);
@@ -50,6 +60,8 @@ function Pumps() {
     const runPump2 = () => {
         try {
             checkValuesPump2();
+            setInAction(true)
+            setRunningPump2(true)
             console.log("SUCCESS");
         } catch (error) {
             setAlertModalText(error.message);
@@ -61,6 +73,8 @@ function Pumps() {
         try {
             checkValuesPump1();
             checkValuesPump2();
+            setInAction(true)
+            setRunningBoth(true)
             console.log("SUCCESS");
         } catch (error) {
             setAlertModalText(error.message);
@@ -77,8 +91,6 @@ function Pumps() {
         if (parseInt(volumePump1, 10) <= 0) {
             throw new Error("Volume of pump 1 must be positive");
         }
-
-        console.log('rege')
 
         let flowRatePump1isInt = !isNaN(parseInt(flowRatePump1, 10));
         if (!flowRatePump1isInt) {
@@ -110,6 +122,75 @@ function Pumps() {
         }
     }
 
+    /**
+     * SLEW PUMPS
+     */
+
+    const slewPump1 = () => {
+        try {
+            setInAction(true)
+            setSlewingPump1(true)
+            console.log("SUCCESS");
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+    }
+
+    const slewPump2 = () => {
+        try {
+            setInAction(true)
+            setSlewingPump2(true)
+            console.log("SUCCESS");
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+    }
+
+    const slewPumpBoth = () => {
+        try {
+            setInAction(true)
+            setSlewingPumpBoth(true)
+            console.log("SUCCESS");
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+    }
+
+    const endSlewPump1 = () => {
+        try {
+            setInAction(false)
+            setSlewingPump1(false)
+            console.log("SUCCESS");
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+    }
+
+    const endSlewPump2 = () => {
+        try {
+            setInAction(false)
+            setSlewingPump2(false)
+            console.log("SUCCESS");
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+    }
+
+    const endSlewPumpBoth = () => {
+        try {
+            setInAction(false)
+            setSlewingPumpBoth(false)
+            console.log("SUCCESS");
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+    }
 
     // Return HTML Code
     return (
@@ -187,26 +268,105 @@ function Pumps() {
                     </div>
                 </div>
                 <div className={"flex flex-row justify-between mb-5"}>
-                    <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
-                            onClick={runPump1}
-                    >Run Pump 1
-                    </button>
-                    <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
-                            onClick={runPumpBoth}
-                    >Run Both
-                    </button>
-                    <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
-                            onClick={runPump2}
-                    >Run Pump 2
-                    </button>
+                    {!inAction ? (
+                        <>
+                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
+                                    onClick={runPump1}
+                            >Run Pump 1
+                            </button>
+                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
+                                    onClick={runPumpBoth}
+                            >Run Both
+                            </button>
+                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
+                                    onClick={runPump2}
+                            >Run Pump 2
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            {!runningPump1 ? (
+                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2"}
+                                >Run Pump 1
+                                </button>
+                            ): (
+                                <button className={"bg-green-500 w-3/12 rounded-lg text-white font-poppins py-2"}
+                                >Running
+                                </button>
+                            )}
+                            {!runningPumpBoth ? (
+                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2"}
+                                >Run Pump Both
+                                </button>
+                            ): (
+                                <button className={"bg-green-500 w-3/12 rounded-lg text-white font-poppins py-2"}
+                                >Running
+                                </button>
+                            )}
+                            {!runningPump2 ? (
+                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2"}
+                                >Run Pump 2
+                                </button>
+                            ): (
+                                <button className={"bg-green-500 w-3/12 rounded-lg text-white font-poppins py-2"}
+                                >Running
+                                </button>
+                            )}
+                        </>
+                    )}
                 </div>
                 <div className={"flex flex-row justify-between"}>
-                    <button className={"bg-blue-600 w-5/12 rounded-lg text-white font-poppins py-2 text-sm"}>Slew Pump
-                        1
-                    </button>
-                    <button className={"bg-blue-600 w-5/12 rounded-lg text-white font-poppins py-2 text-sm"}>Slew Pump
-                        2
-                    </button>
+                    {!inAction ? (
+                        <>
+                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
+                                    onClick={slewPump1}
+                            >Slew Pump
+                                1
+                            </button>
+                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
+                                    onClick={slewPumpBoth}>Slew Both
+                            </button>
+                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
+                                    onClick={slewPump2}>Slew Pump
+                                2
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            {!slewingPump1 ? (
+                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2 text-sm"}
+                                >Slew Pump
+                                    1
+                                </button>
+                            ) : (
+                                <button className={"bg-red-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
+                                        onClick={endSlewPump1}
+                                >Stop
+                                </button>
+                            )}
+                            {!slewingPumpBoth ? (
+                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2 text-sm"}
+                                >Slew Both
+                                </button>
+                            ) : (
+                                <button className={"bg-red-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
+                                        onClick={endSlewPumpBoth}
+                                >Stop
+                                </button>
+                            )}
+                            {!slewingPump2 ? (
+                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2 text-sm"}
+                                >Slew Pump
+                                    2
+                                </button>
+                            ) : (
+                                <button className={"bg-red-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
+                                        onClick={endSlewPump2}
+                                >Stop
+                                </button>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
             <Alert isOpen={isModalOpen} onRequestClose={closeModal} text={alertModalText}/>

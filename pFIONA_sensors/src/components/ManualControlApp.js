@@ -14,14 +14,16 @@ function ManualControlApp() {
     setLogMessages(prev => [...prev, message]);
   };
 
+  const [inAction, setInAction] = useState(false)
+
   return (
       <div className={"flex flex-col"}>
           <div className={"flex flex-row justify-between pb-12"}>
               <Log messages={logMessages}/>
           </div>
           <div className={"flex flex-row justify-between pb-12"}>
-              <ValvePort/>
-              <Pumps/>
+              <ValvePort inAction={inAction} setInAction={setInAction}/>
+              <Pumps inAction={inAction} setInAction={setInAction}/>
           </div>
           <div className={"flex flex-row justify-between pb-12"}>
               <Spectrophotometer addLogMessage={addLogMessage}/>
