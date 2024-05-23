@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import Alert from "../Alert";
 
-function AuxPump() {
-    const [auxPumpStatus, setAuxPumpStatus] = useState(false);
+function AuxPump({inAction, setInAction}) {
+    const [auxPumpRunning, setAuxPumpRunning] = useState(false);
 
     const turnOnAuxPump = () => {
-        setAuxPumpStatus(true);
+        setAuxPumpRunning(true);
+        setInAction(true);
     };
 
     const turnOffAuxPump = () => {
-        setAuxPumpStatus(false);
+        setAuxPumpRunning(false);
+        setInAction(false);
     };
 
     // Return HTML Code
@@ -22,11 +24,25 @@ function AuxPump() {
                 <div className={"flex flex-col"}>
                     <p className={"text-sm mb-2"}>Current status :</p>
                     <div className={"flex flex-row items-center mb-5"}>
-                        <div className={`w-5 h-5 rounded-full ${auxPumpStatus ? 'bg-green-600' : 'bg-red-600'}`}></div>
-                        <p className={"ml-3"}>{auxPumpStatus ? 'ON' : 'OFF'}</p>
+                        <div className={`w-5 h-5 rounded-full ${auxPumpRunning ? 'bg-green-600' : 'bg-red-600'}`}></div>
+                        <p className={"ml-3"}>{auxPumpRunning ? 'ON' : 'OFF'}</p>
                     </div>
-                    <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"} onClick={turnOnAuxPump}>Turn ON</button>
-                    <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"} onClick={turnOffAuxPump}>Turn OFF</button>
+                    {!auxPumpRunning ? (
+                        <button
+                            className={`rounded-lg font-poppins py-2 mb-5 ${inAction ? 'bg-gray-200 text-gray-700' : 'bg-blue-600 text-white'}`}
+                            onClick={turnOnAuxPump}
+                            disabled={inAction}
+                        >
+                            Turn ON
+                        </button>
+                    ) : (
+                        <button
+                            className="bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"
+                            onClick={turnOffAuxPump}
+                        >
+                            Turn OFF
+                        </button>
+                    )}
                 </div>
             </div>
         </div>
