@@ -16,7 +16,7 @@
                 </div>
                 <div class="bg-white flex flex-col shadow-lg rounded-2xl py-5 px-8">
                     <label class="font-montserrat text-sm mb-2">IP Address</label>
-                    <input class="remove-arrow rounded-lg bg-gray-200 mb-2" readonly="" value="{{ sensor.ip_address }}"/>
+                    <input class="remove-arrow rounded-lg bg-gray-200 mb-2" readonly value="{{ sensor.ip_address }}"/>
                 </div>
             </div>
             <div class="pt-12">
@@ -40,6 +40,18 @@
                         {% csrf_token %}
                         {% include "pFIONA_sensors/form/basic_form.html" with form=lat_long_form %}
                         <button type="submit" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold" name="submit_lat_long">Save</button>
+                    </form>
+                </div>
+            </div>
+            <div class="pt-12">
+                <div class="mb-5">
+                    <h2 class="font-poppins font-bold text-gray-500 text-sm">SENSOR SETTINGS</h2>
+                </div>
+                <div class="bg-white shadow-lg rounded-2xl py-5 px-8">
+                    <form method="post" id="sensor_settings">
+                        {% csrf_token %}
+                        {% include "pFIONA_sensors/form/basic_form.html" with form=sensor_settings_form %}
+                        <button type="submit" class="bg-lime-500 text-white font-poppins px-8 py-2 rounded-md hover:bg-lime-300 font-bold" name="submit_sensor_settings">Save</button>
                     </form>
                 </div>
             </div>

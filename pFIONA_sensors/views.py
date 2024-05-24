@@ -14,7 +14,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
 from pFIONA_sensors.models import Sensor, Reagent, Step, Reaction, Spectrum
-from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm
+from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm, SensorSettingsForm
 
 
 @login_required()
@@ -217,26 +217,39 @@ def sensors_settings(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')
     lat_long_form = SensorLatLongForm(request.POST or None, instance=sensor, prefix='lat_long')
+    sensor_settings_form = SensorSettingsForm(request.POST or None, instance=sensor, prefix='settings')
 
     if request.method == 'POST':
-        print("********************")
-        print(f"{request.method}")
-        print(f"{request.POST}")
         if 'submit_name_notes' in request.POST:
             name_notes_form = SensorNameAndNotesForm(request.POST, instance=sensor, prefix='name_notes')
             if name_notes_form.is_valid():
                 name_notes_form.save()
                 return redirect('sensors_settings', sensor_id=sensor_id)
-        if 'submit_lat_long' in request.POST:
+            # Reinitialize other forms to preserve the existing values
+            lat_long_form = SensorLatLongForm(None, instance=sensor, prefix='lat_long')
+            sensor_settings_form = SensorSettingsForm(None, instance=sensor, prefix='settings')
+        elif 'submit_lat_long' in request.POST:
             lat_long_form = SensorLatLongForm(request.POST, instance=sensor, prefix='lat_long')
-            print(lat_long_form.is_valid())
             if lat_long_form.is_valid():
                 lat_long_form.save()
                 return redirect('sensors_settings', sensor_id=sensor_id)
+            # Reinitialize other forms to preserve the existing values
+            name_notes_form = SensorNameAndNotesForm(None, instance=sensor, prefix='name_notes')
+            sensor_settings_form = SensorSettingsForm(None, instance=sensor, prefix='settings')
+        elif 'submit_sensor_settings' in request.POST:
+            sensor_settings_form = SensorSettingsForm(request.POST, instance=sensor, prefix='settings')
+            if sensor_settings_form.is_valid():
+                sensor_settings_form.save()
+                return redirect('sensors_settings', sensor_id=sensor_id)
+            # Reinitialize other forms to preserve the existing values
+            name_notes_form = SensorNameAndNotesForm(None, instance=sensor, prefix='name_notes')
+            lat_long_form = SensorLatLongForm(None, instance=sensor, prefix='lat_long')
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor,
-                   'lat_long_form': lat_long_form})
+                   'lat_long_form': lat_long_form, 'sensor_settings_form': sensor_settings_form})
+
+
 
 
 @login_required()

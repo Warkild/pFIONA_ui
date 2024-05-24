@@ -15,17 +15,13 @@
 {% for field in form.visible_fields %}
   <div class="form-group flex flex-col mb-8">
     <label for="{{ field.id_for_label }}" class="font-montserrat text-sm pb-2">{{ field.label }}</label>
-    {% if form.is_bound %}
-      {% if field.errors %}
-        {% render_field field class="form-control is-invalid border-red-700 rounded-lg" %}
-        {% for error in field.errors %}
-          <div class="invalid-feedback font-montserrat text-red-700 pt-1 text-sm">
-            {{ error }}
-          </div>
-        {% endfor %}
-      {% else %}
-        {% render_field field class="form-control is-valid border-gray-600 rounded-lg" %}
-      {% endif %}
+    {% if field.errors %}
+      {% render_field field class="form-control is-invalid border-red-700 rounded-lg" %}
+      {% for error in field.errors %}
+        <div class="invalid-feedback font-montserrat text-red-700 pt-1 text-sm">
+          {{ error }}
+        </div>
+      {% endfor %}
     {% else %}
       {% render_field field class="form-control border-gray-600 rounded-lg" %}
     {% endif %}
