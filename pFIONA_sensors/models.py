@@ -19,6 +19,7 @@ class Sensor(models.Model):
     flush_volume = models.IntegerField(null=True)
     max_flow_rate = models.IntegerField(null=True)
     max_aspirate_volume = models.IntegerField(null=True)
+    volume_for_valve_port_priming = models.IntegerField(null=True)
 
     class Meta:
         db_table = 'pfiona_sensor'
