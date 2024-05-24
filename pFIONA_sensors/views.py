@@ -56,7 +56,8 @@ def sensors_manual(request, sensor_id):
 def sensors_deploy(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     q.is_deployed(sensor_id)
-    return render(request, 'pFIONA_sensors/view/sensors_deploy.html', {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,})
+    return render(request, 'pFIONA_sensors/view/sensors_deploy.html',
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, })
 
 
 @login_required()
@@ -248,8 +249,6 @@ def sensors_settings(request, sensor_id):
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor,
                    'lat_long_form': lat_long_form, 'sensor_settings_form': sensor_settings_form})
-
-
 
 
 @login_required()

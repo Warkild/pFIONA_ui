@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import Alert from "../Alert";
 
-function Pumps({inAction, setInAction}) {
+function Pumps({inAction, setInAction, isDeployed}) {
 
     /**
      * VARIABLES
@@ -267,104 +267,102 @@ function Pumps({inAction, setInAction}) {
                         </div>
                     </div>
                 </div>
-                <div className={"flex flex-row justify-between mb-5"}>
-                    {!inAction ? (
+                <div className="flex flex-row justify-between mb-5">
+                    {!inAction && !isDeployed ? (
                         <>
-                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
-                                    onClick={runPump1}
-                            >Run Pump 1
+                            <button
+                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"
+                                onClick={runPump1}
+                                disabled={inAction || isDeployed}
+                            >
+                                Run Pump 1
                             </button>
-                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
-                                    onClick={runPumpBoth}
-                            >Run Both
+                            <button
+                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"
+                                onClick={runPumpBoth}
+                                disabled={inAction || isDeployed}
+                            >
+                                Run Both
                             </button>
-                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"}
-                                    onClick={runPump2}
-                            >Run Pump 2
+                            <button
+                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"
+                                onClick={runPump2}
+                                disabled={inAction || isDeployed}
+                            >
+                                Run Pump 2
                             </button>
                         </>
                     ) : (
                         <>
-                            {!runningPump1 ? (
-                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2"}
-                                >Run Pump 1
-                                </button>
-                            ): (
-                                <button className={"bg-green-500 w-3/12 rounded-lg text-white font-poppins py-2"}
-                                >Running
-                                </button>
-                            )}
-                            {!runningPumpBoth ? (
-                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2"}
-                                >Run Pump Both
-                                </button>
-                            ): (
-                                <button className={"bg-green-500 w-3/12 rounded-lg text-white font-poppins py-2"}
-                                >Running
-                                </button>
-                            )}
-                            {!runningPump2 ? (
-                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2"}
-                                >Run Pump 2
-                                </button>
-                            ): (
-                                <button className={"bg-green-500 w-3/12 rounded-lg text-white font-poppins py-2"}
-                                >Running
-                                </button>
-                            )}
+                            <button
+                                className={`w-3/12 rounded-lg font-poppins py-2 ${runningPump1 ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                                disabled={inAction || isDeployed}
+                            >
+                                {runningPump1 ? "Running" : "Run Pump 1"}
+                            </button>
+                            <button
+                                className={`w-3/12 rounded-lg font-poppins py-2 ${runningPumpBoth ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                                disabled={inAction || isDeployed}
+                            >
+                                {runningPumpBoth ? "Running" : "Run Both"}
+                            </button>
+                            <button
+                                className={`w-3/12 rounded-lg font-poppins py-2 ${runningPump2 ? "bg-green-500 text-white" : "bg-gray-200 text-gray-700"}`}
+                                disabled={inAction || isDeployed}
+                            >
+                                {runningPump2 ? "Running" : "Run Pump 2"}
+                            </button>
                         </>
                     )}
                 </div>
-                <div className={"flex flex-row justify-between"}>
-                    {!inAction ? (
+                <div className="flex flex-row justify-between">
+                    {!inAction && !isDeployed ? (
                         <>
-                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
-                                    onClick={slewPump1}
-                            >Slew Pump
-                                1
+                            <button
+                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"
+                                onClick={slewPump1}
+                                disabled={false}
+                            >
+                                Slew Pump 1
                             </button>
-                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
-                                    onClick={slewPumpBoth}>Slew Both
+                            <button
+                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"
+                                onClick={slewPumpBoth}
+                                disabled={false}
+                            >
+                                Slew Both
                             </button>
-                            <button className={"bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
-                                    onClick={slewPump2}>Slew Pump
-                                2
+                            <button
+                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"
+                                onClick={slewPump2}
+                                disabled={false}
+                            >
+                                Slew Pump 2
                             </button>
                         </>
                     ) : (
                         <>
-                            {!slewingPump1 ? (
-                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2 text-sm"}
-                                >Slew Pump
-                                    1
-                                </button>
-                            ) : (
-                                <button className={"bg-red-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
-                                        onClick={endSlewPump1}
-                                >Stop
-                                </button>
-                            )}
-                            {!slewingPumpBoth ? (
-                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2 text-sm"}
-                                >Slew Both
-                                </button>
-                            ) : (
-                                <button className={"bg-red-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
-                                        onClick={endSlewPumpBoth}
-                                >Stop
-                                </button>
-                            )}
-                            {!slewingPump2 ? (
-                                <button className={"bg-gray-200 w-3/12 rounded-lg text-gray-700 font-poppins py-2 text-sm"}
-                                >Slew Pump
-                                    2
-                                </button>
-                            ) : (
-                                <button className={"bg-red-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"}
-                                        onClick={endSlewPump2}
-                                >Stop
-                                </button>
-                            )}
+                            <button
+                                className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump1 ? "bg-red-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                                onClick={slewingPump1 ? endSlewPump1 : null}
+                                disabled={!(slewingPump1 || !isDeployed && !inAction)}
+                            >
+                                {slewingPump1 ? "Stop" : "Slew Pump 1"}
+                            </button>
+                            <button
+                                className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPumpBoth ? "bg-red-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                                onClick={slewingPumpBoth ? endSlewPumpBoth : null}
+                                disabled={!(slewingPumpBoth || !isDeployed && !inAction)}
+                            >
+                                {slewingPumpBoth ? "Stop" : "Slew Both"}
+                            </button>
+                            <button
+                                className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump2 ? "bg-red-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                                onClick={slewingPump2 ? endSlewPump2 : null}
+                                disabled={!(slewingPump2 || !isDeployed && !inAction)}
+                            >
+                                {slewingPump2 ? "Stop" : "Slew Pump 2"}
+                            </button>
                         </>
                     )}
                 </div>

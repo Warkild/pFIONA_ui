@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Alert from "../Alert";
 
-function AuxPump({inAction, setInAction}) {
+function AuxPump({inAction, setInAction, isDeployed}) {
     const [auxPumpRunning, setAuxPumpRunning] = useState(false);
 
     const turnOnAuxPump = () => {
@@ -29,9 +29,9 @@ function AuxPump({inAction, setInAction}) {
                     </div>
                     {!auxPumpRunning ? (
                         <button
-                            className={`rounded-lg font-poppins py-2 mb-5 ${inAction ? 'bg-gray-200 text-gray-700' : 'bg-blue-600 text-white'}`}
+                            className={`rounded-lg font-poppins py-2 mb-5 ${inAction || isDeployed ? 'bg-gray-200 text-gray-700' : 'bg-blue-600 text-white'}`}
                             onClick={turnOnAuxPump}
-                            disabled={inAction}
+                            disabled={inAction || isDeployed}
                         >
                             Turn ON
                         </button>
