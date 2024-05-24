@@ -145,18 +145,18 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
             const y = Math.sin(angle) * 65;
 
             return (
-              <div
-                key={port}
-                onClick={() => handleClick(port)}
-                className={`absolute w-7 h-7 rounded-full cursor-pointer flex items-center justify-center
-                  ${selectedPort == port ? 'bg-blue-900 text-white' : 'bg-blue-200 text-black'}
-                  ${inAction || isDeployed ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : ''}`}
-                style={{
-                  transform: `translate(${x}px, ${y}px)`,
-                }}
-              >
-                {port}
-              </div>
+                <div
+                    key={port}
+                    onClick={() => handleClick(port)}
+                    className={`absolute w-7 h-7 rounded-full cursor-pointer flex items-center justify-center
+                  ${inAction || isDeployed ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
+                        selectedPort == port ? 'bg-blue-900 text-white' : 'bg-blue-200 text-black'}`}
+                    style={{
+                      transform: `translate(${x}px, ${y}px)`,
+                    }}
+                >
+                  {port}
+                </div>
             );
           })}
         </div>
