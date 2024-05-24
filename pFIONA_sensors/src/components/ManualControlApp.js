@@ -129,7 +129,7 @@ function ManualControlApp() {
                                 <Spectrophotometer addLogMessage={addLogMessage}/>
                                 <AuxPump inAction={inAction} setInAction={setInAction} isDeployed={isDeployed}/>
                             </div>
-                            <div className={"flex flex-row justify-between"}>
+                            <div className={"flex flex-row justify-between pb-12"}>
                                 <PreEstablishedScan/>
                             </div>
                         </>
