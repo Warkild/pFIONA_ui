@@ -131,6 +131,12 @@ def get_reaction_details(reaction_id):
         'number': step.number
     } for step in step_list]
 
+    # Get the monitored wavelength to have the full reaction details
+
+    wavelength_list = models.WavelengthMonitored.objects.filter(pfiona_reaction_id=reaction.id)
+
+    monitored_wavelengths = sorted([wavelength.wavelength for wavelength in wavelength_list])
+
     # Create an object with all the information about the reaction
 
     reaction_json = json.dumps({
@@ -141,6 +147,7 @@ def get_reaction_details(reaction_id):
         'actions': step_json,
         'volume_of_mixture': reaction.volume_of_mixture,
         'volume_to_push_to_flow_cell': reaction.volume_to_push_to_flow_cell,
+        'monitored_wavelengths': monitored_wavelengths
     })
 
     return reaction_json
@@ -326,3 +333,7 @@ def set_sample_frequency(sensor_id, sample_frequency):
     sensor = models.Sensor.objects.get(id=sensor_id)
     sensor.sample_frequency = sample_frequency
     sensor.save()
+
+
+def delete_all_wavelength_monitored(reaction_id):
+    models.WavelengthMonitored.objects.filter(pfiona_reaction_id=reaction_id).delete()
