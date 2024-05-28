@@ -130,7 +130,7 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
         <div className={"flex flex-col"}>
           <>
             <button
-              className={`${!inAction && !isDeployed ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"} rounded-lg font-poppins py-1`}
+              className={`${!inAction && !isDeployed ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 cursor-not-allowed"} rounded-lg font-poppins py-1`}
               onClick={handleMoveAirPortClick}
               disabled={inAction || isDeployed}
             >
@@ -148,9 +148,12 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
                 <div
                     key={port}
                     onClick={() => handleClick(port)}
-                    className={`absolute w-7 h-7 rounded-full cursor-pointer flex items-center justify-center
-                  ${inAction || isDeployed ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
-                        selectedPort == port ? 'bg-blue-900 text-white' : 'bg-blue-200 text-black'}`}
+                   className={`absolute w-7 h-7 rounded-full flex items-center justify-center
+    ${inAction || isDeployed ? 'cursor-not-allowed' : 'cursor-pointer'}
+    ${inAction || isDeployed
+        ? (selectedPort === port ? 'bg-gray-600 text-white' : 'bg-gray-300 text-gray-500')
+        : (selectedPort === port ? 'bg-blue-900 text-white' : 'bg-blue-200 text-black')
+    }`}
                     style={{
                       transform: `translate(${x}px, ${y}px)`,
                     }}
@@ -160,6 +163,9 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
             );
           })}
         </div>
+        {currentVal === "Air" &&
+          <p>On the air port</p>
+        }
       </div>
       <Alert isOpen={isModalOpen} onRequestClose={closeModal}/>
     </div>

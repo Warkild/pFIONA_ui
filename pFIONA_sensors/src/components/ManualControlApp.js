@@ -5,7 +5,6 @@ import Pumps from "./plugins/ManualControl/Pumps";
 import Spectrophotometer from "./plugins/ManualControl/Spectrophotometer";
 import AuxPump from "./plugins/ManualControl/AuxPump";
 import PreEstablishedScan from "./plugins/ManualControl/PreEstablishedScan";
-import Log from "./plugins/ManualControl/Log";
 
 function ManualControlApp() {
 
@@ -24,26 +23,26 @@ function ManualControlApp() {
                 'Content-Type': 'application/json',
             },
         })
-        .then(response => {
-            if (!response.ok) {
-                setErrorMessageDeployed("Unable to connect")
+            .then(response => {
+                if (!response.ok) {
+                    setErrorMessageDeployed("Unable to connect")
+                    setIsErrorDeployed(true)
+                    setIsLoadingDeployed(false)
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                setIsDeployed(data.data)
+                setIsLoadingDeployed(false)
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                setErrorMessageDeployed(`There is an error : ${error.message}`)
                 setIsErrorDeployed(true)
                 setIsLoadingDeployed(false)
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            setIsDeployed(data.data)
-            setIsLoadingDeployed(false)
-            console.log('Success:', data);
-        })
-        .catch(error => {
-            setErrorMessageDeployed(`There is an error : ${error.message}`)
-            setIsErrorDeployed(true)
-            setIsLoadingDeployed(false)
-            console.error('Error:', error);
-        });
+                console.error('Error:', error);
+            });
     };
 
     useEffect(() => {
@@ -75,20 +74,20 @@ function ManualControlApp() {
                 'Content-Type': 'application/json',
             },
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
-            setConnected(true)
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            setConnected(false)
-        });
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setConnected(true)
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setConnected(false)
+            });
     };
 
     useEffect(() => {
@@ -105,13 +104,14 @@ function ManualControlApp() {
     return (
         <>
             {isLoadingDeployed ? (
-            <>
-                Loading...
-            </>
-            ): (
+                <>
+                    Loading...
+                </>
+            ) : (
                 <div className={"flex flex-col"}>
                     {isDeployed &&
-                        <div className={"font-montserrat rounded-lg border border-red-700 bg-red-100 text-red-700 mb-5"}>
+                        <div
+                            className={"font-montserrat rounded-lg border border-red-700 bg-red-100 text-red-700 mb-5"}>
                             <div className={"flex flex-row h-min py-2 px-3"}>
                                 <img src={"/static/img/ico/icons8-warning-red-512.svg"} alt="Warning"
                                      className={"w-6 h-6 mr-2"}/>
@@ -126,7 +126,7 @@ function ManualControlApp() {
                                 <Pumps inAction={inAction} setInAction={setInAction} isDeployed={isDeployed}/>
                             </div>
                             <div className={"flex flex-row justify-between pb-12"}>
-                                <Spectrophotometer addLogMessage={addLogMessage}/>
+                                <Spectrophotometer inAction={inAction} setInAction={setInAction} isDeployed={isDeployed}/>
                                 <AuxPump inAction={inAction} setInAction={setInAction} isDeployed={isDeployed}/>
                             </div>
                             <div className={"flex flex-row justify-between pb-12"}>

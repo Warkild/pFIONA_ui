@@ -5,13 +5,59 @@ function AuxPump({inAction, setInAction, isDeployed}) {
     const [auxPumpRunning, setAuxPumpRunning] = useState(false);
 
     const turnOnAuxPump = () => {
+        const url = `http://${SENSOR_IP}:5000/auxpump/turn_on`;
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+        },
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Success:', data);
         setAuxPumpRunning(true);
         setInAction(true);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setAuxPumpRunning(false);
+        setInAction(false);
+      });
     };
 
     const turnOffAuxPump = () => {
-        setAuxPumpRunning(false);
-        setInAction(false);
+        const url = `http://${SENSOR_IP}:5000/auxpump/turn_off`;
+
+          fetch(url, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+            },
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Success:', data);
+            setAuxPumpRunning(false);
+            setInAction(false);
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            setAuxPumpRunning(false);
+            setInAction(false);
+          });
     };
 
     // Return HTML Code
