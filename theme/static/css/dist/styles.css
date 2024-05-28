@@ -1055,6 +1055,10 @@ select {
   margin-top: 1.25rem;
 }
 
+.ml-4 {
+  margin-left: 1rem;
+}
+
 .flex {
   display: flex;
 }
