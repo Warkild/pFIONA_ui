@@ -164,7 +164,7 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
           })}
         </div>
         {currentVal === "Air" &&
-          <p>On the air port</p>
+          <p className={"font-montserrat mt-2"}>> On the air port</p>
         }
       </div>
       <Alert isOpen={isModalOpen} onRequestClose={closeModal}/>
