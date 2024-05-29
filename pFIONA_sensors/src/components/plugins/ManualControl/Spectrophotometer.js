@@ -185,13 +185,16 @@ function Spectrophotometer({ inAction, setInAction, isDeployed }) {
                         <button
                             className={`rounded-lg font-poppins py-2 mb-5 ${isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
                             onClick={turnOffLight}
+                            disabled={isDeployed}
                         >
                             Turn OFF
                         </button>
                     )}
                     <p className={"text-sm mb-2"}>Spectrophotometer</p>
-                    <button className={"bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"}
-                        onClick={scanNow}>Scan now</button>
+                    <button className={`rounded-lg font-poppins py-2 mb-5 ${isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
+                        onClick={scanNow}
+                        disabled={isDeployed}
+                    >Scan now</button>
                 </div>
                 <div className={"flex flex-col w-full ml-4 h-full"}>
                     <div style={{ height: '400px' }}>
