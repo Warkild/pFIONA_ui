@@ -75,7 +75,7 @@ function AuxPump({inAction, setInAction, isDeployed}) {
                     </div>
                     {!auxPumpRunning ? (
                         <button
-                            className={`rounded-lg font-poppins py-2 mb-5 ${inAction || isDeployed ? 'bg-gray-200 text-gray-700' : 'bg-blue-600 text-white'}`}
+                            className={`rounded-lg font-poppins py-2 mb-5 ${inAction || isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
                             onClick={turnOnAuxPump}
                             disabled={inAction || isDeployed}
                         >
@@ -83,8 +83,9 @@ function AuxPump({inAction, setInAction, isDeployed}) {
                         </button>
                     ) : (
                         <button
-                            className="bg-blue-600 rounded-lg text-white font-poppins py-2 mb-5"
+                            className={`rounded-lg font-poppins py-2 mb-5 ${isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
                             onClick={turnOffAuxPump}
+                            disabled={isDeployed}
                         >
                             Turn OFF
                         </button>
