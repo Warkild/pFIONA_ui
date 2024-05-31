@@ -2,6 +2,7 @@ import csv
 import datetime
 import json
 
+from django.contrib import messages
 from django.db import transaction
 
 from pFIONA_api import queries as q
@@ -10,8 +11,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import user_passes_test
 
 from pFIONA_sensors.models import Sensor, Reagent, Step, Reaction, Spectrum
+from .decorators import admin_required
 from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm, SensorSettingsForm
 
 
@@ -131,6 +134,7 @@ def sensors_reagents_valve_update(request, sensor_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_delete(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
     reactions = q.get_reactions_associated_reagent(reagent_id)
@@ -143,6 +147,7 @@ def sensors_reagent_delete(request, sensor_id, reagent_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_deletion(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
 
@@ -164,6 +169,7 @@ def sensors_reagent_deletion(request, sensor_id, reagent_id):
 
 
 @login_required()
+@admin_required
 def sensors_reaction_delete(request, sensor_id, reaction_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     sensor.actual_reaction_id = None
@@ -176,6 +182,7 @@ def sensors_reaction_delete(request, sensor_id, reaction_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_edit(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
     reagent_form = ReagentEditForm(request.POST or None, instance=reagent, prefix='reagent')
@@ -193,6 +200,7 @@ def sensors_reagent_edit(request, sensor_id, reagent_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_add(request, sensor_id):
     if request.method == 'POST':
         reagent_form = ReagentEditForm(request.POST, prefix='reagent')
@@ -212,6 +220,7 @@ def sensors_reagent_add(request, sensor_id):
 
 
 @login_required
+@admin_required
 def sensors_settings(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')
@@ -250,6 +259,7 @@ def sensors_settings(request, sensor_id):
 
 
 @login_required()
+@admin_required
 def sensors_reaction_add(request, sensor_id):
     reagents_json = q.get_utils_reagents(sensor_id, return_json=True)
 
@@ -260,6 +270,7 @@ def sensors_reaction_add(request, sensor_id):
 
 
 @login_required()
+@admin_required
 def sensors_reaction_edit(request, sensor_id, reaction_id):
     reagents_json = q.get_utils_reagents(sensor_id, return_json=True)
 
