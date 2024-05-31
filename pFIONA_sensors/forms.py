@@ -30,14 +30,14 @@ class SensorSettingsForm(ModelForm):
     class Meta:
         model = Sensor
         fields = [
-            'boxcar_width', 'time_to_wait_for_lamp', 'time_between_2_measure',
+            'boxcar_width', 'time_to_wait_for_lamp', 'time_between_2_spectrophotometer_scan',
             'flush_flow_rate', 'flush_volume', 'max_flow_rate', 'max_aspirate_volume', 'volume_for_valve_port_priming'
         ]
 
     def clean(self):
         cleaned_data = super().clean()
         fields_to_check = [
-            'boxcar_width', 'time_to_wait_for_lamp', 'time_between_2_measure',
+            'boxcar_width', 'time_to_wait_for_lamp', 'time_between_2_spectrophotometer_scan',
             'flush_flow_rate', 'flush_volume', 'max_flow_rate', 'max_aspirate_volume', 'volume_for_valve_port_priming'
         ]
 

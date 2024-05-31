@@ -14,7 +14,7 @@ class Sensor(models.Model):
     scans_to_average = models.IntegerField(null=True)
     boxcar_width = models.IntegerField(null=True)
     time_to_wait_for_lamp = models.IntegerField(null=True)
-    time_between_2_measure = models.IntegerField(null=True)
+    time_between_2_spectrophotometer_scan = models.IntegerField(null=True)
     flush_flow_rate = models.IntegerField(null=True)
     flush_volume = models.IntegerField(null=True)
     max_flow_rate = models.IntegerField(null=True)
