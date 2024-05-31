@@ -247,8 +247,12 @@ def get_reactions_associated_reagent(reagent_id):
 
 
 def get_last_spectrum_all_type(reaction_name, timestamp):
-    # Filtrer les types de spectre qui commencent par reaction_name
-    matching_spectrum_types = models.SpectrumType.objects.filter(type__startswith=reaction_name)
+    # Filtrer les types de spectre qui commencent par reaction_name et ne se terminent pas par "wavelength monitored"
+    matching_spectrum_types = models.SpectrumType.objects.filter(
+        type__startswith=reaction_name
+    ).exclude(
+        type__endswith="wavelength_monitored"
+    )
     print(f"Matching spectrum types: {matching_spectrum_types}")
 
     # Dictionnaire pour stocker le dernier spectre de chaque type
