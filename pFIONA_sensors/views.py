@@ -4,15 +4,13 @@ import json
 
 from django.db import transaction
 
-from pFIONA_sensors import queries as q, models
+from pFIONA_api import queries as q
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework_simplejwt.tokens import RefreshToken
 
-from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
 from pFIONA_sensors.models import Sensor, Reagent, Step, Reaction, Spectrum
 from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm, SensorSettingsForm
 

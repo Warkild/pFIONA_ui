@@ -8,7 +8,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-import pFIONA_sensors.queries as q
+import pFIONA_api.queries as q
 
 
 @login_required()
