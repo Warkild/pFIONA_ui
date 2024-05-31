@@ -337,3 +337,7 @@ def set_sample_frequency(sensor_id, sample_frequency):
 
 def delete_all_wavelength_monitored(reaction_id):
     models.WavelengthMonitored.objects.filter(pfiona_reaction_id=reaction_id).delete()
+
+
+def get_last_states(sensor_id):
+    return models.Sensor.objects.get(id=sensor_id).last_states

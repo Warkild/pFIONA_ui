@@ -1,5 +1,6 @@
 import json
 import re
+import ast
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -195,7 +196,8 @@ def api_edit_reaction(request):
         wavelength_monitored = list(set([int(e) for e in elements if e]))
 
         reaction = q.update_reaction(data['id'], data['name'], int(data['standard_reagent_id']),
-                                     float(data['standard_concentration']), float(data['volume_of_mixture']), float(data['volume_to_push_to_flow_cell']))
+                                     float(data['standard_concentration']), float(data['volume_of_mixture']),
+                                     float(data['volume_to_push_to_flow_cell']))
 
         q.delete_all_step(data['id'])
         q.delete_all_wavelength_monitored(data['id'])
@@ -210,8 +212,6 @@ def api_edit_reaction(request):
 
         for wavelength in wavelength_monitored:
             q.create_monitored_wavelength(reaction_id=reaction.id, wavelength=wavelength)
-
-
 
         return JsonResponse({'status': 'success', 'message': 'Reaction edited successfully!'})
 
@@ -398,6 +398,29 @@ def api_get_sample_frequency(request):
         sample_frequency = q.get_sensor_sample_frequency(sensor_id)
 
         return JsonResponse({'status': 'success', 'data': sample_frequency})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_last_states(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        last_states = ast.literal_eval(q.get_last_states(sensor_id))
+
+        return JsonResponse({'status': 'success', 'data': last_states})
 
     except ValueError as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

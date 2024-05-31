@@ -198,7 +198,7 @@ function DeployBasicSettings({}) {
 
 
     return (
-        <div className="w-6/12">
+        <div className="w-5/12">
             <div className="mb-5">
                 <h2 className="font-poppins font-bold text-gray-500 text-sm">BASIC SETTINGS</h2>
             </div>

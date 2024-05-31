@@ -15,4 +15,5 @@ urlpatterns = [
     path('get_sensor_sleep', views.api_get_sleep, name='api_get_sleep'),
     path('get_sensor_sample_frequency', views.api_get_sample_frequency, name='api_get_sample_frequency'),
     path('set_sensor_general_settings', views.api_set_sensor_general_settings, name='api_set_sensor_general_settings'),
+    path('get_last_states', views.api_get_last_states, name='api_get_last_states'),
 ]
