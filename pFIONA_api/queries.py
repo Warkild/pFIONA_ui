@@ -58,7 +58,8 @@ def get_utils_reagents(sensor_id, return_json=False):
         return reagents
 
 
-def create_reaction(name, standard_id, standard_concentration, volume_of_mixture, volume_to_push_to_flow_cell):
+def create_reaction(name, standard_id, standard_concentration, volume_of_mixture, volume_to_push_to_flow_cell,
+                    number_of_blank, number_of_sample, number_of_standard, multi_standard, multi_standard_time):
     """
     Create a reaction in database
 
@@ -67,15 +68,28 @@ def create_reaction(name, standard_id, standard_concentration, volume_of_mixture
     :param standard_concentration: Standard concentration of reaction
     :param volume_of_mixture: Volume of mixture of reaction
     :param volume_to_push_to_flow_cell: Volume to push to flow cell of reaction
+    :param number_of_blank : Number of blank in each cycle
+    :param number_of_standard : Number of standard cycle in each cycle
+    :param number_of_sample : Number of sample in each cycle
+    :param multi_standard : True or False for multi-standard reaction
+    :param multi_standard_time : Time for multi-standard reaction
 
     :return: Reaction object
     """
 
     standard = models.Reagent.objects.get(id=standard_id)
 
-    reaction = models.Reaction.objects.create(name=name, standard_concentration=standard_concentration,
-                                              standard=standard, volume_of_mixture=volume_of_mixture,
-                                              volume_to_push_to_flow_cell=volume_to_push_to_flow_cell)
+    reaction = models.Reaction.objects.create(name=name,
+                                              standard_concentration=standard_concentration,
+                                              standard=standard,
+                                              volume_of_mixture=volume_of_mixture,
+                                              volume_to_push_to_flow_cell=volume_to_push_to_flow_cell,
+                                              number_of_blank=number_of_blank,
+                                              number_of_standard=number_of_standard,
+                                              number_of_sample=number_of_sample,
+                                              multi_standard=multi_standard,
+                                              multi_standard_time=multi_standard_time
+                                              )
 
     reaction.save()
 
@@ -169,7 +183,8 @@ def delete_all_step(reaction_id):
 
 
 def update_reaction(reaction_id, name, standard_id, standard_concentration, volume_of_mixture,
-                    volume_to_push_to_flow_cell):
+                    volume_to_push_to_flow_cell, number_of_blank, number_of_sample, number_of_standard,
+                    multi_standard, multi_standard_time):
     """
     Update a reaction in database
 
@@ -179,6 +194,11 @@ def update_reaction(reaction_id, name, standard_id, standard_concentration, volu
     :param standard_concentration: Standard concentration of reaction
     :param volume_of_mixture: Volume of mixture of reaction
     :param volume_to_push_to_flow_cell: Volume to push to flow cell of reaction
+    :param number_of_blank : Number of blank in each cycle
+    :param number_of_standard : Number of standard cycle in each cycle
+    :param number_of_sample : Number of sample in each cycle
+    :param multi_standard : True or False for multi-standard reaction
+    :param multi_standard_time : Time for multi-standard reaction
 
     :return: Reaction object
     """
@@ -189,6 +209,11 @@ def update_reaction(reaction_id, name, standard_id, standard_concentration, volu
     reaction.standard_id = standard_id
     reaction.volume_of_mixture = volume_of_mixture
     reaction.volume_to_push_to_flow_cell = volume_to_push_to_flow_cell
+    reaction.number_of_blank = number_of_blank
+    reaction.number_of_sample = number_of_sample
+    reaction.number_of_standard = number_of_standard
+    reaction.multi_standard = multi_standard
+    reaction.multi_standard_time = multi_standard_time
     reaction.save()
 
     return reaction

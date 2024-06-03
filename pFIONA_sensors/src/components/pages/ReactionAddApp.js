@@ -41,6 +41,13 @@ function ReactionAddApp() {
     // Monitored Wavelength
     const [wavelengthMonitored, setWavelengthMonitored] = useState("");
 
+    // CYCLE ANALYSIS
+    const [numberOfBlank, setNumberOfBlank] = useState(2);
+    const [numberOfSample, setNumberOfSample] = useState(2);
+    const [numberOfStandard, setNumberOfStandard] = useState(2);
+    const [multiStandard, setMultiStandard] = useState(false);
+    const [multiStandardTime, setMultiStandardTime] = useState(360);
+
 
     /**
      * Change the list of reagents for the reaction when user interact with the UI
@@ -89,6 +96,11 @@ function ReactionAddApp() {
             volume_of_mixture: volumeOfMixture,
             volume_to_push_to_flow_cell: volumeToPushToFlowCell,
             monitored_wavelength: wavelengthMonitored,
+            number_of_blank: numberOfBlank,
+            number_of_sample: numberOfSample,
+            number_of_standard: numberOfStandard,
+            multi_standard: multiStandard,
+            multi_standard_time: multiStandardTime,
         };
 
         const apiUrl = "/api/add_reaction"; // Your Django API URL
@@ -252,6 +264,61 @@ function ReactionAddApp() {
                                 className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
                         </div>
+                    </div>
+                </div>
+                <div className={"flex flex-row justify-between w-full pb-10"}>
+                    <div className={"flex flex-col w-3/12"}>
+                        <label className={"font-montserrat text-sm pb-2"}>Number Of Blank</label>
+                        <input
+                            type="number"
+                            value={numberOfBlank}
+                            onChange={(e) => setNumberOfBlank(e.target.value)}
+                            placeholder="Standard Concentration (molarity)"
+                            className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        />
+                    </div>
+                    <div className={"flex flex-col w-3/12"}>
+                        <label className={"font-montserrat text-sm pb-2"}>Number Of Blank</label>
+                        <input
+                            type="number"
+                            value={numberOfSample}
+                            onChange={(e) => setNumberOfSample(e.target.value)}
+                            placeholder="Standard Concentration (molarity)"
+                            className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        />
+                    </div>
+                    <div className={"flex flex-col w-3/12"}>
+                        <label className={"font-montserrat text-sm pb-2"}>Number Of Blank</label>
+                        <input
+                            type="number"
+                            value={numberOfStandard}
+                            onChange={(e) => setNumberOfStandard(e.target.value)}
+                            placeholder="Standard Concentration (molarity)"
+                            className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        />
+                    </div>
+                </div>
+                <div className={"flex flex-row space-x-10 w-full pb-10"}>
+                    <div>
+                        <label>
+                            <input
+                                type="checkbox"
+                                className={"form-checkbox focus:outline-none rounded-lg mr-3"}
+                                checked={multiStandard}
+                                onChange={(e) => setMultiStandard(e.target.checked)}
+                            />
+                            Multi Standard
+                        </label>
+                    </div>
+                    <div className={"flex flex-col w-3/12"}>
+                        <label className={"font-montserrat text-sm pb-2"}>Multi Standard Time</label>
+                        <input
+                            type="number"
+                            value={multiStandardTime}
+                            onChange={(e) => setMultiStandardTime(e.target.value)}
+                            placeholder="Multi Standard Time"
+                            className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        />
                     </div>
                 </div>
                 <button

@@ -1,5 +1,4 @@
 import json
-import re
 import ast
 
 from django.contrib.auth.decorators import login_required
@@ -9,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 import pFIONA_api.queries as q
+from pFIONA_api.validation import validate_reaction_data
 
 
 @login_required()
@@ -50,65 +50,24 @@ def api_add_reaction(request):
         data = json.loads(request.body)
         print(data)
 
-        # Validation of data
-        if data['name'] == "":
-            raise ValidationError('Name cannot be empty')
-
-        if len(data['steps']) == 0:
-            raise ValidationError('You need to specify at least one reagent')
-
-        reagent_id = []
-        for step in data["steps"]:
-            # Receive the step to format ["reagent_id/wait, volume/wait_time"]
-            if step[0] == "w":
-                # Wait time
-                if step[1] == "":
-                    raise ValidationError('Wait time cannot be empty')
-                if int(step[1]) < 0:
-                    raise ValidationError('Wait time cannot be negative')
-            elif step[0] != "":
-                # Reagent
-                if step[1] == "":
-                    raise ValidationError('Reagent volume cannot be empty')
-                if int(step[1]) <= 0:
-                    raise ValidationError('Reagent volume cannot be negative or nul')
-                reagent_id.append(step[0])
-            else:
-                # Nothing selected
-                raise ValidationError('Step cannot be empty')
-
-        if len(reagent_id) == 0:
-            raise ValidationError('You must specify at least one reagent')
-
-        if data['standard_reagent_id'] == "":
-            raise ValidationError('Standard reagent cannot be empty')
-
-        if float(data["standard_concentration"]) <= 0:
-            raise ValidationError('Standard concentration cannot be negative')
-
-        if float(data["volume_of_mixture"]) <= 0:
-            raise ValidationError('Volume of mixture cannot be negative')
-
-        if float(data["volume_to_push_to_flow_cell"]) <= 0:
-            raise ValidationError('Volume of flow cell cannot be negative')
-
-        if float(data["volume_of_mixture"]) < float(data["volume_to_push_to_flow_cell"]):
-            raise ValidationError('Volume of mixture must be greater than volume of flow cell')
-
-        if data['monitored_wavelength'] == "":
-            raise ValidationError('Monitored wavelength cannot be empty')
-
-        if not bool(re.compile(r'^[0-9;]*$').match(data['monitored_wavelength'])):
-            raise ValidationError('Unknown monitored wavelength format')
+        # Validate data
+        validate_reaction_data(data)
 
         # All validations passed, proceed to create the reaction
-
         elements = data['monitored_wavelength'].split(';')
         wavelength_monitored = list(set([int(e) for e in elements if e]))
 
-        reaction = q.create_reaction(data['name'], int(data['standard_reagent_id']),
-                                     float(data['standard_concentration']), float(data['volume_of_mixture']),
-                                     float(data['volume_to_push_to_flow_cell']))
+        reaction = q.create_reaction(data['name'],
+                                     int(data['standard_reagent_id']),
+                                     float(data['standard_concentration']),
+                                     float(data['volume_of_mixture']),
+                                     float(data['volume_to_push_to_flow_cell']),
+                                     int(data['number_of_blank']),
+                                     int(data['number_of_sample']),
+                                     int(data['number_of_standard']),
+                                     bool(data['multi_standard']),
+                                     int(data['multi_standard_time'])
+                                     )
 
         for key, step in enumerate(data['steps']):
             if step[0] == "w":
@@ -128,8 +87,9 @@ def api_add_reaction(request):
         return JsonResponse({'status': 'error', 'message': str(e.message)}, status=400)
     except Exception as e:
         # Catch other unexpected errors
-        return JsonResponse({'status': 'error', 'message': f'An unexpected error occurred: {str(e.message)}'},
+        return JsonResponse({'status': 'error', 'message': f'An unexpected error occurred: {str(e)}'},
                             status=500)
+
 
 
 @login_required()
@@ -139,65 +99,26 @@ def api_edit_reaction(request):
         data = json.loads(request.body)
         print(data)
 
-        # Validation of data
-        if data['name'] == "":
-            raise ValidationError('Name cannot be empty')
-
-        if len(data['steps']) == 0:
-            raise ValidationError('You need to specify at least one reagent')
-
-        reagent_id = []
-        for step in data["steps"]:
-            # Receive the step to format ["reagent_id/wait, volume/wait_time"]
-            if step[0] == "w":
-                # Wait time
-                if step[1] == "":
-                    raise ValidationError('Wait time cannot be empty')
-                if int(step[1]) < 0:
-                    raise ValidationError('Wait time cannot be negative')
-            elif step[0] != "":
-                # Reagent
-                if step[1] == "":
-                    raise ValidationError('Reagent volume cannot be empty')
-                if int(step[1]) <= 0:
-                    raise ValidationError('Reagent volume cannot be negative or nul')
-                reagent_id.append(step[0])
-            else:
-                # Nothing selected
-                raise ValidationError('Step cannot be empty')
-
-        if len(reagent_id) == 0:
-            raise ValidationError('You must specify at least one reagent')
-
-        if data['standard_reagent_id'] == "":
-            raise ValidationError('Standard reagent cannot be empty')
-
-        if float(data["standard_concentration"]) <= 0:
-            raise ValidationError('Standard concentration cannot be negative')
-
-        if float(data["volume_of_mixture"]) <= 0:
-            raise ValidationError('Volume of mixture cannot be negative')
-
-        if float(data["volume_to_push_to_flow_cell"]) <= 0:
-            raise ValidationError('Volume of flow cell cannot be negative')
-
-        if float(data["volume_of_mixture"]) < float(data["volume_to_push_to_flow_cell"]):
-            raise ValidationError('Volume of mixture must be greater than volume of flow cell')
-
-        if data['monitored_wavelength'] == "":
-            raise ValidationError('Monitored wavelength cannot be empty')
-
-        if not bool(re.compile(r'^[0-9;]*$').match(data['monitored_wavelength'])):
-            raise ValidationError('Unknown monitored wavelength format')
+        # Validate data
+        validate_reaction_data(data)
 
         # All validations passed, proceed to update the reaction
 
         elements = data['monitored_wavelength'].split(';')
         wavelength_monitored = list(set([int(e) for e in elements if e]))
 
-        reaction = q.update_reaction(data['id'], data['name'], int(data['standard_reagent_id']),
-                                     float(data['standard_concentration']), float(data['volume_of_mixture']),
-                                     float(data['volume_to_push_to_flow_cell']))
+        reaction = q.update_reaction(data['id'],
+                                     data['name'],
+                                     int(data['standard_reagent_id']),
+                                     float(data['standard_concentration']),
+                                     float(data['volume_of_mixture']),
+                                     float(data['volume_to_push_to_flow_cell']),
+                                     int(data['number_of_blank']),
+                                     int(data['number_of_sample']),
+                                     int(data['number_of_standard']),
+                                     bool(data['multi_standard']),
+                                     int(data['multi_standard_time'])
+                                     )
 
         q.delete_all_step(data['id'])
         q.delete_all_wavelength_monitored(data['id'])
