@@ -1,10 +1,10 @@
 import React, { Component, useState } from "react";
 import { createRoot } from "react-dom/client";
-import Overview from "./plugins/Reagents/Overview";
-import ReagentsList from "./plugins/Reagents/ReagentsList";
-import Valve from "./plugins/Reagents/Valve";
-import ReactionsBuilder from "./plugins/Reagents/ReactionsBuilder";
-import CurrentReaction from "./plugins/Reagents/CurrentReaction";
+import Overview from "../plugins/reagents/Overview";
+import ReagentsList from "../plugins/reagents/ReagentsList";
+import Valve from "../plugins/reagents/Valve";
+import ReactionsBuilder from "../plugins/reagents/ReactionsBuilder";
+import CurrentReaction from "../plugins/reagents/CurrentReaction";
 
 function ReagentsApp({ip}) {
 

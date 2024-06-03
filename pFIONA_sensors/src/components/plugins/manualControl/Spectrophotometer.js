@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import Alert from "../Alert";
+import Alert from "../universal/Alert";
 
 ChartJS.register(...registerables);
 
@@ -16,7 +16,7 @@ function Spectrophotometer({ inAction, setInAction, isDeployed }) {
     // Intensities returned by the spec
     const [intensities, setIntensities] = useState([]);
 
-    // Chart Data
+    // Chart data
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: []

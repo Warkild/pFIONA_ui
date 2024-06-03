@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Alert from "../Alert";
+import Alert from "../universal/Alert";
 
 const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => {
   // Get value of current valve in sensor

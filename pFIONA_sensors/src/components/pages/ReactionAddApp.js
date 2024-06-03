@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
-import Alert from "./plugins/Alert";
+import Alert from "../plugins/universal/Alert";
 
 /**
  * Reaction add application

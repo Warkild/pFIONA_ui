@@ -1,10 +1,10 @@
-import ManualControlApp from "./components/ManualControlApp";
-import StatusApp from "./components/StatusApp";
-import ReagentsApp from "./components/ReagentsApp"
-import ReactionAddApp from "./components/ReactionAddApp"
-import ReactionEditApp from "./components/ReactionEditApp"
-import DataApp from "./components/DataApp"
-import DeployApp from "./components/DeployApp"
+import ManualControlApp from "./components/pages/ManualControlApp";
+import StatusApp from "./components/plugins/universal/StatusApp";
+import ReagentsApp from "./components/pages/ReagentsApp"
+import ReactionAddApp from "./components/pages/ReactionAddApp"
+import ReactionEditApp from "./components/pages/ReactionEditApp"
+import DataApp from "./components/pages/DataApp"
+import DeployApp from "./components/pages/DeployApp"
 
 // Fonction pour obtenir les JWT tokens
 function fetchAndStoreJwt() {

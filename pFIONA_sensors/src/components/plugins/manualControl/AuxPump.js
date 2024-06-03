@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Alert from "../Alert";
+import Alert from "../universal/Alert";
 
 function AuxPump({inAction, setInAction, isDeployed}) {
     const [auxPumpRunning, setAuxPumpRunning] = useState(false);

@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from "react";
 import { createRoot } from "react-dom/client";
-import DeployStatus from "./plugins/Deploy/DeployStatus";
-import DeployBasicSettings from "./plugins/Deploy/DeployBasicSettings";
-import DeployStatesInformation from "./plugins/Deploy/DeployStatesInformation";
+import DeployStatus from "../plugins/deploy/DeployStatus";
+import DeployBasicSettings from "../plugins/deploy/DeployBasicSettings";
+import DeployStatesInformation from "../plugins/deploy/DeployStatesInformation";
 function DeployApp({  }) {
 
 

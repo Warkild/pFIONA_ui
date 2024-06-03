@@ -9,7 +9,7 @@ def admin_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
         if not request.user.groups.filter(name='ADMIN').exists():
             messages.error(request,
-                           "You are not authorized to access this page. Please log in with an administrator account.")
+                           "You are not authorized to access this pages. Please log in with an administrator account.")
             return redirect('login')
         return view_func(request, *args, **kwargs)
 

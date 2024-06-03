@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {createRoot} from "react-dom/client";
-import ValvePort from "./plugins/ManualControl/ValvePort";
-import Pumps from "./plugins/ManualControl/Pumps";
-import Spectrophotometer from "./plugins/ManualControl/Spectrophotometer";
-import AuxPump from "./plugins/ManualControl/AuxPump";
-import PreEstablishedScan from "./plugins/ManualControl/PreEstablishedScan";
+import ValvePort from "../plugins/manualControl/ValvePort";
+import Pumps from "../plugins/manualControl/Pumps";
+import Spectrophotometer from "../plugins/manualControl/Spectrophotometer";
+import AuxPump from "../plugins/manualControl/AuxPump";
+import PreEstablishedScan from "../plugins/manualControl/PreEstablishedScan";
 
 function ManualControlApp() {
 
