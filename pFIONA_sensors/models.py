@@ -40,10 +40,15 @@ class Reagent(models.Model):
 class Reaction(models.Model):
     name = models.CharField(max_length=100)
     standard = models.ForeignKey(Reagent, on_delete=models.CASCADE, null=True, name="standard")
-    standard_concentration = models.FloatField(default=0)
+    standard_concentration = models.FloatField(default=1)
     volume_of_mixture = models.FloatField(default=0)
     volume_to_push_to_flow_cell = models.FloatField(default=0)
     reaction_time = models.IntegerField(default=30)
+    multi_standard = models.BooleanField(default=False)
+    multi_standard_time = models.IntegerField(default=360)
+    number_of_standard = models.IntegerField(default=2)
+    number_of_blank = models.IntegerField(default=2)
+    number_of_sample = models.IntegerField(default=2)
 
     class Meta:
         db_table = 'pfiona_reaction'
