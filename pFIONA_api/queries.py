@@ -316,7 +316,7 @@ def get_last_spectrum_all_type(reaction_name, timestamp):
             }
 
             # Récupérer et stocker les valeurs associées à ce spectre
-            associated_values = models.Value.objects.filter(pfiona_spectrum=last_spectrum)
+            associated_values = models.Value.objects.filter(pfiona_spectrum=last_spectrum).order_by('wavelength')
             for value in associated_values:
                 spectrum_details['Values'].append(value.value)
 
