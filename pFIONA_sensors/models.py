@@ -20,6 +20,7 @@ class Sensor(models.Model):
     max_flow_rate = models.IntegerField(null=True)
     max_aspirate_volume = models.IntegerField(null=True)
     volume_for_valve_port_priming = models.IntegerField(null=True)
+    time_to_pump = models.IntegerField(null=True)
 
     class Meta:
         db_table = 'pfiona_sensor'
@@ -27,8 +28,8 @@ class Sensor(models.Model):
 
 class Reagent(models.Model):
     name = models.CharField(max_length=100)
-    volume = models.IntegerField(null=True)
-    volume_max = models.IntegerField(null=True)
+    volume = models.FloatField(null=True)
+    volume_max = models.FloatField(null=True)
     port = models.IntegerField(null=True)
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, name="pfiona_sensor")
     is_standard = models.BooleanField(default=False)
