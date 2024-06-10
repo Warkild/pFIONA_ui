@@ -3,26 +3,27 @@ from django.db.models import Q
 import pFIONA_sensors.models as models
 import json
 
-state_dict = {'Boot': 0,
-              'Flush': 1,
-              'Mix': 2,
-              'Change_Valve': 3,
-              'Scan': 4,
-              'Pump_Sample_from_ocean': 5,
-              'Push_to_flow_cell': 6,
-              'Dilution': 7,
-              'Wait': 8,
-              'Darkspectrum': 9,
-              'Idle': 10,
-              'Reference_spectrum': 11,
-              'Blank_spectrum': 12,
-              'Sample_spectrum': 13,
-              'Standard_spectrum': 14,
-              'Deployed': 15,
-              'Sleep': 16,
-              'Shutdown': 17,
-              'Error': 18,
-              }
+state_dict = {'Boot' : 0,
+                'Flush': 1,
+                'Mix':2,
+                'Change_Valve':3,
+                'Scan':4,
+                'Pump_Sample_from_ocean':5,
+                'Push_to_flow_cell':6,
+                'Multi_standard_spectrum':7,
+                'Wait':8,
+                'Darkspectrum' : 9,
+                'Idle' : 10,
+                'Reference_spectrum' : 11,
+                'Blank_spectrum' : 12,
+                'Sample_spectrum' : 13,
+                'Standard_spectrum' : 14,
+                'Deployed': 15,
+                'Sleep' : 16,
+                'Shutdown' : 17,
+                'Stop_deploying_in_progress' : 18,
+                'Error' : 19,
+                }
 
 
 def get_utils_reagents(sensor_id, return_json=False):
@@ -343,7 +344,7 @@ def get_reagent(reagent_id):
 def is_deployed(sensor_id):
     states = models.Sensor.objects.get(id=sensor_id).last_states
     states_tab = json.loads(states)
-    return state_dict['Deployed'] in states_tab
+    return state_dict['Deployed'] in states_tab or state_dict['Stop_deploying_in_progress'] in states_tab
 
 
 def is_sleeping(sensor_id):
