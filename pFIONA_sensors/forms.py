@@ -31,7 +31,8 @@ class SensorSettingsForm(ModelForm):
         model = Sensor
         fields = [
             'boxcar_width', 'time_to_wait_for_lamp', 'time_between_2_spectrophotometer_scan',
-            'flush_flow_rate', 'flush_volume', 'max_flow_rate', 'max_aspirate_volume', 'volume_for_valve_port_priming'
+            'flush_flow_rate', 'flush_volume', 'max_flow_rate', 'max_aspirate_volume', 'volume_for_valve_port_priming',
+            'scans_to_average', 'time_to_pump'
         ]
 
     def clean(self):
