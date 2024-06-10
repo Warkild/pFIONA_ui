@@ -69,7 +69,8 @@ class Spectrum(models.Model):
     sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE, name="pfiona_sensor")
     time = models.ForeignKey('Time', on_delete=models.CASCADE, name="pfiona_time")
     spectrumtype = models.ForeignKey('SpectrumType', on_delete=models.CASCADE, name="pfiona_spectrumtype")
-    cycle = models.IntegerField(null = True)
+    cycle = models.IntegerField(null=True)
+    deployment = models.IntegerField(null=True)
 
     class Meta:
         db_table = 'pfiona_spectrum'

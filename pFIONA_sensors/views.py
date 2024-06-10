@@ -2,7 +2,6 @@ import csv
 import datetime
 import json
 
-from django.contrib import messages
 from django.db import transaction
 
 from pFIONA_api import queries as q
@@ -11,9 +10,10 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import user_passes_test
 
 from pFIONA_sensors.models import Sensor, Reagent, Step, Reaction, Spectrum
+from pFIONA_api.analysis.formula import absorbance
+from pFIONA_api.analysis.spectrum_finder import *
 from .decorators import admin_required
 from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm, SensorSettingsForm
 
@@ -303,20 +303,22 @@ def export_spectra_csv(request):
             pfiona_time__timestamp__gte=start_timestamp,
             pfiona_time__timestamp__lte=end_timestamp,
             pfiona_sensor=sensor_id
-        ).select_related('pfiona_spectrumtype', 'pfiona_time')
+        ).select_related('pfiona_spectrumtype', 'pfiona_time').order_by('id')
     else:
         query = Spectrum.objects.all().select_related('pfiona_spectrumtype', 'pfiona_time')
 
     spectra = query
     all_wavelengths = sorted(set(value.wavelength for spectrum in spectra for value in spectrum.value_set.all()))
-    header = ['SpectrumType', 'Timestamp (Local Time)'] + [str(wl) for wl in all_wavelengths]
+    header = ['SpectrumType', 'Timestamp (Local Time)', 'Cycle', 'Id'] + [str(wl) for wl in all_wavelengths]
     writer.writerow(header)
 
     for spectrum in spectra:
         spectrum_type = spectrum.pfiona_spectrumtype.type
         local_datetime = datetime.datetime.fromtimestamp(spectrum.pfiona_time.timestamp).strftime('%m/%d/%Y %H:%M:%S')
+        cycle = spectrum.cycle
+        id = spectrum.id
         values_dict = {value.wavelength: value.value for value in spectrum.value_set.all()}
-        row = [spectrum_type, local_datetime] + [values_dict.get(wl, '') for wl in all_wavelengths]
+        row = [spectrum_type, local_datetime, cycle, id] + [values_dict.get(wl, '') for wl in all_wavelengths]
         writer.writerow(row)
 
     return response
