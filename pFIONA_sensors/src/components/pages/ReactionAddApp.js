@@ -278,7 +278,7 @@ function ReactionAddApp() {
                         />
                     </div>
                     <div className={"flex flex-col w-3/12"}>
-                        <label className={"font-montserrat text-sm pb-2"}>Number Of Blank</label>
+                        <label className={"font-montserrat text-sm pb-2"}>Number Of Sample</label>
                         <input
                             type="number"
                             value={numberOfSample}
@@ -288,7 +288,7 @@ function ReactionAddApp() {
                         />
                     </div>
                     <div className={"flex flex-col w-3/12"}>
-                        <label className={"font-montserrat text-sm pb-2"}>Number Of Blank</label>
+                        <label className={"font-montserrat text-sm pb-2"}>Number Of Standard</label>
                         <input
                             type="number"
                             value={numberOfStandard}
