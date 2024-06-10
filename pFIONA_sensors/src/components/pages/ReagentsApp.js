@@ -11,7 +11,7 @@ function ReagentsApp({ip}) {
   return (
       <div className={"flex flex-col space-y-10"}>
           <Overview reagents={reagents_json}/>
-          <ReagentsList reagents={reagents_json}/>
+          <ReagentsList ip={ip} reagents={reagents_json}/>
           <Valve ip={ip} reagents={reagents_json}/>
           <ReactionsBuilder ip={ip} reactions={reactions_json}/>
           <CurrentReaction reactions={reactions_json}/>
