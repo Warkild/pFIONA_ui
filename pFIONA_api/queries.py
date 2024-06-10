@@ -123,21 +123,24 @@ def create_monitored_wavelength(reaction_id, wavelength):
     return monitored_wavelength
 
 
-def get_reaction_details(reaction_id):
+def get_reaction_details(reaction_id=None, reaction_name=None):
     """
-    Get reaction details with the reaction and step details
+    Get reaction details with the reaction and step details.
 
     :param reaction_id: Reaction ID
+    :param reaction_name: Reaction Name
 
     :return: JSON Object (Reaction details)
     """
 
-    # Get the reaction basic details
-
-    reaction = models.Reaction.objects.filter(id=reaction_id).get()
+    if reaction_id:
+        reaction = models.Reaction.objects.filter(id=reaction_id).get()
+    elif reaction_name:
+        reaction = models.Reaction.objects.filter(name=reaction_name).get()
+    else:
+        raise ValueError("Either reaction_id or reaction_name must be provided")
 
     # Get the step to have the full reaction details
-
     step_list = models.Step.objects.filter(pfiona_reaction_id=reaction.id).order_by('order')
 
     step_json = [{
@@ -146,13 +149,11 @@ def get_reaction_details(reaction_id):
     } for step in step_list]
 
     # Get the monitored wavelength to have the full reaction details
-
     wavelength_list = models.WavelengthMonitored.objects.filter(pfiona_reaction_id=reaction.id)
 
     monitored_wavelengths = sorted([wavelength.wavelength for wavelength in wavelength_list])
 
     # Create an object with all the information about the reaction
-
     reaction_json = json.dumps({
         'id': reaction.id,
         'name': reaction.name,
@@ -170,6 +171,7 @@ def get_reaction_details(reaction_id):
     })
 
     return reaction_json
+
 
 
 def delete_all_step(reaction_id):
@@ -235,22 +237,23 @@ def get_current_reaction(sensor_id):
         return None
 
 
-def set_current_reaction(sensor_id, reaction_id):
+def set_current_reaction(sensor_id, reaction_ids):
     """
-    Set current reaction for a sensor in database
+    Set current reactions for a sensor in the database.
 
     :param sensor_id: Sensor ID
-    :param reaction_id: Reaction ID (or None)
+    :param reaction_ids: List of Reaction IDs (or empty list)
     """
 
     sensor = models.Sensor.objects.get(id=sensor_id)
 
-    if reaction_id is not None:
-        reaction = models.Reaction.objects.get(id=reaction_id)
-        sensor.actual_reaction = reaction
+    if reaction_ids:
+        reactions = models.Reaction.objects.filter(id__in=reaction_ids)
+        reaction_names = [reaction.name for reaction in reactions]
+        sensor.actual_reaction = reaction_names
         sensor.save()
     else:
-        sensor.actual_reaction = None
+        sensor.actual_reaction = []
         sensor.save()
 
 

@@ -19,13 +19,13 @@ def api_set_current_reaction(request, sensor_id):
     if request.method == 'POST':
         try:
             data = json.loads(request.body.decode('utf-8'))
+            print(data)
+            reaction_ids = data.get('reaction_ids')
 
-            if data['reaction_id'] is not None:
-                q.set_current_reaction(sensor_id, data['reaction_id'])
-            else:
-                q.set_current_reaction(sensor_id, None)
+            # Assurez-vous que la liste est stockée correctement dans JSONField
+            q.set_current_reaction(sensor_id, reaction_ids)
 
-            return JsonResponse({'status': 'success', 'message': 'Current reaction updated successfully'})
+            return JsonResponse({'status': 'success', 'message': 'Current reactions updated successfully'})
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     else:
@@ -36,13 +36,13 @@ def api_set_current_reaction(request, sensor_id):
 @csrf_exempt
 def api_get_current_reaction(request, sensor_id):
     try:
-        current_reaction = q.get_current_reaction(sensor_id)
+        current_reactions = q.get_current_reaction(sensor_id)
         return JsonResponse(
-            {'status': 'success', 'reaction_id': current_reaction.id, 'reaction_name': current_reaction.name})
+            {'status': 'success', 'reaction_names': current_reactions if current_reactions else []})
 
     except Exception as e:
-
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+
 
 
 @login_required()
@@ -175,16 +175,20 @@ def api_get_last_spectrum_all_type_view(request):
 def api_get_validity_reaction_to_set_as_current_reaction(request):
     try:
         reaction_id = request.GET.get('reaction_id')
+        reaction_name = request.GET.get('reaction_name')
 
-        if not reaction_id:
-            raise ValueError("Missing reaction_id parameter")
+        if not reaction_id and not reaction_name:
+            raise ValueError("Missing reaction_id or reaction_name parameter")
 
-        reaction_detail = q.get_reaction_details(reaction_id)
-
-        reaction_detail_json = json.loads(reaction_detail)
+        if reaction_id:
+            reaction_detail = q.get_reaction_details(reaction_id=reaction_id)
+        else:
+            reaction_detail = q.get_reaction_details(reaction_name=reaction_name)
 
         if not reaction_detail:
             raise ValueError("Reaction not found")
+
+        reaction_detail_json = json.loads(reaction_detail)
 
         valid = True
 
@@ -205,6 +209,8 @@ def api_get_validity_reaction_to_set_as_current_reaction(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred: {}'.format(str(e))},
                             status=500)
+
+
 
 
 @login_required

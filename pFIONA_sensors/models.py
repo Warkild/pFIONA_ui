@@ -1,11 +1,12 @@
 from django.db import models
+from django.db.models import JSONField
 
 
 class Sensor(models.Model):
     name = models.CharField(max_length=100)
     ip_address = models.GenericIPAddressField()
     notes = models.TextField(null=True, blank=True)
-    actual_reaction = models.ForeignKey('Reaction', on_delete=models.CASCADE, null=True)
+    actual_reaction = JSONField(null=True, blank=True)
     lat = models.FloatField(null=True)
     long = models.FloatField(null=True)
     sample_frequency = models.FloatField(null=False, default=60)

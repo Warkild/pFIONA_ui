@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
-function DeployStatus({}) {
+function DeployStatus({ sensor_ip }) {
 
     /** DEPLOYED STATUS **/
-
     const [isLoadingDeployed, setIsLoadingDeployed] = useState(true);
     const [isErrorDeployed, setIsErrorDeployed] = useState(false);
     const [errorMessageDeployed, setErrorMessageDeployed] = useState('');
@@ -18,28 +17,27 @@ function DeployStatus({}) {
         })
             .then(response => {
                 if (!response.ok) {
-                    setErrorMessageDeployed("Unable to connect")
-                    setIsErrorDeployed(true)
-                    setIsLoadingDeployed(false)
+                    setErrorMessageDeployed("Unable to connect");
+                    setIsErrorDeployed(true);
+                    setIsLoadingDeployed(false);
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
             .then(data => {
-                setIsDeployed(data.data)
-                setIsLoadingDeployed(false)
+                setIsDeployed(data.data);
+                setIsLoadingDeployed(false);
                 console.log('Success:', data);
             })
             .catch(error => {
-                setErrorMessageDeployed(`There is an error : ${error.message}`)
-                setIsErrorDeployed(true)
-                setIsLoadingDeployed(false)
+                setErrorMessageDeployed(`There is an error : ${error.message}`);
+                setIsErrorDeployed(true);
+                setIsLoadingDeployed(false);
                 console.error('Error:', error);
             });
     };
 
     /** SLEEPING STATUS **/
-
     const [isLoadingSleeping, setIsLoadingSleeping] = useState(true);
     const [isErrorSleeping, setIsErrorSleeping] = useState(false);
     const [errorMessageSleeping, setErrorMessageSleeping] = useState('');
@@ -54,41 +52,39 @@ function DeployStatus({}) {
         })
             .then(response => {
                 if (!response.ok) {
-                    setErrorMessageSleeping("Unable to connect")
-                    setIsErrorSleeping(true)
-                    setIsLoadingSleeping(false)
+                    setErrorMessageSleeping("Unable to connect");
+                    setIsErrorSleeping(true);
+                    setIsLoadingSleeping(false);
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
             .then(data => {
-                setIsSleeping(data.data)
-                setIsLoadingSleeping(false)
+                setIsSleeping(data.data);
+                setIsLoadingSleeping(false);
                 console.log('Success:', data);
             })
             .catch(error => {
-                setErrorMessageSleeping(`There is an error : ${error.message}`)
-                setIsErrorSleeping(true)
-                setIsLoadingSleeping(false)
+                setErrorMessageSleeping(`There is an error : ${error.message}`);
+                setIsErrorSleeping(true);
+                setIsLoadingSleeping(false);
                 console.error('Error:', error);
             });
     };
 
     useEffect(() => {
         checkDeployedStatus();
-        checkSleepingStatus()
+        checkSleepingStatus();
 
         const intervalId = setInterval(() => {
-
             checkDeployedStatus();
-            checkSleepingStatus()
+            checkSleepingStatus();
         }, 5000);
 
         return () => clearInterval(intervalId);
     }, []);
 
     /** START DEPLOY **/
-
     const startDeploy = () => {
         const url = `http://${sensor_ip}:5000/sensor/deploy`;
 
@@ -106,7 +102,7 @@ function DeployStatus({}) {
                 return response.json();
             })
             .then(data => {
-                setIsDeployed(true)
+                setIsDeployed(true);
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -114,8 +110,7 @@ function DeployStatus({}) {
     };
 
     /** STOP DEPLOY **/
-
-    const [stopDeploySuccess, setStopDeploySuccess] = useState(false)
+    const [stopDeploySuccess, setStopDeploySuccess] = useState(false);
 
     const stopDeploy = () => {
         const url = `http://${sensor_ip}:5000/sensor/stop_deploy`;
@@ -134,7 +129,7 @@ function DeployStatus({}) {
                 return response.json();
             })
             .then(data => {
-                setStopDeploySuccess(true)
+                setStopDeploySuccess(true);
                 setTimeout(() => setStopDeploySuccess(false), 5000);
             })
             .catch(error => {
@@ -143,36 +138,32 @@ function DeployStatus({}) {
     };
 
     /** GET CURRENT REACTION **/
-
-    const [currentReactionId, setCurrentReactionId] = useState(null);
+    const [currentReactionNames, setCurrentReactionNames] = useState([]);
     const [reactionValid, setReactionValid] = useState(true);
-    const [currentReactionName, setCurrentReactionName] = useState(null)
-
-
 
     useEffect(() => {
         fetch(`/api/get_current_reaction/${sensor_id}`)
             .then(response => response.json())
             .then(data => {
-                setCurrentReactionId(data.reaction_id);
-                setCurrentReactionName(data.reaction_name)
+                const reactionNames = data.reaction_names || []; // assuming the API returns a list of reaction names
+                setCurrentReactionNames(reactionNames);
+                checkReactionValid(reactionNames);
             })
-            .catch(error => console.error("Error fetching current reaction id:", error));
+            .catch(error => console.error("Error fetching current reaction names:", error));
     }, [sensor_id]);
 
-    useEffect(() => {
-        checkReactionValid();
-    }, [currentReactionId]);
+    function checkReactionValid(reactionNames) {
+        if (reactionNames.length > 0) {
+            const queries = reactionNames.map(name =>
+                fetch(`/api/get_validity_reaction_to_set_as_current_reaction?reaction_name=${name}`).then(response => response.json())
+            );
 
-    function checkReactionValid() {
-        if (currentReactionId) {
-            fetch(`/api/get_validity_reaction_to_set_as_current_reaction?reaction_id=${currentReactionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    setReactionValid(data.data);
+            Promise.all(queries)
+                .then(results => {
+                    const allValid = results.every(result => result.data);
+                    setReactionValid(allValid);
                 })
-                .catch(error => console.error("Error fetching current reaction id:", error));
-        } else {
+                .catch(error => console.error("Error fetching current reaction validity:", error));
         }
     }
 
@@ -183,33 +174,32 @@ function DeployStatus({}) {
             </div>
             <div className="font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
                 <div className={"flex flex-row pb-6"}>
-                    {currentReactionName ? (
+                    {currentReactionNames.length > 0 ? (
                         <>
-                            <p>Current Reaction Name: <strong>{currentReactionName}</strong></p>
+                            <p>Current Reaction Names: <strong>{currentReactionNames.join(', ')}</strong></p>
                         </>
                     ) : (
                         <>
-                            <p>Current Reaction Name: --nothing-- </p>
+                            <p>Current Reaction Names: --nothing-- </p>
                         </>
                     )}
-                    {currentReactionId && (
+                    {currentReactionNames.length > 0 && (
                         <>
-                                {reactionValid ? (
-                                    <div className={"flex flex-row h-min ml-5"}>
-                                        <img src={"/static/img/ico/icons8-checked-512.svg"} alt="Checked"
-                                             className={"w-6 h-6 mr-2"}/>
-                                        <p>All reagents and standard are active</p>
-                                    </div>
-                                ) : (
-                                    <div className={"flex flex-row h-min ml-5"}>
-                                        <img src={"/static/img/ico/icons8-warning-red-512.svg"} alt="Warning"
-                                             className={"w-6 h-6 mr-2"}/>
-                                        <p>Warning : Some reagents/standard are not loaded. <strong>This can make error on execution !</strong></p>
-                                    </div>
-                                )}
-                            </>
-
-                        )}
+                            {reactionValid ? (
+                                <div className={"flex flex-row h-min ml-5"}>
+                                    <img src={"/static/img/ico/icons8-checked-512.svg"} alt="Checked"
+                                         className={"w-6 h-6 mr-2"}/>
+                                    <p>All reagents and standards are active</p>
+                                </div>
+                            ) : (
+                                <div className={"flex flex-row h-min ml-5"}>
+                                    <img src={"/static/img/ico/icons8-warning-red-512.svg"} alt="Warning"
+                                         className={"w-6 h-6 mr-2"}/>
+                                    <p>Warning: Some reagents/standards are not loaded. <strong>This can cause errors during execution!</strong></p>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
                 <div className={"flex flex-row"}>
                     <div className={"flex flex-col space-y-5 w-3/12"}>
@@ -258,7 +248,6 @@ function DeployStatus({}) {
                 </div>
             </div>
         </div>
-
     );
 }
 

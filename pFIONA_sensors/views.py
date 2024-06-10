@@ -100,6 +100,8 @@ def sensors_reagents(request, sensor_id):
 
     reactions_json = json.dumps(reactions_data)
 
+    print(reactions_json)
+
     # RENDER
 
     return render(request, 'pFIONA_sensors/view/sensors_reagents.html', {
