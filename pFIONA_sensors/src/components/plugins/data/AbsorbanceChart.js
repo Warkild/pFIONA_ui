@@ -145,95 +145,96 @@ const AbsorbanceChart = () => {
                                     value={timestamp}
                                     onChange={handleTimestampChange}
                                     required
+                                    disabled={loading}
                                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 />
                             </label>
                         </div>
                         <button
                             type="submit"
-                            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            disabled={loading}
+                            className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
                         >
                             Fetch Deployment
                         </button>
                     </form>
-                    {loading && <div>Loading...</div>}
                     {!loading && errorMessage && <div className="text-red-500 mb-5">{errorMessage}</div>}
-                    {!loading && cycleCount > 0 && (
-                        <div className="flex flex-row justify-between">
-                            <div className="w-5/12">
-                                <h3 className="font-bold text-lg mb-3">Cycle</h3>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Select Cycle:
-                                    <select
-                                        onChange={(e) => handleCycleChange(e.target.value)}
-                                        value={selectedCycle}
-                                        className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                    >
-                                        <option value="" disabled>Select a cycle</option>
-                                        {[...Array(cycleCount).keys()].map((cycle) => (
-                                            <option key={cycle} value={cycle + 1}>
-                                                {cycle + 1}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
-                                <div className="flex space-x-2 mt-2">
-                                    <button
-                                        onClick={handlePrevCycle}
-                                        disabled={parseInt(selectedCycle) <= 1}
-                                        className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${parseInt(selectedCycle) <= 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
-                                    >
-                                        Previous Cycle
-                                    </button>
-                                    <button
-                                        onClick={handleNextCycle}
-                                        disabled={parseInt(selectedCycle) >= cycleCount}
-                                        className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${parseInt(selectedCycle) >= cycleCount ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
-                                    >
-                                        Next Cycle
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="w-1/2">
-                                {!loading && deploymentInfo && (
-                                    <div className="mb-4">
-                                        <h3 className="font-bold text-lg mb-3">Deployment Information</h3>
-                                        <div className="bg-gray-100 p-4 rounded-md shadow-sm">
-                                            <p className="text-sm"><strong>Deployment
-                                                ID:</strong> {deploymentInfo.deployment_id}</p>
-                                            <p className="text-sm"><strong>Deployment Start
-                                                Time:</strong> {moment.unix(deploymentInfo.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')}
-                                            </p>
-                                            <p className="text-sm"><strong>Deployment End
-                                                Time:</strong> {moment.unix(deploymentInfo.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}
-                                            </p>
-                                            <p className="text-sm"><strong>Cycle Start Time:</strong> {moment.unix(deploymentInfo.cycle_start_time).format('YYYY-MM-DD HH:mm:ss')}</p>
-                                            <p className="text-sm"><strong>Cycle End Time:</strong> {moment.unix(deploymentInfo.cycle_end_time).format('YYYY-MM-DD HH:mm:ss')}</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                    {!loading && availableReactions.length > 0 && (
-                        <div className="mt-4">
-                            <h3 className="font-bold text-lg mb-3">Reaction</h3>
+                    <div className="flex flex-row justify-between">
+                        <div className="w-5/12">
+                            <h3 className="font-bold text-lg mb-3">Cycle</h3>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Select Reaction:
+                                Select Cycle:
                                 <select
-                                    onChange={(e) => handleReactionChange(e.target.value)}
-                                    value={selectedReaction}
+                                    onChange={(e) => handleCycleChange(e.target.value)}
+                                    value={selectedCycle}
+                                    disabled={loading}
                                     className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 >
-                                    {availableReactions.map((reaction) => (
-                                        <option key={reaction} value={reaction}>
-                                            {reaction}
+                                    <option value="" disabled>Select a cycle</option>
+                                    {[...Array(cycleCount).keys()].map((cycle) => (
+                                        <option key={cycle} value={cycle + 1}>
+                                            {cycle + 1}
                                         </option>
                                     ))}
                                 </select>
                             </label>
+                            <div className="flex space-x-2 mt-2">
+                                <button
+                                    onClick={handlePrevCycle}
+                                    disabled={parseInt(selectedCycle) <= 1 || loading}
+                                    className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${parseInt(selectedCycle) <= 1 || loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                                >
+                                    Previous Cycle
+                                </button>
+                                <button
+                                    onClick={handleNextCycle}
+                                    disabled={parseInt(selectedCycle) >= cycleCount || loading}
+                                    className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${parseInt(selectedCycle) >= cycleCount || loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                                >
+                                    Next Cycle
+                                </button>
+                            </div>
                         </div>
-                    )}
+                        <div className="w-1/2">
+                            {deploymentInfo ? (
+                                <div className="mb-4">
+                                    <h3 className="font-bold text-lg mb-3">Deployment Information</h3>
+                                    <div className="bg-gray-100 p-4 rounded-md shadow-sm">
+                                        <p className="text-sm"><strong>Deployment ID:</strong> {deploymentInfo.deployment_id}</p>
+                                        <p className="text-sm"><strong>Deployment Start Time:</strong> {moment.unix(deploymentInfo.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')}</p>
+                                        <p className="text-sm"><strong>Deployment End Time:</strong> {moment.unix(deploymentInfo.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}</p>
+                                        <p className="text-sm"><strong>Cycle Start Time:</strong> {moment.unix(deploymentInfo.cycle_start_time).format('YYYY-MM-DD HH:mm:ss')}</p>
+                                        <p className="text-sm"><strong>Cycle End Time:</strong> {moment.unix(deploymentInfo.cycle_end_time).format('YYYY-MM-DD HH:mm:ss')}</p>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="mb-4">
+                                    <h3 className="font-bold text-lg mb-3">Deployment Information</h3>
+                                    <div className="bg-gray-100 p-4 rounded-md shadow-sm">
+                                        <p className="text-sm">No deployment information available.</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                    <div className="mt-4">
+                        <h3 className="font-bold text-lg mb-3">Reaction</h3>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Select Reaction:
+                            <select
+                                onChange={(e) => handleReactionChange(e.target.value)}
+                                value={selectedReaction}
+                                disabled={loading}
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            >
+                                {availableReactions.map((reaction) => (
+                                    <option key={reaction} value={reaction}>
+                                        {reaction}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 <div>
                     {selectedCycle && selectedCycleData && (
@@ -289,4 +290,3 @@ const AbsorbanceChart = () => {
 };
 
 export default AbsorbanceChart;
-
