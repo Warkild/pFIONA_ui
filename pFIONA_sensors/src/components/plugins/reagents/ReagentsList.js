@@ -83,8 +83,8 @@ function ReagentsList({ ip, reagents }) {
                                 {validReagents.map((reagent) => (
                                     <tr key={reagent.id} className="border border-custom-gray-1">
                                         <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">{reagent.name}</td>
-                                        <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">{reagent.volume}</td>
-                                        <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">{reagent.volume_max}</td>
+                                        <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">{reagent.volume.toFixed(2)}</td>
+                                        <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">{reagent.volume_max.toFixed(2)}</td>
                                         <td className={`pl-5 ${reagent.port != null ? 'text-lime-500' : 'text-red-600'}`}>{reagent.port != null ? 'Active' : 'Inactive'}</td>
                                         <td>
                                             <div className="h-full flex flex-row-reverse pl-5">
