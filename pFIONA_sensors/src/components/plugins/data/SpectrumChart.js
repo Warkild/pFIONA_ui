@@ -10,6 +10,7 @@ const SpectrumChart = () => {
     const [loading, setLoading] = useState(false);
     const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm'));
     const [data, setData] = useState(null);
+    const [chartData, setChartData] = useState(null);
     const [wavelengths, setWavelengths] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [deploymentInfo, setDeploymentInfo] = useState(null);
@@ -28,9 +29,11 @@ const SpectrumChart = () => {
 
     useEffect(() => {
         if (selectedReaction) {
-            setData(allReactionsData[selectedReaction] || {});
+            const reactionData = allReactionsData[selectedReaction] || {};
+            setData(reactionData);
+            setChartData(generateChartData(reactionData));
         }
-    }, [selectedReaction]);
+    }, [selectedReaction, allReactionsData]);
 
     const fetchCycleCount = async () => {
         setLoading(true);
@@ -107,6 +110,7 @@ const SpectrumChart = () => {
 
     const handleCycleChange = (cycle) => {
         setSelectedCycle(cycle);
+        fetchSpectrumData(cycle);
     };
 
     const handleReactionChange = (reaction) => {
@@ -165,8 +169,6 @@ const SpectrumChart = () => {
         }
         return chartData;
     };
-
-    const selectedCycleData = selectedCycle ? generateChartData(data) : null;
 
     return (
         <div className="w-full">
@@ -276,15 +278,15 @@ const SpectrumChart = () => {
                     </div>
                 </div>
                 <div>
-                    {selectedCycle && selectedCycleData && (
+                    {selectedCycle && chartData && (
                         <div className="mt-5" style={{ height: '500px' }}>
                             <h2 className="text-lg font-bold mb-2">Cycle {selectedCycle}</h2>
                             <Line
-                                data={selectedCycleData}
+                                data={chartData}
                                 options={{
                                     responsive: true,
                                     maintainAspectRatio: false,
-                                    animation: false,
+                                    animation: false, // Désactiver les animations
                                     scales: {
                                         x: {
                                             title: {
