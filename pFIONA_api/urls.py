@@ -16,10 +16,12 @@ urlpatterns = [
     path('get_sensor_sample_frequency', views.api_get_sample_frequency, name='api_get_sample_frequency'),
     path('set_sensor_general_settings', views.api_set_sensor_general_settings, name='api_set_sensor_general_settings'),
     path('get_last_states', views.api_get_last_states, name='api_get_last_states'),
-    path('get_absorbance_spectrums_in_deployment', views.api_get_absorbance_spectrums_in_deployment, name='api_get_absorbance_spectrums_in_deployment'),
     path('get_cycle_count', views.api_get_cycle_count, name='api_get_cycle_count'),
     path('get_absorbance_spectrums_in_cycle', views.api_get_absorbance_spectrums_in_cycle,
          name='api_get_absorbance_spectrums_in_cycle'),
+    path('get_spectrums_in_cycle', views.api_get_spectrums_in_cycle, name='api_get_spectrums_in_cycle'),
     path('test', views.test, name='test'),
     path('test2', views.test2, name='test2'),
+    path('get_mean_absorbance_spectrums_in_cycle', views.api_get_mean_absorbance_spectrums_in_cycle, name='api_get_mean_absorbance_spectrums_in_cycle'),
+    path('get_standard_concentration', views.get_standard_concentration, name='api_get_standard_concentration'),
 ]

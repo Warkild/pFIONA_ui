@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function DeployStatus({ sensor_ip }) {
+function DeployStatus({  }) {
 
     /** DEPLOYED STATUS **/
     const [isLoadingDeployed, setIsLoadingDeployed] = useState(true);
@@ -155,7 +155,7 @@ function DeployStatus({ sensor_ip }) {
     function checkReactionValid(reactionNames) {
         if (reactionNames.length > 0) {
             const queries = reactionNames.map(name =>
-                fetch(`/api/get_validity_reaction_to_set_as_current_reaction?reaction_name=${name}`).then(response => response.json())
+                fetch(`/api/get_validity_reaction_to_set_as_current_reaction?reaction_name=${name}&sensor_id=${sensor_id}`).then(response => response.json())
             );
 
             Promise.all(queries)

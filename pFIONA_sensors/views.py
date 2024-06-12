@@ -276,7 +276,7 @@ def sensors_reaction_add(request, sensor_id):
 def sensors_reaction_edit(request, sensor_id, reaction_id):
     reagents_json = q.get_utils_reagents(sensor_id, return_json=True)
 
-    reaction_json = q.get_reaction_details(reaction_id)
+    reaction_json = q.get_reaction_details(reaction_id=reaction_id, sensor_id=sensor_id)
 
     return render(request, 'pFIONA_sensors/view/sensors_reaction_edit.html', {
         'id': sensor_id,

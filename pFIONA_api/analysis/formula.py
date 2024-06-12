@@ -30,3 +30,11 @@ def absorbance(ref_scan, dark_scan, sample_scan):
 
     return absorbance_values.tolist()
 
+
+def concentration(abs_sample, abs_blank, abs_standard, std_conc):
+    print('CALCUL')
+    print(f"abs_sample: {abs_sample}")
+    print(f"abs_blank: {abs_blank}")
+    print(f"abs_standard: {abs_standard}")
+    print(f"std_conc: {std_conc}")
+    return ((abs_sample - abs_blank) * std_conc) / (abs_standard - abs_blank)

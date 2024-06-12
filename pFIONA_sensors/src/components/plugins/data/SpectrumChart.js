@@ -3,12 +3,12 @@ import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
 
-const AbsorbanceChart = () => {
+const SpectrumChart = () => {
     const [cycleCount, setCycleCount] = useState(0);
     const [selectedCycle, setSelectedCycle] = useState('');
     const [selectedReaction, setSelectedReaction] = useState('');
     const [loading, setLoading] = useState(false);
-    const [timestamp, setTimestamp] = useState('');
+    const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm'));
     const [data, setData] = useState(null);
     const [wavelengths, setWavelengths] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
@@ -17,8 +17,12 @@ const AbsorbanceChart = () => {
     const [allReactionsData, setAllReactionsData] = useState({});
 
     useEffect(() => {
+        fetchCycleCount();
+    }, []);
+
+    useEffect(() => {
         if (selectedCycle) {
-            fetchAbsorbanceData(selectedCycle);
+            fetchSpectrumData(selectedCycle);
         }
     }, [selectedCycle]);
 
@@ -37,8 +41,7 @@ const AbsorbanceChart = () => {
             const result = await response.json();
             if (result.cycle_count > 0) {
                 setCycleCount(result.cycle_count);
-                setSelectedCycle('1');
-                await fetchAbsorbanceData('1');
+                setSelectedCycle(result.cycle_count.toString());
             } else {
                 setCycleCount(0);
                 setSelectedCycle('');
@@ -54,23 +57,39 @@ const AbsorbanceChart = () => {
         }
     };
 
-    const fetchAbsorbanceData = async (cycle) => {
+    const fetchSpectrumData = async (cycle) => {
         setLoading(true);
         try {
             const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`http://127.0.0.1:8000/api/get_absorbance_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
+            const response = await fetch(`http://127.0.0.1:8000/api/get_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
             const result = await response.json();
-            const reactions = Object.keys(result.absorbance_data || {});
-            setAvailableReactions(reactions);
-            setAllReactionsData(result.absorbance_data);
+            if (!result || result.length === 0) {
+                throw new Error('Spectrums data is missing');
+            }
 
-            const firstReaction = reactions[0] || '';
+            const spectrumsData = result['spectrums_data'];
+            const reactions = Object.keys(spectrumsData);
+            if (reactions.length === 0) {
+                throw new Error('No reactions data available');
+            }
+
+            setAvailableReactions(reactions);
+            setAllReactionsData(spectrumsData);
+
+            const firstReaction = reactions[0];
             setSelectedReaction(firstReaction);
-            setData(result.absorbance_data[firstReaction] || {});
-            setWavelengths(result.wavelengths);
+            const firstReactionData = spectrumsData[firstReaction];
+
+            if (firstReactionData && firstReactionData.Blank && firstReactionData.Blank['0'] && firstReactionData.Blank['0'][0] && firstReactionData.Blank['0'][0].values) {
+                setWavelengths(firstReactionData.Blank['0'][0].values.map(v => v.wavelength));
+            } else {
+                throw new Error('Invalid data structure');
+            }
+
             setDeploymentInfo(result.deployment_info);
         } catch (error) {
-            console.error('Error fetching absorbance data:', error);
+            console.error('Error fetching spectrum data:', error);
+            setErrorMessage('Error fetching spectrum data. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -88,7 +107,6 @@ const AbsorbanceChart = () => {
 
     const handleCycleChange = (cycle) => {
         setSelectedCycle(cycle);
-        fetchAbsorbanceData(cycle);
     };
 
     const handleReactionChange = (reaction) => {
@@ -105,9 +123,21 @@ const AbsorbanceChart = () => {
         handleCycleChange(prevCycle);
     };
 
-    const generateColor = (baseColor, subcycleIndex) => {
-        const factor = 0.1 * subcycleIndex;
-        return `rgb(${Math.min(baseColor[0] + factor * 255, 255)}, ${Math.min(baseColor[1] + factor * 255, 255)}, ${Math.min(baseColor[2] + factor * 255, 255)})`;
+    const colorMap = {
+        'Blank_Reference': 'rgb(255, 0, 0)',        // Rouge
+        'Blank_Dark': 'rgb(255, 165, 0)',           // Orange
+        'Blank': 'rgb(255, 255, 0)',                // Jaune
+        'Sample_Reference': 'rgb(211, 211, 211)',   // Gris clair
+        'Sample_Dark': 'rgb(0, 0, 0)',              // Noir
+        'Sample': 'rgb(169, 169, 169)',             // Gris foncé
+        'Standard_Reference': 'rgb(0, 0, 255)',     // Bleu
+        'Standard_Dark': 'rgb(0, 0, 139)',          // Bleu foncé
+        'Standard': 'rgb(0, 191, 255)',             // Bleu ciel
+    };
+
+    const extractType = (spectrumtype) => {
+        const parts = spectrumtype.split('_');
+        return parts.slice(1).join('_'); // Extract everything after the first underscore
     };
 
     const generateChartData = (cycleData) => {
@@ -116,19 +146,20 @@ const AbsorbanceChart = () => {
         }
 
         const chartData = { labels: wavelengths.map(w => w.toFixed(2)), datasets: [] };
-        const baseColors = {
-            Blank: [0, 0, 255],  // Blue
-            Sample: [0, 255, 0], // Green
-            Standard: [255, 0, 0], // Red
-        };
 
         for (const [type, subcycles] of Object.entries(cycleData || {})) {
-            for (const [subcycle, absorbanceValues] of Object.entries(subcycles || {})) {
-                chartData.datasets.push({
-                    label: `${type} Subcycle ${subcycle}`,
-                    data: absorbanceValues,
-                    borderColor: generateColor(baseColors[type] || [0, 0, 0], subcycle),
-                    fill: false,
+            for (const [subcycle, spectrumList] of Object.entries(subcycles || {})) {
+                spectrumList.forEach(spectrum => {
+                    if (!spectrum.spectrumtype.includes('wavelength_monitored')) { // Exclude spectra containing 'wavelength_monitored'
+                        const typeKey = extractType(spectrum.spectrumtype);
+                        chartData.datasets.push({
+                            label: `${typeKey} Subcycle ${subcycle}`,
+                            data: spectrum.values.map(v => v.value),
+                            borderColor: colorMap[typeKey] || 'rgb(0, 0, 0)', // Default to black if not found
+                            fill: false,
+                            tension: 0.1 // Optional: to smooth the line
+                        });
+                    }
                 });
             }
         }
@@ -140,7 +171,7 @@ const AbsorbanceChart = () => {
     return (
         <div className="w-full">
             <div className="mb-5">
-                <h2 className="font-poppins font-bold text-gray-500 text-sm">ABSORBANCE CHARTS</h2>
+                <h2 className="font-poppins font-bold text-gray-500 text-sm">SPECTRUM CHARTS</h2>
             </div>
             <div className="flex flex-col md:flex-row font-montserrat bg-white shadow-lg rounded-2xl py-7 px-8">
                 <div className="md:w-1/2 mb-5 md:mb-0 pr-5">
@@ -253,6 +284,7 @@ const AbsorbanceChart = () => {
                                 options={{
                                     responsive: true,
                                     maintainAspectRatio: false,
+                                    animation: false,
                                     scales: {
                                         x: {
                                             title: {
@@ -263,7 +295,7 @@ const AbsorbanceChart = () => {
                                         y: {
                                             title: {
                                                 display: true,
-                                                text: 'Absorbance',
+                                                text: 'Intensity',
                                             },
                                         },
                                     },
@@ -280,7 +312,7 @@ const AbsorbanceChart = () => {
                                                         label += ': ';
                                                     }
                                                     if (context.parsed.y !== null) {
-                                                        label += context.parsed.y.toFixed(2); // round absorbance to 2 decimal places
+                                                        label += context.parsed.y.toFixed(2); // round intensity to 2 decimal places
                                                     }
                                                     return label;
                                                 }
@@ -297,4 +329,4 @@ const AbsorbanceChart = () => {
     );
 };
 
-export default AbsorbanceChart;
+export default SpectrumChart;

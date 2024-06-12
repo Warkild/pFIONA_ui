@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { createRoot } from "react-dom/client";
 import ExportSpec from "../plugins/data/ExportSpec";
-import LastSpectrum from "../plugins/data/LastSpectrum";
+import LastSpectrum from "../plugins/data/SpectrumChart";
 import AbsorbanceChart from "../plugins/data/AbsorbanceChart";
 function DataApp({  }) {
 

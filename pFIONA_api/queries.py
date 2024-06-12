@@ -124,22 +124,29 @@ def create_monitored_wavelength(reaction_id, wavelength):
     return monitored_wavelength
 
 
-def get_reaction_details(reaction_id=None, reaction_name=None):
+def get_reaction_details(reaction_id=None, reaction_name=None, sensor_id=None):
     """
     Get reaction details with the reaction and step details.
 
     :param reaction_id: Reaction ID
     :param reaction_name: Reaction Name
+    :param sensor_id: Sensor ID
 
     :return: JSON Object (Reaction details)
     """
 
+    if not sensor_id:
+        raise ValueError("sensor_id must be provided")
+
     if reaction_id:
-        reaction = models.Reaction.objects.filter(id=reaction_id).get()
+        reaction = models.Reaction.objects.filter(id=reaction_id, standard__pfiona_sensor_id=sensor_id).first()
     elif reaction_name:
-        reaction = models.Reaction.objects.filter(name=reaction_name).get()
+        reaction = models.Reaction.objects.filter(name=reaction_name, standard__pfiona_sensor_id=sensor_id).first()
     else:
         raise ValueError("Either reaction_id or reaction_name must be provided")
+
+    if not reaction:
+        raise ValueError("No reaction found with the given parameters")
 
     # Get the step to have the full reaction details
     step_list = models.Step.objects.filter(pfiona_reaction_id=reaction.id).order_by('order')
@@ -172,7 +179,6 @@ def get_reaction_details(reaction_id=None, reaction_name=None):
     })
 
     return reaction_json
-
 
 
 def delete_all_step(reaction_id):
@@ -232,8 +238,8 @@ def get_current_reaction(sensor_id):
     """
     sensor = models.Sensor.objects.get(id=sensor_id)
 
-    if sensor.actual_reaction is not None:
-        return sensor.actual_reaction
+    if sensor.actual_reactions is not None:
+        return sensor.actual_reactions
     else:
         return None
 
@@ -251,10 +257,10 @@ def set_current_reaction(sensor_id, reaction_ids):
     if reaction_ids:
         reactions = models.Reaction.objects.filter(id__in=reaction_ids)
         reaction_names = [reaction.name for reaction in reactions]
-        sensor.actual_reaction = reaction_names
+        sensor.actual_reactions = reaction_names
         sensor.save()
     else:
-        sensor.actual_reaction = []
+        sensor.actual_reactions = []
         sensor.save()
 
 
@@ -379,3 +385,16 @@ def delete_all_wavelength_monitored(reaction_id):
 
 def get_last_states(sensor_id):
     return models.Sensor.objects.get(id=sensor_id).last_states
+
+
+def get_standard_concentration(reaction_name=None, reaction_id=None):
+    try:
+        if reaction_id is not None:
+            reaction = models.Reaction.objects.get(id=reaction_id)
+        elif reaction_name is not None:
+            reaction = models.Reaction.objects.get(name=reaction_name)
+        else:
+            return None
+        return reaction.standard_concentration
+    except models.Reaction.DoesNotExist:
+        return None

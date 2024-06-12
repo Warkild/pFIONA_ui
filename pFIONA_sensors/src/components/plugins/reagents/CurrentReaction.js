@@ -14,7 +14,7 @@ function CurrentReaction({ reactions }) {
     function checkReactionValid() {
         if (selectedReactionIds && selectedReactionIds.length > 0) {
             const queries = selectedReactionIds.map(option =>
-                fetch(`/api/get_validity_reaction_to_set_as_current_reaction?reaction_id=${option.value}`).then(response => response.json())
+                fetch(`/api/get_validity_reaction_to_set_as_current_reaction?reaction_id=${option.value}&sensor_id=${sensor_id}`).then(response => response.json())
             );
 
             Promise.all(queries)

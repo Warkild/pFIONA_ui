@@ -44,7 +44,6 @@ def api_get_current_reaction(request, sensor_id):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
 
 
-
 @login_required()
 @csrf_exempt
 def api_add_reaction(request):
@@ -176,14 +175,18 @@ def api_get_validity_reaction_to_set_as_current_reaction(request):
     try:
         reaction_id = request.GET.get('reaction_id')
         reaction_name = request.GET.get('reaction_name')
+        sensor_id = request.GET.get('sensor_id')
 
         if not reaction_id and not reaction_name:
             raise ValueError("Missing reaction_id or reaction_name parameter")
 
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
         if reaction_id:
-            reaction_detail = q.get_reaction_details(reaction_id=reaction_id)
+            reaction_detail = q.get_reaction_details(reaction_id=reaction_id, sensor_id=sensor_id)
         else:
-            reaction_detail = q.get_reaction_details(reaction_name=reaction_name)
+            reaction_detail = q.get_reaction_details(reaction_name=reaction_name, sensor_id=sensor_id)
 
         if not reaction_detail:
             raise ValueError("Reaction not found")
@@ -209,8 +212,6 @@ def api_get_validity_reaction_to_set_as_current_reaction(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': 'An unexpected error occurred: {}'.format(str(e))},
                             status=500)
-
-
 
 
 @login_required
@@ -359,32 +360,6 @@ def api_get_last_states(request):
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
-def api_get_absorbance_spectrums_in_deployment(request):
-    try:
-        sensor_id = request.GET.get('sensor_id')
-        timestamp = request.GET.get('timestamp')
-
-        if not sensor_id:
-            raise ValueError("Missing sensor_id parameter")
-
-        if not sensor_id:
-            raise ValueError("Missing timestamp parameter")
-
-        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
-            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
-
-        values = get_all_absorbance_spectrums_in_deployment(timestamp, sensor_id)
-        return JsonResponse({"values": values})
-
-    except ValueError as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-
-@login_required
-@require_http_methods(["GET"])
-@csrf_exempt
 def api_get_cycle_count(request):
     try:
         sensor_id = request.GET.get('sensor_id')
@@ -430,7 +405,8 @@ def api_get_absorbance_spectrums_in_cycle(request):
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
         absorbance_data, wavelengths, deployment_info = get_absorbance_spectrums_in_cycle(timestamp, sensor_id, cycle)
-        return JsonResponse({"absorbance_data": absorbance_data, "wavelengths": wavelengths, "deployment_info": deployment_info})
+        return JsonResponse(
+            {"absorbance_data": absorbance_data, "wavelengths": wavelengths, "deployment_info": deployment_info})
 
     except ValueError as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
@@ -438,31 +414,140 @@ def api_get_absorbance_spectrums_in_cycle(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
-@login_required()
+@login_required
 @require_http_methods(["GET"])
+@csrf_exempt
+def api_get_mean_absorbance_spectrums_in_cycle(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+        cycle = request.GET.get('cycle')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not cycle:
+            raise ValueError("Missing cycle parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        absorbance_data, wavelengths, deployment_info = get_mean_absorbance_spectrums_in_cycle(timestamp, sensor_id,
+                                                                                               cycle)
+        return JsonResponse(
+            {"absorbance_data": absorbance_data, "wavelengths": wavelengths, "deployment_info": deployment_info})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_spectrums_in_cycle(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+        cycle = request.GET.get('cycle')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not cycle:
+            raise ValueError("Missing cycle parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        absorbance_data, wavelengths, deployment_info = get_spectrums_in_cycle(timestamp, sensor_id, cycle)
+        return JsonResponse(
+            {"spectrums_data": absorbance_data, "wavelengths": wavelengths, "deployment_info": deployment_info})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
 def test(request):
-    current_reaction = "Silice"
-    timestamp = 1796926200
-    sensor_id = 1
-    cycle = 1
-    spectrum_type_prefix = "Blank"
-
     try:
-        values = get_absorbance_spectrums_in_cycle(timestamp, sensor_id, cycle)
-        return JsonResponse({"values": values}, safe=False)
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        absorbance_data, deployment_info = get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id)
+        return JsonResponse(
+            {"spectrums_data": absorbance_data, "deployment_info": deployment_info})
+
     except ValueError as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
-@login_required()
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
 def test2(request):
-    current_reaction = "Silice"
-    timestamp = 1717607550
-    sensor_id = 1
-    spectrum_type_prefix = "Blank"
-
     try:
-        values = values = []
-        return JsonResponse({"values": values}, safe=False)
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        absorbance_data, deployment_info = calculate_concentration_for_deployment(timestamp, sensor_id)
+        return JsonResponse(
+            {"spectrums_data": absorbance_data, "deployment_info": deployment_info})
+
     except ValueError as e:
-        return JsonResponse({"error": str(e)}, status=400)
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def get_standard_concentration(request):
+    reaction_name = request.GET.get('reaction_name')
+    reaction_id = request.GET.get('reaction_id')
+
+    if reaction_id is not None:
+        try:
+            reaction_id = int(reaction_id)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid reaction ID format'}, status=400)
+
+    concentration = q.get_standard_concentration(reaction_name=reaction_name, reaction_id=reaction_id)
+
+    if concentration is not None:
+        return JsonResponse({'standard_concentration': concentration})
+    else:
+        return JsonResponse({'error': 'Reaction not found'}, status=404)
