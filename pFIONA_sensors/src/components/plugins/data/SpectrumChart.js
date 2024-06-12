@@ -79,9 +79,15 @@ const SpectrumChart = () => {
             setAvailableReactions(reactions);
             setAllReactionsData(spectrumsData);
 
-            const firstReaction = reactions[0];
-            setSelectedReaction(firstReaction);
-            const firstReactionData = spectrumsData[firstReaction];
+            if (reactions.includes(selectedReaction)) {
+                setData(spectrumsData[selectedReaction] || {});
+            } else {
+                const firstReaction = reactions[0];
+                setSelectedReaction(firstReaction);
+                setData(spectrumsData[firstReaction] || {});
+            }
+
+            const firstReactionData = spectrumsData[selectedReaction] || spectrumsData[reactions[0]];
 
             if (firstReactionData && firstReactionData.Blank && firstReactionData.Blank['0'] && firstReactionData.Blank['0'][0] && firstReactionData.Blank['0'][0].values) {
                 setWavelengths(firstReactionData.Blank['0'][0].values.map(v => v.wavelength));

@@ -64,9 +64,14 @@ const AbsorbanceChart = () => {
             setAvailableReactions(reactions);
             setAllReactionsData(result.absorbance_data);
 
-            const firstReaction = reactions[0] || '';
-            setSelectedReaction(firstReaction);
-            setData(result.absorbance_data[firstReaction] || {});
+            if (reactions.includes(selectedReaction)) {
+                setData(result.absorbance_data[selectedReaction] || {});
+            } else {
+                const firstReaction = reactions[0] || '';
+                setSelectedReaction(firstReaction);
+                setData(result.absorbance_data[firstReaction] || {});
+            }
+
             setWavelengths(result.wavelengths);
             setDeploymentInfo(result.deployment_info);
         } catch (error) {
