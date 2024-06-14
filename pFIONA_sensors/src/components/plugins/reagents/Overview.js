@@ -4,8 +4,8 @@ import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
 
 Chart.register(ArcElement, Tooltip, Legend);
 
-function Overview({reagents}) {
-    const validReagents = reagents.filter(reagent => reagent.port !== null && reagent.volume_max > 0);
+function Overview({ reagents }) {
+    const validReagents = reagents.filter(reagent => reagent.port !== null && reagent.volume_max > 0 || reagent.name === 'water');
 
     return (
         <div className="w-full">
@@ -51,6 +51,5 @@ function DoughnutChart({ reagent }) {
         </div>
     );
 }
-
 
 export default Overview;
