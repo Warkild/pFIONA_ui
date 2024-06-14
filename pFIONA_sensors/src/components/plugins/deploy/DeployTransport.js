@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
-function DeployTransport({ }) {
+function DeployTransport({}) {
     const [reagents, setReagents] = useState([]);
     const [selectedReagents, setSelectedReagents] = useState([]);
+    const [primePortsClicked, setPrimePortsClicked] = useState(false);
+    const [flushPortsClicked, setFlushPortsClicked] = useState(false);
 
     useEffect(() => {
         fetch(`http://127.0.0.1:8000/api/get_current_reagents_for_current_reaction/${sensor_id}`)
@@ -14,18 +16,23 @@ function DeployTransport({ }) {
                         value: reagent,
                         label: reagent
                     }));
-                    // Ajoutez "sample" à la liste des réactifs
                     const sampleReagent = { value: "sample", label: "sample" };
                     const updatedReagents = [...reagentOptions, sampleReagent];
 
                     setReagents(updatedReagents);
-                    setSelectedReagents(updatedReagents);  // Preselect all reagents including "sample"
+                    setSelectedReagents(updatedReagents);
                 }
             })
             .catch(error => console.error('Error fetching reagents:', error));
     }, [sensor_id]);
 
     const handlePrimePorts = () => {
+        if (!primePortsClicked) {
+            setPrimePortsClicked(true);
+            setTimeout(() => setPrimePortsClicked(false), 3000); // Reset after 3 seconds
+            return;
+        }
+
         const selectedReagentNames = selectedReagents.map(reagent => reagent.value);
         const requestBody = {
             reagents: selectedReagentNames
@@ -41,13 +48,21 @@ function DeployTransport({ }) {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
+            setPrimePortsClicked(false);
         })
         .catch(error => {
             console.error('Error:', error);
+            setPrimePortsClicked(false);
         });
     };
 
     const handleFlushAllPorts = () => {
+        if (!flushPortsClicked) {
+            setFlushPortsClicked(true);
+            setTimeout(() => setFlushPortsClicked(false), 3000); // Reset after 3 seconds
+            return;
+        }
+
         fetch(`http://${sensor_ip}/sensor/flush_all_ports`, {
             method: 'POST',
             headers: {
@@ -57,9 +72,11 @@ function DeployTransport({ }) {
         .then(response => response.json())
         .then(data => {
             console.log('Success:', data);
+            setFlushPortsClicked(false);
         })
         .catch(error => {
             console.error('Error:', error);
+            setFlushPortsClicked(false);
         });
     };
 
@@ -71,22 +88,22 @@ function DeployTransport({ }) {
             <div className="font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
                 <div className={"flex flex-col"}>
                     <Select
-                    options={reagents}
-                    isMulti
-                    value={selectedReagents}
-                    onChange={setSelectedReagents}
+                        options={reagents}
+                        isMulti
+                        value={selectedReagents}
+                        onChange={setSelectedReagents}
                     />
                     <button
                         onClick={handlePrimePorts}
                         className="bg-blue-600 mt-5 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"
                     >
-                        Prime Ports
+                        {primePortsClicked ? 'Click again to confirm' : 'Prime Ports'}
                     </button>
                     <button
                         onClick={handleFlushAllPorts}
                         className="bg-blue-600 mt-5 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"
                     >
-                        Flush All Ports
+                        {flushPortsClicked ? 'Click again to confirm' : 'Flush All Ports'}
                     </button>
                 </div>
             </div>
