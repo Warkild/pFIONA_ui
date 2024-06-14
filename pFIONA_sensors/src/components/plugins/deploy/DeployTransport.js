@@ -47,24 +47,48 @@ function DeployTransport({ }) {
         });
     };
 
+    const handleFlushAllPorts = () => {
+        fetch(`http://${sensor_ip}/sensor/flush_all_ports`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    };
+
     return (
         <div className="w-5/12">
             <div className="mb-5">
                 <h2 className="font-poppins font-bold text-gray-500 text-sm">BASIC TRANSPORT</h2>
             </div>
             <div className="font-montserrat bg-white shadow-lg rounded-2xl py-5 px-8">
-                <Select
+                <div className={"flex flex-col"}>
+                    <Select
                     options={reagents}
                     isMulti
                     value={selectedReagents}
                     onChange={setSelectedReagents}
-                />
-                <button
-                    onClick={handlePrimePorts}
-                    className="bg-blue-600 mt-5 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"
-                >
-                    Prime Ports
-                </button>
+                    />
+                    <button
+                        onClick={handlePrimePorts}
+                        className="bg-blue-600 mt-5 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"
+                    >
+                        Prime Ports
+                    </button>
+                    <button
+                        onClick={handleFlushAllPorts}
+                        className="bg-blue-600 mt-5 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"
+                    >
+                        Flush All Ports
+                    </button>
+                </div>
             </div>
         </div>
     );
