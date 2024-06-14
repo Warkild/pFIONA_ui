@@ -551,3 +551,15 @@ def get_standard_concentration(request):
         return JsonResponse({'standard_concentration': concentration})
     else:
         return JsonResponse({'error': 'Reaction not found'}, status=404)
+
+
+@login_required()
+@csrf_exempt
+def api_get_current_reagents_from_current_reaction(request, sensor_id):
+    try:
+        current_reagents = q.get_reagents_for_current_reaction(sensor_id)
+        return JsonResponse(
+            {'status': 'success', 'reaction_names': current_reagents if current_reagents else []})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

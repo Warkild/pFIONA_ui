@@ -398,3 +398,32 @@ def get_standard_concentration(reaction_name=None, reaction_id=None):
         return reaction.standard_concentration
     except models.Reaction.DoesNotExist:
         return None
+
+
+def get_reagents_for_current_reaction(sensor_id):
+    """
+    Get reagents for the current reaction
+
+    :param sensor_id: Sensor ID
+    :return: List of reagent names used in the current reactions, including standards
+    """
+    reaction_names = get_current_reaction(sensor_id)
+
+    if not reaction_names:
+        return []
+
+    reagent_names = set()  # Using a set to avoid duplicates
+
+    for reaction_name in reaction_names:
+        reaction = models.Reaction.objects.filter(name=reaction_name).first()
+        if reaction:
+            # Include the standard reagent if it exists
+            if reaction.standard:
+                reagent_names.add(reaction.standard.name)
+
+            steps = models.Step.objects.filter(pfiona_reaction=reaction)
+            for step in steps:
+                if step.pfiona_reagent:
+                    reagent_names.add(step.pfiona_reagent.name)
+
+    return list(reagent_names)
