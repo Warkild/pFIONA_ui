@@ -6,6 +6,8 @@ from django.db import transaction
 
 from pFIONA_api import queries as q
 
+import pandas as pd
+
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -285,52 +287,3 @@ def sensors_reaction_edit(request, sensor_id, reaction_id):
     })
 
 
-@login_required()
-def export_spectra_csv(request):
-    start_timestamp_ms = request.GET.get('start')
-    end_timestamp_ms = request.GET.get('end')
-    sensor_id = request.GET.get('sensor_id')
-
-    response = HttpResponse(
-        content_type='text/csv',
-        headers={'Content-Disposition': 'attachment; filename="spectra.csv"'},
-    )
-    writer = csv.writer(response)
-
-    if start_timestamp_ms and end_timestamp_ms:
-        start_timestamp = int(start_timestamp_ms) // 1000
-        end_timestamp = int(end_timestamp_ms) // 1000
-
-        query = Spectrum.objects.filter(
-            pfiona_time__timestamp__gte=start_timestamp,
-            pfiona_time__timestamp__lte=end_timestamp,
-            pfiona_sensor=sensor_id
-        ).select_related('pfiona_spectrumtype', 'pfiona_time').order_by('id')
-    else:
-        query = Spectrum.objects.all().select_related('pfiona_spectrumtype', 'pfiona_time')
-
-    spectra = query
-    all_wavelengths = sorted(set(value.wavelength for spectrum in spectra for value in spectrum.value_set.all()))
-    header = ['SpectrumType', 'Timestamp (Local Time)', 'Deployment', 'Cycle', 'Id'] + [str(wl) for wl in all_wavelengths]
-    writer.writerow(header)
-
-    for spectrum in spectra:
-        spectrum_type = spectrum.pfiona_spectrumtype.type
-        local_datetime = datetime.datetime.fromtimestamp(spectrum.pfiona_time.timestamp).strftime('%m/%d/%Y %H:%M:%S')
-        deployment = spectrum.deployment
-        cycle = spectrum.cycle
-        id = spectrum.id
-        values_dict = {value.wavelength: value.value for value in spectrum.value_set.all()}
-        row = [spectrum_type, local_datetime, deployment, cycle, id] + [values_dict.get(wl, '') for wl in all_wavelengths]
-        writer.writerow(row)
-
-    return response
-
-
-@login_required
-def prepare_export_spectra_csv(request):
-    return render(request, "prepare_export.html", {
-        'sensor_id': request.GET.get('sensor_id', ''),
-        'start': request.GET.get('start', ''),
-        'end': request.GET.get('end', '')
-    })

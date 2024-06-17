@@ -313,9 +313,6 @@ def get_monitored_wavelength_values_in_deployment(timestamp, sensor_id):
 
     return all_monitored_wavelength_values, deployment_info
 
-
-from collections import defaultdict
-
 def get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id):
     # Obtenir le nombre de cycles pour le déploiement
     total_cycles = get_cycle_count(timestamp, sensor_id)
@@ -328,8 +325,8 @@ def get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id
 
         if monitored_wavelength_values:
             # Extraire les temps de début et de fin de cycle
-            cycle_start_time = deployment_info.get('cycle_start_time')
-            cycle_end_time = deployment_info.get('cycle_end_time')
+            cycle_start_time = deployment_info.pop('cycle_start_time', None)
+            cycle_end_time = deployment_info.pop('cycle_end_time', None)
 
             for reaction, types in monitored_wavelength_values.items():
                 if cycle not in all_monitored_wavelength_values[reaction]:
@@ -363,14 +360,15 @@ def get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id
 
 
 def calculate_concentration_for_deployment(timestamp, sensor_id):
-    monitored_wavelength_values, deployment_info = get_monitored_wavelength_values_absorbance_substraction(timestamp,
-                                                                                                           sensor_id)
+    monitored_wavelength_values, deployment_info = get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id)
 
     concentrations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
 
     for reaction, cycles in monitored_wavelength_values.items():
         std_conc = get_standard_concentration(reaction_name=reaction)
         for cycle, types in cycles.items():
+            cycle_start_time = types.get('cycle_start_time')
+            cycle_end_time = types.get('cycle_end_time')
             abs_blank = types.get('Blank', {})
             abs_sample = types.get('Sample', {})
             abs_standard = types.get('Standard', {})
@@ -382,6 +380,14 @@ def calculate_concentration_for_deployment(timestamp, sensor_id):
                     abs_standard_val = abs_standard[wavelength]
 
                     conc = concentration(abs_sample_val, abs_blank_val, abs_standard_val, std_conc)
-                    concentrations[reaction][cycle][wavelength] = conc
+                    concentrations[reaction][cycle]['concentration'][wavelength] = conc
+                    concentrations[reaction][cycle]['cycle_start_time'] = cycle_start_time
+                    concentrations[reaction][cycle]['cycle_end_time'] = cycle_end_time
+
+    # Convertir defaultdict en dict pour assurer la sérialisation JSON
+    concentrations = {reaction: {
+        cycle: {type_key: dict(wavelength_values) if isinstance(wavelength_values, defaultdict) else wavelength_values
+                for type_key, wavelength_values in types.items()} for cycle, types in cycles.items()} for
+        reaction, cycles in concentrations.items()}
 
     return concentrations, deployment_info

@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import ExportSpec from "../plugins/data/ExportSpec";
 import LastSpectrum from "../plugins/data/SpectrumChart";
 import AbsorbanceChart from "../plugins/data/AbsorbanceChart";
+import ConcentrationChart from "../plugins/data/ConcentrationChart";
 function DataApp({  }) {
 
 
@@ -11,6 +12,7 @@ function DataApp({  }) {
           <LastSpectrum/>
           <ExportSpec/>
           <AbsorbanceChart/>
+          <ConcentrationChart/>
       </div>
   );
 }

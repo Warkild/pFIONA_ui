@@ -26,4 +26,8 @@ urlpatterns = [
     path('test2', views.test2, name='test2'),
     path('get_mean_absorbance_spectrums_in_cycle', views.api_get_mean_absorbance_spectrums_in_cycle, name='api_get_mean_absorbance_spectrums_in_cycle'),
     path('get_standard_concentration', views.get_standard_concentration, name='api_get_standard_concentration'),
+    path('get_concentration_for_deployment', views.api_get_concentration_for_deployment, name='api_get_concentration_for_deployment'),
+    path('export-raw-spectra/', views.export_raw_spectra_csv, name='export_raw_spectra_csv'),
+    path('prepare-export/', views.prepare_export, name='prepare_export'),
+    path('export_raw_spectra_csv/', views.prepare_export_raw_spectra_csv, name='prepare_export_raw_spectra_csv'),
 ]

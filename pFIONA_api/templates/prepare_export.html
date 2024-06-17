@@ -7,10 +7,10 @@
     <title>Preparing Export</title>
     <script>
         window.onload = function() {
-            document.getElementById('message').innerHTML = "Création du csv en cours... Veuillez patienter.";
+            document.getElementById('message').innerHTML = "Creating csv... Please wait";
             setTimeout(function() {
-                window.location.href = `/sensors/export-spectra/?start=${encodeURIComponent('{{ start }}')}&end=${encodeURIComponent('{{ end }}')}&sensor_id=${encodeURIComponent('{{ sensor_id }}')}`;
-            }, 3000); // Redirige après 3 secondes
+                window.location.href = `/api/export-raw-spectra/?start=${encodeURIComponent('{{ start }}')}&end=${encodeURIComponent('{{ end }}')}&sensor_id=${encodeURIComponent('{{ sensor_id }}')}`;
+            }, 1000);
         }
     </script>
 </head>
