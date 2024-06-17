@@ -191,7 +191,7 @@ function ReactionEditApp() {
                                 <option value="w">Wait</option>
                                 {true_reagents.map((reagent) => (
                                     <option key={reagent.id} value={reagent.id}>
-                                        {reagent.name}
+                                        Add {reagent.name}
                                     </option>
                                 ))}
                             </select>
