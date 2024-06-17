@@ -38,10 +38,11 @@ function DeployTransport({}) {
             reagents: selectedReagentNames
         };
 
-        fetch(`http://${sensor_ip}/sensor/valve_port_priming`, {
+        fetch(`http://${sensor_ip}:5000/sensor/valve_port_priming`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
             body: JSON.stringify(requestBody)
         })

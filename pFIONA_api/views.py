@@ -557,6 +557,26 @@ def get_standard_concentration(request):
         return JsonResponse({'error': 'Reaction not found'}, status=404)
 
 
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def get_last_spectrum_cycle_0(request):
+    sensor_id = request.GET.get('sensor_id')
+
+    if sensor_id is not None:
+        try:
+            sensor_id = int(sensor_id)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid reaction ID format'}, status=400)
+
+    get_last_spectrum_cycle_0 = q.get_last_spectrum_cycle_0(sensor_id)
+
+    if get_last_spectrum_cycle_0 is not None:
+        return JsonResponse({'standard_concentration': get_last_spectrum_cycle_0})
+    else:
+        return JsonResponse({'error': 'Reaction not found'}, status=404)
+
+
 @login_required()
 @csrf_exempt
 def api_get_current_reagents_from_current_reaction(request, sensor_id):

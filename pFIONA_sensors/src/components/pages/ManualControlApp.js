@@ -95,6 +95,10 @@ function ManualControlApp() {
         return () => clearInterval(intervalId);
     }, []);
 
+    const handleSpecFinish = () => {
+        console.log('Message reçu depuis B');
+    };
+
     return (
         <>
             {isLoadingDeployed ? (
@@ -127,7 +131,7 @@ function ManualControlApp() {
                                          allowAnything={allowAnything}/>
                             </div>
                             <div className="flex flex-row justify-between pb-12">
-                                <PreEstablishedScan allowAnything={allowAnything}/>
+                                <PreEstablishedScan allowAnything={allowAnything} setInAction={setInAction} inAction={inAction} handleSpecFinish={handleSpecFinish}/>
                             </div>
                         </>
                     ) : (

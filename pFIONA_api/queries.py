@@ -1,29 +1,29 @@
-from django.db.models import Q
+from django.db.models import Q, F
 
 import pFIONA_sensors.models as models
 import json
 
-state_dict = {'Boot' : 0,
-                'Flush': 1,
-                'Mix':2,
-                'Change_Valve':3,
-                'Scan':4,
-                'Pump_Sample_from_ocean':5,
-                'Push_to_flow_cell':6,
-                'Multi_standard_spectrum':7,
-                'Wait':8,
-                'Darkspectrum' : 9,
-                'Idle' : 10,
-                'Reference_spectrum' : 11,
-                'Blank_spectrum' : 12,
-                'Sample_spectrum' : 13,
-                'Standard_spectrum' : 14,
-                'Deployed': 15,
-                'Sleep' : 16,
-                'Shutdown' : 17,
-                'Stop_deploying_in_progress' : 18,
-                'Error' : 19,
-                }
+state_dict = {'Boot': 0,
+              'Flush': 1,
+              'Mix': 2,
+              'Change_Valve': 3,
+              'Scan': 4,
+              'Pump_Sample_from_ocean': 5,
+              'Push_to_flow_cell': 6,
+              'Multi_standard_spectrum': 7,
+              'Wait': 8,
+              'Darkspectrum': 9,
+              'Idle': 10,
+              'Reference_spectrum': 11,
+              'Blank_spectrum': 12,
+              'Sample_spectrum': 13,
+              'Standard_spectrum': 14,
+              'Deployed': 15,
+              'Sleep': 16,
+              'Shutdown': 17,
+              'Stop_deploying_in_progress': 18,
+              'Error': 19,
+              }
 
 
 def get_utils_reagents(sensor_id, return_json=False):
@@ -427,3 +427,16 @@ def get_reagents_for_current_reaction(sensor_id):
                     reagent_names.add(step.pfiona_reagent.name)
 
     return list(reagent_names)
+
+
+def get_last_spectrum_cycle_0(sensor_id):
+    last_spectrum = models.Spectrum.objects.filter(sensor_id=sensor_id, cycle=0).order_by('-id').first()
+
+    if last_spectrum:
+        values = models.Value.objects.filter(spectrum_id=last_spectrum.id).order_by('wavelength')
+
+        spectrum_dict = {value.wavelength: value.value for value in values}
+
+        return spectrum_dict
+
+    return None

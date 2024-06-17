@@ -15,7 +15,7 @@ function ReagentsList({ ip, reagents }) {
     /** FULLY FILLED ***/
     const fullyFilled = () => {
         fetch(`http://${ip}:5000/sensor/fully_filled`, {
-            method: 'GET',
+            method: 'POST',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 'Content-Type': 'application/json',
