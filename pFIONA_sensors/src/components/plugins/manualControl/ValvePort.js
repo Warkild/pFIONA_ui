@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Alert from "../universal/Alert";
 
-const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => {
+const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed, allowAnything }) => {
   // Get value of current valve in sensor
   const [currentVal, setCurrentVal] = useState('-');
 
@@ -12,7 +12,7 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
   const [selectedPort, setSelectedPort] = useState(null);
 
   const handleClick = (port) => {
-    if (inAction || isDeployed) return;
+    if ((inAction && !allowAnything) || isDeployed) return;
     setSelectedPort(port);
     handleMoveClick(port);
   };
@@ -130,9 +130,9 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
         <div className={"flex flex-col"}>
           <>
             <button
-              className={`${!inAction && !isDeployed ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 cursor-not-allowed"} rounded-lg font-poppins py-1`}
+              className={`${!(inAction && !allowAnything) && !isDeployed ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 cursor-not-allowed"} rounded-lg font-poppins py-1`}
               onClick={handleMoveAirPortClick}
-              disabled={inAction || isDeployed}
+              disabled={(inAction && !allowAnything) || isDeployed}
             >
               Move to air port
             </button>
@@ -149,8 +149,8 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed }) => 
                     key={port}
                     onClick={() => handleClick(port)}
                    className={`absolute w-7 h-7 rounded-full flex items-center justify-center
-    ${inAction || isDeployed ? 'cursor-not-allowed' : 'cursor-pointer'}
-    ${inAction || isDeployed
+    ${(inAction && !allowAnything) || isDeployed ? 'cursor-not-allowed' : 'cursor-pointer'}
+    ${(inAction && !allowAnything) || isDeployed
         ? (selectedPort === port ? 'bg-gray-600 text-white' : 'bg-gray-300 text-gray-500')
         : (selectedPort === port ? 'bg-blue-900 text-white' : 'bg-blue-200 text-black')
     }`}

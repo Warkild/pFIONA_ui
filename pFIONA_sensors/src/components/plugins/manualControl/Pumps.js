@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import Alert from "../universal/Alert";
 
-function Pumps({inAction, setInAction, isDeployed}) {
+function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
 
     /**
      * VARIABLES
@@ -29,7 +29,7 @@ function Pumps({inAction, setInAction, isDeployed}) {
      * ALERT MESSAGE
      */
 
-        // Alert box state
+    // Alert box state
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Alert box error message
@@ -348,26 +348,32 @@ function Pumps({inAction, setInAction, isDeployed}) {
                         <p className={"font-montserrat text-sm mb-2"}>Volume (μL)</p>
                         <input
                             type="number"
-                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${inAction || isDeployed ? 'bg-gray-200' : ''}`}
+                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${
+                              (inAction && !allowAnything) || 
+                              (isDeployed) || 
+                              (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                              ? 'bg-gray-200' : ''
+                            }`}
                             value={volumePump1}
                             onChange={(e) => {
-                                if (!inAction && !isDeployed) {
-                                    setVolumePump1(e.target.value);
-                                }
+                                setVolumePump1(e.target.value);
                             }}
-                            disabled={inAction || isDeployed}
+                            disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))}
                         />
                         <p className={"font-montserrat text-sm mb-2"}>Flow Rate (μL / s)</p>
                         <input
                             type="number"
-                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${inAction || isDeployed ? 'bg-gray-200' : ''}`}
+                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${
+                              (inAction && !allowAnything) || 
+                              (isDeployed) || 
+                              (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                              ? 'bg-gray-200' : ''
+                            }`}
                             value={flowRatePump1}
                             onChange={(e) => {
-                                if (!inAction && !isDeployed) {
-                                    setFlowRatePump1(e.target.value);
-                                }
+                                setFlowRatePump1(e.target.value);
                             }}
-                            disabled={inAction || isDeployed}
+                            disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))}
                         />
                         <p className={"font-montserrat text-sm mb-2"}>Aspirate / Dispense</p>
                         <div className="flex items-center justify-around">
@@ -376,14 +382,16 @@ function Pumps({inAction, setInAction, isDeployed}) {
                             <input
                                 type="checkbox"
                                 id="toogle-ad-pump-1"
-                                className={`relative w-[6.5rem] h-7 p-px border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-purple-600 checked:border-purple-600 focus:checked:border-purple-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-teal-200 before:inline-block before:size-6 before:bg-white checked:before:bg-white before:translate-x-0 checked:before:translate-x-[4.7rem] before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200 ${inAction || isDeployed ? 'bg-gray-200' : 'bg-teal-500'}`}
+                                className={`relative w-[6.5rem] h-7 p-px border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-purple-600 checked:border-purple-600 focus:checked:border-purple-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-teal-200 before:inline-block before:size-6 before:bg-white checked:before:bg-white before:translate-x-0 checked:before:translate-x-[4.7rem] before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200 ${
+                              (inAction && !allowAnything) || 
+                              (isDeployed) || 
+                              (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                              ? 'bg-teal-200' : 'bg-teal-500'}`}
                                 onChange={(e) => {
-                                    if (!inAction && !isDeployed) {
-                                        setAspirateDispensePump1(e.target.checked);
-                                    }
+                                    setAspirateDispensePump1(e.target.checked);
                                 }}
                                 checked={aspirateDispensePump1}
-                                disabled={inAction || isDeployed}
+                            disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))}
                             />
                             <label htmlFor="toogle-ad-pump-1"
                                    className="text-sm text-gray-500 ms-3 dark:text-neutral-400">Dispense</label>
@@ -394,26 +402,34 @@ function Pumps({inAction, setInAction, isDeployed}) {
                         <p className={"font-montserrat text-sm mb-2"}>Volume (μL)</p>
                         <input
                             type="number"
-                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${inAction || isDeployed ? 'bg-gray-200' : ''}`}
+                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${
+                              (inAction && !allowAnything) || 
+                              (isDeployed) || 
+                              (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                              ? 'bg-gray-200' : ''
+                            }`}
                             value={volumePump2}
                             onChange={(e) => {
-                                if (!inAction && !isDeployed) {
-                                    setVolumePump2(e.target.value);
-                                }
+                                setVolumePump2(e.target.value);
                             }}
-                            disabled={inAction || isDeployed}
+                            disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))}
                         />
                         <p className={"font-montserrat text-sm mb-2"}>Flow Rate (μL / s)</p>
                         <input
                             type="number"
-                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${inAction || isDeployed ? 'bg-gray-200' : ''}`}
+                            className={`text-center w-full remove-arrow rounded-lg mb-2 ${
+                              (inAction && !allowAnything) || 
+                              (isDeployed) || 
+                              (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                              ? 'bg-gray-200' : ''
+                            }`}
                             value={flowRatePump2}
                             onChange={(e) => {
                                 if (!inAction && !isDeployed) {
                                     setFlowRatePump2(e.target.value);
                                 }
                             }}
-                            disabled={inAction || isDeployed}
+                            disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))}
                         />
                         <p className={"font-montserrat text-sm mb-2"}>Aspirate / Dispense</p>
                         <div className="flex items-center justify-around">
@@ -422,14 +438,16 @@ function Pumps({inAction, setInAction, isDeployed}) {
                             <input
                                 type="checkbox"
                                 id="toogle-ad-pump-2"
-                                className={`relative w-[6.5rem] h-7 p-px border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-purple-600 checked:border-purple-600 focus:checked:border-purple-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-teal-200 before:inline-block before:size-6 before:bg-white checked:before:bg-white before:translate-x-0 checked:before:translate-x-[4.7rem] before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200 ${inAction || isDeployed ? 'bg-teal-200' : 'bg-teal-500'}`}
+                                className={`relative w-[6.5rem] h-7 p-px border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-purple-600 checked:border-purple-600 focus:checked:border-purple-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-teal-200 before:inline-block before:size-6 before:bg-white checked:before:bg-white before:translate-x-0 checked:before:translate-x-[4.7rem] before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200 ${
+                              (inAction && !allowAnything) || 
+                              (isDeployed) || 
+                              (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                              ? 'bg-teal-200' : 'bg-teal-500'}`}
                                 onChange={(e) => {
-                                    if (!inAction && !isDeployed) {
-                                        setAspirateDispensePump2(e.target.checked);
-                                    }
+                                    setAspirateDispensePump2(e.target.checked);
                                 }}
                                 checked={aspirateDispensePump2}
-                                disabled={inAction || isDeployed}
+                                disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))}
                             />
                             <label htmlFor="toogle-ad-pump-2"
                                    className="text-sm text-gray-500 ms-3 dark:text-neutral-400">Dispense</label>
@@ -438,103 +456,85 @@ function Pumps({inAction, setInAction, isDeployed}) {
                     </div>
                 </div>
                 <div className="flex flex-row justify-between mb-5">
-                    {!inAction && !isDeployed ? (
-                        <>
-                            <button
-                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"
-                                onClick={runPump1}
-                                disabled={inAction || isDeployed}
-                            >
-                                Run Pump 1
-                            </button>
-                            <button
-                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"
-                                onClick={runPumpBoth}
-                                disabled={inAction || isDeployed}
-                            >
-                                Run Both
-                            </button>
-                            <button
-                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2"
-                                onClick={runPump2}
-                                disabled={inAction || isDeployed}
-                            >
-                                Run Pump 2
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                className={`w-3/12 rounded-lg font-poppins py-2 ${runningPump1 ? "bg-green-500 text-white" : "bg-gray-200 cursor-not-allowed text-gray-700"}`}
-                                disabled={inAction || isDeployed}
-                            >
-                                {runningPump1 ? "Running" : "Run Pump 1"}
-                            </button>
-                            <button
-                                className={`w-3/12 rounded-lg font-poppins py-2 ${runningPumpBoth ? "bg-green-500 text-white" : "bg-gray-200 cursor-not-allowed text-gray-700"}`}
-                                disabled={inAction || isDeployed}
-                            >
-                                {runningPumpBoth ? "Running" : "Run Both"}
-                            </button>
-                            <button
-                                className={`w-3/12 rounded-lg font-poppins py-2 ${runningPump2 ? "bg-green-500 text-white" : "bg-gray-200 cursor-not-allowed text-gray-700"}`}
-                                disabled={inAction || isDeployed}
-                            >
-                                {runningPump2 ? "Running" : "Run Pump 2"}
-                            </button>
-                        </>
-                    )}
+                    <button
+                        className={`w-3/12 rounded-lg font-poppins py-2 ${
+                            (inAction && !allowAnything) ||
+                            isDeployed ||
+                            (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                                ? 'bg-gray-200 cursor-not-allowed text-gray-700'
+                                : 'bg-blue-600 text-white'
+                        }`}
+                        onClick={runPump1}
+                        disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))}
+                    >
+                        {runningPump1 ? "Running" : "Run Pump 1"}
+                    </button>
+                    <button
+                        className={`w-3/12 rounded-lg font-poppins py-2 ${
+                            (inAction && !allowAnything) ||
+                            isDeployed ||
+                            (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth || runningPump2 || slewingPump2))
+                                ? 'bg-gray-200 cursor-not-allowed text-gray-700'
+                                : 'bg-blue-600 text-white'
+                        }`}
+                        onClick={runPumpBoth}
+                        disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth || runningPump2 || slewingPump2))}
+                    >
+                        {runningPumpBoth ? "Running" : "Run Both"}
+                    </button>
+                    <button
+                        className={`w-3/12 rounded-lg font-poppins py-2 ${
+                            (inAction && !allowAnything) ||
+                            isDeployed ||
+                            (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                                ? 'bg-gray-200 cursor-not-allowed text-gray-700'
+                                : 'bg-blue-600 text-white'
+                        }`}                        onClick={runPump2}
+                        disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))}
+                    >
+                        {runningPump2 ? "Running" : "Run Pump 2"}
+                    </button>
                 </div>
                 <div className="flex flex-row justify-between">
-                    {!inAction && !isDeployed ? (
-                        <>
-                            <button
-                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"
-                                onClick={slewPump1}
-                                disabled={false}
-                            >
-                                Slew Pump 1
-                            </button>
-                            <button
-                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"
-                                onClick={slewPumpBoth}
-                                disabled={false}
-                            >
-                                Slew Both
-                            </button>
-                            <button
-                                className="bg-blue-600 w-3/12 rounded-lg text-white font-poppins py-2 text-sm"
-                                onClick={slewPump2}
-                                disabled={false}
-                            >
-                                Slew Pump 2
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            <button
-                                className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump1 ? "bg-red-600 text-white" : "bg-gray-200 cursor-not-allowed text-gray-700"}`}
-                                onClick={slewingPump1 ? endSlewPump1 : null}
-                                disabled={!(slewingPump1 || !isDeployed && !inAction)}
-                            >
-                                {slewingPump1 ? "Stop" : "Slew Pump 1"}
-                            </button>
-                            <button
-                                className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPumpBoth ? "bg-red-600 text-white" : "bg-gray-200 cursor-not-allowed text-gray-700"}`}
-                                onClick={slewingPumpBoth ? endSlewPumpBoth : null}
-                                disabled={!(slewingPumpBoth || !isDeployed && !inAction)}
-                            >
-                                {slewingPumpBoth ? "Stop" : "Slew Both"}
-                            </button>
-                            <button
-                                className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump2 ? "bg-red-600 text-white" : "bg-gray-200 cursor-not-allowed text-gray-700"}`}
-                                onClick={slewingPump2 ? endSlewPump2 : null}
-                                disabled={!(slewingPump2 || !isDeployed && !inAction)}
-                            >
-                                {slewingPump2 ? "Stop" : "Slew Pump 2"}
-                            </button>
-                        </>
-                    )}
+                    <button
+                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump1 ? "bg-red-600 text-white" : 
+                          ((isDeployed || (inAction && !allowAnything) || slewingPumpBoth) ? 
+                          "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
+                        onClick={slewingPump1 ? endSlewPump1 : !((inAction && !allowAnything) ||
+                            isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                        ) ? slewPump1 : null}
+                        disabled={!(slewingPump1 || !((inAction && !allowAnything) ||
+                            isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                        ))}
+                    >
+                        {slewingPump1 ? "Stop" : "Slew Pump 1"}
+                    </button>
+                    <button
+                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPumpBoth ? "bg-red-600 text-white" : 
+                      ((isDeployed || (inAction && !allowAnything) || slewingPump1 || slewingPump2) ? 
+                      "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
+                        onClick={slewingPumpBoth ? endSlewPumpBoth : !((inAction && !allowAnything) ||
+                            isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPump2 || slewingPump2))
+                        ) ? slewPumpBoth : null}
+                        disabled={!(slewingPumpBoth || !((inAction && !allowAnything) ||
+                            isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPump2 || slewingPump2))
+                        ))}
+                    >
+                        {slewingPumpBoth ? "Stop" : "Slew Both"}
+                    </button>
+                    <button
+                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump2 ? "bg-red-600 text-white" : 
+  ((isDeployed || (inAction && !allowAnything) || slewingPumpBoth) ? 
+  "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
+                        onClick={slewingPump2 ? endSlewPump2 : !((inAction && !allowAnything) ||
+                            isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                        ) ? slewPump2 : null}
+                        disabled={!(slewingPump2 || !((inAction && !allowAnything) ||
+                            isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                        ))}
+                    >
+                        {slewingPump2 ? "Stop" : "Slew Pump 2"}
+                    </button>
                 </div>
             </div>
             <Alert isOpen={isModalOpen} onRequestClose={closeModal} text={alertModalText}/>

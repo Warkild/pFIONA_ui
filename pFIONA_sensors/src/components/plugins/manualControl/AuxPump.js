@@ -1,66 +1,98 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import Alert from "../universal/Alert";
 
-function AuxPump({inAction, setInAction, isDeployed}) {
+function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
     const [auxPumpRunning, setAuxPumpRunning] = useState(false);
 
     const turnOnAuxPump = () => {
         const url = `http://${SENSOR_IP}:5000/auxpump/turn_on`;
 
-      fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-        },
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('Success:', data);
-        setAuxPumpRunning(true);
-        setInAction(true);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        setAuxPumpRunning(false);
-        setInAction(false);
-      });
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setAuxPumpRunning(true);
+                setInAction(true);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setAuxPumpRunning(false);
+                setInAction(false);
+            });
     };
 
     const turnOffAuxPump = () => {
         const url = `http://${SENSOR_IP}:5000/auxpump/turn_off`;
 
-          fetch(url, {
+        fetch(url, {
             method: 'POST',
             headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
-          })
-          .then(response => {
-            if (!response.ok) {
-              throw new Error('Network response was not ok');
-            }
-            return response.json();
-          })
-          .then(data => {
-            console.log('Success:', data);
-            setAuxPumpRunning(false);
-            setInAction(false);
-          })
-          .catch(error => {
-            console.error('Error:', error);
-            setAuxPumpRunning(false);
-            setInAction(false);
-          });
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setAuxPumpRunning(false);
+                setInAction(false);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setAuxPumpRunning(false);
+                setInAction(false);
+            });
     };
 
-    // Return HTML Code
+    const getStatus = () => {
+    fetch(`http://${SENSOR_IP}:5000/auxpump/is_active`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+        'Content-Type': 'application/json',
+      },
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Success:', data);
+      setAuxPumpRunning(data.message)
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  };
+
+    useEffect(() => {
+    getStatus();
+
+    const intervalId = setInterval(() => {
+      getStatus();
+    }, 2000);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
     return (
         <div className={"w-2/12 flex flex-col"}>
             <div className={"mb-5"}>
@@ -75,9 +107,9 @@ function AuxPump({inAction, setInAction, isDeployed}) {
                     </div>
                     {!auxPumpRunning ? (
                         <button
-                            className={`rounded-lg font-poppins py-2 mb-5 ${inAction || isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
+                            className={`rounded-lg font-poppins py-2 mb-5 ${(inAction && !allowAnything) || isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
                             onClick={turnOnAuxPump}
-                            disabled={inAction || isDeployed}
+                            disabled={(inAction && !allowAnything) || isDeployed}
                         >
                             Turn ON
                         </button>
