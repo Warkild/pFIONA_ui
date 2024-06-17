@@ -72,7 +72,8 @@ def api_add_reaction(request):
                                      int(data['number_of_sample']),
                                      int(data['number_of_standard']),
                                      bool(data['multi_standard']),
-                                     int(data['multi_standard_time'])
+                                     int(data['multi_standard_time']),
+                                     int(data['reaction_time'])
                                      )
 
         for key, step in enumerate(data['steps']):
@@ -122,7 +123,8 @@ def api_edit_reaction(request):
                                      int(data['number_of_sample']),
                                      int(data['number_of_standard']),
                                      bool(data['multi_standard']),
-                                     int(data['multi_standard_time'])
+                                     int(data['multi_standard_time']),
+                                     int(data['reaction_time'])
                                      )
 
         q.delete_all_step(data['id'])

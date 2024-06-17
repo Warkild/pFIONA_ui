@@ -87,4 +87,7 @@ def validate_reaction_data(data):
     if int(data['multi_standard_time']) < 0:
         raise ValidationError('Number of standard must be at least 0')
 
+    if int(data['reaction_time']) < 0:
+        raise ValidationError('Reaction time must be at least 0')
+
     return True  # If all validations pass, return True

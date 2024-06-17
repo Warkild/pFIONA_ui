@@ -48,6 +48,9 @@ function ReactionAddApp() {
     const [multiStandard, setMultiStandard] = useState(false);
     const [multiStandardTime, setMultiStandardTime] = useState(360);
 
+    // REACTION TIME
+    const [reactionTime, setReactionTime] = useState(0);
+
 
     /**
      * Change the list of reagents for the reaction when user interact with the UI
@@ -101,6 +104,7 @@ function ReactionAddApp() {
             number_of_standard: numberOfStandard,
             multi_standard: multiStandard,
             multi_standard_time: multiStandardTime,
+            reaction_time: reactionTime,
         };
 
         const apiUrl = "/api/add_reaction"; // Your Django API URL
@@ -255,7 +259,22 @@ function ReactionAddApp() {
                 <div className="flex flex-col space-y-4 w-full pb-10">
                     <div className={"flex flex-row justify-between"}>
                         <div className={"flex flex-col w-full"}>
-                            <label className={"font-montserrat text-sm pb-2"}>Monitored wavelength (nm) (separated by " ; " (exemple : 880;1050))</label>
+                            <label className={"font-montserrat text-sm pb-2"}>Reaction Time (s)</label>
+                            <input
+                                type="number"
+                                value={reactionTime}
+                                onChange={(e) => setReactionTime(e.target.value)}
+                                placeholder="Reaction Time (s)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col space-y-4 w-full pb-10">
+                    <div className={"flex flex-row justify-between"}>
+                        <div className={"flex flex-col w-full"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Monitored wavelength (nm) (separated by "
+                                ; " (exemple : 880;1050))</label>
                             <input
                                 type="text"
                                 value={wavelengthMonitored}

@@ -163,8 +163,6 @@ def sensors_reagent_deletion(request, sensor_id, reagent_id):
         reaction_ids_from_volume_to_add = set(vta.pfiona_reaction_id for vta in volume_to_adds)
         reaction_ids = standard_reaction_ids.union(reaction_ids_from_volume_to_add)
 
-        Sensor.objects.filter(actual_reaction_id__in=reaction_ids).update(actual_reaction=None)
-
         Reaction.objects.filter(id__in=reaction_ids).delete()
 
         reagent.delete()
@@ -209,9 +207,17 @@ def sensors_reagent_add(request, sensor_id):
     if request.method == 'POST':
         reagent_form = ReagentEditForm(request.POST, prefix='reagent')
         if reagent_form.is_valid():
+            max_id = \
+                Reagent.objects.filter(id__gte=sensor_id * 10000000,
+                                                          id__lte=(sensor_id + 1) * 10000000).aggregate(Max('id'))[
+                    'id__max']
+
+            if max_id is None:
+                max_id = sensor_id * 10000000
             new_reagent = reagent_form.save(commit=False)
             new_reagent.pfiona_sensor_id = sensor_id
             new_reagent.volume = 0
+            new_reagent.id = max_id + 1
             new_reagent.save()
             return redirect('sensors_reagents', sensor_id=sensor_id)
     else:

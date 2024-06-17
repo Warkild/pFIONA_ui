@@ -44,6 +44,9 @@ function ReactionEditApp() {
     const [multiStandard, setMultiStandard] = useState(false);
     const [multiStandardTime, setMultiStandardTime] = useState(0);
 
+    // REACTION TIME
+    const [reactionTime, setReactionTime] = useState(0);
+
 
     /**
      * Change the list of reagents for the reaction when user interact with the UI
@@ -98,6 +101,7 @@ function ReactionEditApp() {
             number_of_standard: numberOfStandard,
             multi_standard: multiStandard,
             multi_standard_time: multiStandardTime,
+            reaction_time: reactionTime
         };
 
         const apiUrl = "/api/edit_reaction"; // Your Django API URL
@@ -159,6 +163,7 @@ function ReactionEditApp() {
         setNumberOfSample(reaction_json['number_of_sample'])
         setMultiStandard(reaction_json['multi_standard'])
         setMultiStandardTime(reaction_json['multi_standard_time'])
+        setReactionTime(reaction_json['reaction_time'])
     }, []);
 
 
@@ -265,6 +270,20 @@ function ReactionEditApp() {
                                 value={volumeToPushToFlowCell}
                                 onChange={(e) => setVolumeToPushToFlowCell(e.target.value)}
                                 placeholder="Standard Concentration (molarity)"
+                                className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div className="flex flex-col space-y-4 w-full pb-10">
+                    <div className={"flex flex-row justify-between"}>
+                        <div className={"flex flex-col w-full"}>
+                            <label className={"font-montserrat text-sm pb-2"}>Reaction Time (s)</label>
+                            <input
+                                type="number"
+                                value={reactionTime}
+                                onChange={(e) => setReactionTime(e.target.value)}
+                                placeholder="Reaction Time (s)"
                                 className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                             />
                         </div>
