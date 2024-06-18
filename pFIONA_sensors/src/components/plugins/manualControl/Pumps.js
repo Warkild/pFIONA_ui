@@ -461,7 +461,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                             (inAction && !allowAnything) ||
                             isDeployed ||
                             (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
-                                ? 'bg-gray-200 cursor-not-allowed text-gray-700'
+                                ? runningPump1 ? 'bg-green-600 cursor-not-allowed text-white' : 'bg-gray-200 cursor-not-allowed text-gray-700'
                                 : 'bg-blue-600 text-white'
                         }`}
                         onClick={runPump1}
@@ -474,7 +474,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                             (inAction && !allowAnything) ||
                             isDeployed ||
                             (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth || runningPump2 || slewingPump2))
-                                ? 'bg-gray-200 cursor-not-allowed text-gray-700'
+                                ? runningPumpBoth ? 'bg-green-600 cursor-not-allowed text-white' : 'bg-gray-200 cursor-not-allowed text-gray-700'
                                 : 'bg-blue-600 text-white'
                         }`}
                         onClick={runPumpBoth}
@@ -487,7 +487,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                             (inAction && !allowAnything) ||
                             isDeployed ||
                             (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
-                                ? 'bg-gray-200 cursor-not-allowed text-gray-700'
+                                ? runningPump2 ? 'bg-green-600 cursor-not-allowed text-white' : 'bg-gray-200 cursor-not-allowed text-gray-700'
                                 : 'bg-blue-600 text-white'
                         }`}                        onClick={runPump2}
                         disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))}
