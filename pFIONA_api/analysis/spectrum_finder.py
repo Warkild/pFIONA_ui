@@ -17,7 +17,7 @@ def get_cycle_count(timestamp, sensor_id):
         deployment_id = last_spectrum.deployment
 
         # Compter le nombre de cycles associés au même déploiement
-        cycles = Spectrum.objects.filter(deployment=deployment_id).values_list('cycle', flat=True).distinct()
+        cycles = Spectrum.objects.filter(deployment=deployment_id, cycle__gte=1).values_list('cycle', flat=True).distinct()
 
         return cycles.count()
     else:
@@ -316,6 +316,8 @@ def get_monitored_wavelength_values_in_deployment(timestamp, sensor_id):
 def get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id):
     # Obtenir le nombre de cycles pour le déploiement
     total_cycles = get_cycle_count(timestamp, sensor_id)
+
+    print(f"total_cycles : {total_cycles}")
 
     all_monitored_wavelength_values = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
     deployment_info = None

@@ -89,7 +89,9 @@ const SpectrumChart = () => {
 
             const firstReactionData = spectrumsData[selectedReaction] || spectrumsData[reactions[0]];
 
-            if (firstReactionData && firstReactionData.Blank && firstReactionData.Blank['0'] && firstReactionData.Blank['0'][0] && firstReactionData.Blank['0'][0].values) {
+            if (firstReactionData && firstReactionData.Standard && firstReactionData.Standard['0'] && firstReactionData.Standard['0'][0] && firstReactionData.Standard['0'][0].values) {
+                 setWavelengths(firstReactionData.Standard['0'][0].values.map(v => v.wavelength));
+            } else if (firstReactionData && firstReactionData.Blank && firstReactionData.Blank['0'] && firstReactionData.Blank['0'][0] && firstReactionData.Blank['0'][0].values) {
                 setWavelengths(firstReactionData.Blank['0'][0].values.map(v => v.wavelength));
             } else {
                 throw new Error('Invalid data structure');
@@ -135,14 +137,37 @@ const SpectrumChart = () => {
 
     const colorMap = {
         'Blank_Reference': 'rgb(255, 0, 0)',        // Rouge
-        'Blank_Dark': 'rgb(255, 165, 0)',           // Orange
-        'Blank': 'rgb(255, 255, 0)',                // Jaune
-        'Sample_Reference': 'rgb(211, 211, 211)',   // Gris clair
+        'Blank_Dark': 'rgb(0, 0, 0)',           // Orange
+        'Blank': 'rgb(255, 150, 0)',                // Jaune
+        'Sample_Reference': 'rgb(100, 211, 100)',   // Gris clair
         'Sample_Dark': 'rgb(0, 0, 0)',              // Noir
-        'Sample': 'rgb(169, 169, 169)',             // Gris foncé
+        'Sample': 'rgb(50, 211, 0)',             // Gris foncé
         'Standard_Reference': 'rgb(0, 0, 255)',     // Bleu
-        'Standard_Dark': 'rgb(0, 0, 139)',          // Bleu foncé
+        'Standard_Dark': 'rgb(0, 0, 0)',          // Bleu foncé
         'Standard': 'rgb(0, 191, 255)',             // Bleu ciel
+        'Standard_Dillution_0_Dark': 'rgb(0, 0, 0)',// Rouge
+        'Standard_Dillution_1_Dark': 'rgb(0, 0, 0)',
+        'Standard_Dillution_2_Dark': 'rgb(0, 0, 0)',
+        'Standard_Dillution_3_Dark': 'rgb(0, 0, 0)',
+        'Standard_Dillution_0_Reference': 'rgb(255, 0, 0)',
+        'Standard_Dillution_0': 'rgb(255, 0, 0)',
+        'Standard_Dillution_1_Reference': 'rgb(255, 100, 0)',
+        'Standard_Dillution_1': 'rgb(255, 100, 0)',
+        'Standard_Dillution_2_Reference': 'rgb(255, 175, 0)',
+        'Standard_Dillution_2': 'rgb(255, 175, 0)',
+        'Standard_Dillution_3_Reference': 'rgb(255, 255, 0)',
+        'Standard_Dillution_3': 'rgb(255, 255, 0)',
+
+
+    };
+
+    const getRandomColor = () => {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
     };
 
     const extractType = (spectrumtype) => {
@@ -165,7 +190,7 @@ const SpectrumChart = () => {
                         chartData.datasets.push({
                             label: `${typeKey} Subcycle ${subcycle}`,
                             data: spectrum.values.map(v => v.value),
-                            borderColor: colorMap[typeKey] || 'rgb(0, 0, 0)', // Default to black if not found
+                            borderColor: colorMap[typeKey] || getRandomColor(), // Use random color if not found
                             fill: false,
                             tension: 0.1 // Optional: to smooth the line
                         });
