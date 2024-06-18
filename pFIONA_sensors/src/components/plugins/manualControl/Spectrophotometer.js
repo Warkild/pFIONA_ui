@@ -5,16 +5,10 @@ import Alert from "../universal/Alert";
 
 ChartJS.register(...registerables);
 
-function Spectrophotometer({ inAction, setInAction, isDeployed }) {
+function Spectrophotometer({ inAction, setInAction, isDeployed, preScanCount }) {
 
     // Light Status
     const [lightStatus, setLightStatus] = useState(false);
-
-    // Wavelengths returned by the spec
-    const [wavelengths, setWavelengths] = useState([]);
-
-    // Intensities returned by the spec
-    const [intensities, setIntensities] = useState([]);
 
     // Chart data
     const [chartData, setChartData] = useState({
@@ -22,21 +16,38 @@ function Spectrophotometer({ inAction, setInAction, isDeployed }) {
         datasets: []
     });
 
-    const updateChartData = (wavelengths, intensities) => {
-        console.log('Updating chart data with:', { wavelengths, intensities });
-        const formattedWavelengths = formatWavelengths(wavelengths);
-        setChartData({
-            labels: formattedWavelengths,
-            datasets: [
-                {
-                    label: 'Intensity',
-                    data: intensities,
-                    borderColor: 'rgba(75,192,192,1)',
-                    backgroundColor: 'rgba(75,192,192,0.2)',
-                }
-            ]
-        });
-    };
+    const updateChartData = (data) => {
+    const spectra = data.standard_concentration;
+    console.log('Updating chart data with:', spectra);
+
+    const colors = [
+        'rgba(255, 99, 132, 1)', // Rouge
+        'rgba(54, 162, 235, 1)', // Bleu
+        'rgba(75, 192, 192, 1)'  // Vert
+    ];
+
+    const backgroundColors = [
+        'rgba(255, 99, 132, 0.2)', // Rouge
+        'rgba(54, 162, 235, 0.2)', // Bleu
+        'rgba(75, 192, 192, 0.2)'  // Vert
+    ];
+
+    const datasets = spectra.map((spectrum, index) => ({
+        label: `Intensity - ${spectrum.type}`,
+        data: spectrum.values.map(v => v.value),
+        borderColor: colors[index % colors.length],
+        backgroundColor: backgroundColors[index % backgroundColors.length],
+    }));
+
+    const labels = spectra[0].values.map(v => Math.round(v.wavelength * 10) / 10);
+
+    setChartData({
+        labels: labels,
+        datasets: datasets
+    });
+};
+
+
 
     const turnOnLight = () => {
         console.log('IP Address:', SENSOR_IP);
@@ -126,6 +137,32 @@ function Spectrophotometer({ inAction, setInAction, isDeployed }) {
         return () => clearInterval(intervalId);
     }, []);
 
+    useEffect(() => {
+    if (preScanCount !== 0) {
+        fetch(`http://127.0.0.1:8000/api/get_lasts_spectrum_cycle_0?sensor_id=2`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                updateChartData(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+}, [preScanCount]);
+
+
     const scanNow = () => {
         const url = `http://${SENSOR_IP}:5000/spectrophotometer/get_measure`;
 
@@ -144,21 +181,13 @@ function Spectrophotometer({ inAction, setInAction, isDeployed }) {
             })
             .then(data => {
                 console.log('Success:', data);
-                console.log('Wavelengths:', data.message.wavelengths);
-                console.log('Intensities:', data.message.intensities);
                 const newWavelengths = data.message.wavelengths;
                 const newIntensities = data.message.intensities;
-                setWavelengths(newWavelengths);
-                setIntensities(newIntensities);
-                updateChartData(newWavelengths, newIntensities);
+                updateChartData([{ type: 'Current Scan', values: newWavelengths.map((wavelength, index) => ({ wavelength, value: newIntensities[index] })) }]);
             })
             .catch(error => {
                 console.error('Error:', error);
             });
-    };
-
-    const formatWavelengths = (wavelengths) => {
-        return wavelengths.map(wavelength => Math.round(wavelength * 10) / 10);
     };
 
     return (
@@ -170,7 +199,7 @@ function Spectrophotometer({ inAction, setInAction, isDeployed }) {
                 <div className={"flex flex-col"}>
                     <p className={"text-sm mb-2"}>Light current status</p>
                     <div className={"flex flex-row items-center mb-5"}>
-                        <div className={` w-5 h-5 rounded-full ${lightStatus ? 'bg-green-600' : 'bg-red-600'}`}></div>
+                        <div className={`w-5 h-5 rounded-full ${lightStatus ? 'bg-green-600' : 'bg-red-600'}`}></div>
                         <p className={"ml-3"}>{lightStatus ? 'ON' : 'OFF'}</p>
                     </div>
                     {!lightStatus ? (

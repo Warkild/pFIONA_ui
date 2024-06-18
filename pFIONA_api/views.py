@@ -562,7 +562,7 @@ def get_standard_concentration(request):
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
-def get_last_spectrum_cycle_0(request):
+def get_lasts_spectrum_cycle_0(request):
     sensor_id = request.GET.get('sensor_id')
 
     if sensor_id is not None:
@@ -571,7 +571,7 @@ def get_last_spectrum_cycle_0(request):
         except ValueError:
             return JsonResponse({'error': 'Invalid reaction ID format'}, status=400)
 
-    get_last_spectrum_cycle_0 = q.get_last_spectrum_cycle_0(sensor_id)
+    get_last_spectrum_cycle_0 = q.get_3_last_spectrum_cycle_0(sensor_id)
 
     if get_last_spectrum_cycle_0 is not None:
         return JsonResponse({'standard_concentration': get_last_spectrum_cycle_0})

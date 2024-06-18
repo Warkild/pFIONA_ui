@@ -22,6 +22,9 @@ function ManualControlApp() {
     // State for allowing anything
     const [allowAnything, setAllowAnything] = useState(false);
 
+    // State for preestablished scan
+    const [preScanCount, setPreScanCount] = useState(0)
+
     // Function to check deployed status
     const checkDeployedStatus = () => {
         fetch(`/api/is_deployed?sensor_id=${sensor_id}`, {
@@ -96,7 +99,7 @@ function ManualControlApp() {
     }, []);
 
     const handleSpecFinish = () => {
-        console.log('Message reçu depuis B');
+        setPreScanCount(preScanCount+1)
     };
 
     return (
@@ -126,7 +129,7 @@ function ManualControlApp() {
                             </div>
                             <div className="flex flex-row justify-between pb-12">
                                 <Spectrophotometer inAction={inAction} setInAction={setInAction} isDeployed={isDeployed}
-                                                   allowAnything={allowAnything}/>
+                                                   allowAnything={allowAnything} preScanCount={preScanCount}/>
                                 <AuxPump inAction={inAction} setInAction={setInAction} isDeployed={isDeployed}
                                          allowAnything={allowAnything}/>
                             </div>

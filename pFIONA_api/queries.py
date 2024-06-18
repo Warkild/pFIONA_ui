@@ -1,6 +1,7 @@
 from math import floor
 
 from django.db.models import Q, F, Max
+from django.shortcuts import get_object_or_404
 
 import pFIONA_sensors.models as models
 import json
@@ -468,14 +469,20 @@ def get_reagents_for_current_reaction(sensor_id):
     return list(reagent_names)
 
 
-def get_last_spectrum_cycle_0(sensor_id):
-    last_spectrum = models.Spectrum.objects.filter(sensor_id=sensor_id, cycle=0).order_by('-id').first()
+def get_3_last_spectrum_cycle_0(sensor_id):
+    # Récupérer les trois derniers spectres pour ce capteur
+    spectra = models.Spectrum.objects.filter(pfiona_sensor_id=sensor_id, cycle=0).order_by('-id')[:3]
 
-    if last_spectrum:
-        values = models.Value.objects.filter(spectrum_id=last_spectrum.id).order_by('wavelength')
+    # Préparer les données de réponse
+    response_data = []
 
-        spectrum_dict = {value.wavelength: value.value for value in values}
+    for spectrum in spectra:
+        spectrum_data = {}
+        spectrum_data['type'] = spectrum.pfiona_spectrumtype.type
+        spectrum_data['values'] = list(
+            models.Value.objects.filter(pfiona_spectrum=spectrum).order_by('wavelength').values('wavelength', 'value')
+        )
 
-        return spectrum_dict
+        response_data.append(spectrum_data)
 
-    return None
+    return response_data

@@ -30,4 +30,5 @@ urlpatterns = [
     path('export-raw-spectra/', views.export_raw_spectra_csv, name='export_raw_spectra_csv'),
     path('prepare-export/', views.prepare_export, name='prepare_export'),
     path('export_raw_spectra_csv/', views.prepare_export_raw_spectra_csv, name='prepare_export_raw_spectra_csv'),
+    path('get_lasts_spectrum_cycle_0', views.get_lasts_spectrum_cycle_0, name='get_lasts_spectrum_cycle_0')
 ]

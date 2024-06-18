@@ -76,7 +76,7 @@ function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
     })
     .then(data => {
       console.log('Success:', data);
-      setAuxPumpRunning(data.message)
+      setAuxPumpRunning(JSON.parse(data.message));
     })
     .catch(error => {
       console.error('Error:', error);
