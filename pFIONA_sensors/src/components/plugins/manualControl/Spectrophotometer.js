@@ -16,7 +16,7 @@ function Spectrophotometer({ inAction, setInAction, isDeployed, preScanCount }) 
         datasets: []
     });
 
-    const updateChartData = (data) => {
+const updateChartData = (data) => {
     const spectra = data.standard_concentration;
     console.log('Updating chart data with:', spectra);
 
@@ -46,6 +46,7 @@ function Spectrophotometer({ inAction, setInAction, isDeployed, preScanCount }) 
         datasets: datasets
     });
 };
+
 
 
 
@@ -164,31 +165,38 @@ function Spectrophotometer({ inAction, setInAction, isDeployed, preScanCount }) 
 
 
     const scanNow = () => {
-        const url = `http://${SENSOR_IP}:5000/spectrophotometer/get_measure`;
+    const url = `http://${SENSOR_IP}:5000/spectrophotometer/get_measure`;
 
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                'Content-Type': 'application/json',
-            },
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                const newWavelengths = data.message.wavelengths;
-                const newIntensities = data.message.intensities;
-                updateChartData([{ type: 'Current Scan', values: newWavelengths.map((wavelength, index) => ({ wavelength, value: newIntensities[index] })) }]);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    };
+        .then(data => {
+            console.log('Success:', data);
+            const newWavelengths = data.message.wavelengths;
+            const newIntensities = data.message.intensities;
+            const currentScan = {
+                standard_concentration: [{
+                    type: 'Current Scan',
+                    values: newWavelengths.map((wavelength, index) => ({ wavelength, value: newIntensities[index] }))
+                }]
+            };
+            updateChartData(currentScan);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+};
+
 
     return (
         <div className={"w-9/12 flex flex-col"}>

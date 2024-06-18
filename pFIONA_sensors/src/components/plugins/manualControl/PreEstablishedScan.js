@@ -28,8 +28,7 @@ function PreEstablishedScan({ inAction, setInAction, handleSpecFinish }) {
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
             },
             body: JSON.stringify({
-                "sample": 1,
-                "reaction_to_do": selectedReaction,
+                "reaction_to_do": selectedReaction.value,
             })
         })
             .then(response => {
