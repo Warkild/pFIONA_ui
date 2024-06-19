@@ -510,6 +510,7 @@ def test(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
@@ -525,6 +526,9 @@ def api_get_spectrum_in_cycle_full_info(request):
         if not timestamp:
             raise ValueError("Missing timestamp parameter")
 
+        if not cycle:
+            raise ValueError("Missing cycle parameter")
+
         if not q.models.Sensor.objects.filter(id=sensor_id).exists():
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
@@ -536,6 +540,89 @@ def api_get_spectrum_in_cycle_full_info(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_absorbance_spectrums_in_cycle_full_info(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+        cycle = request.GET.get('cycle')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not cycle:
+            raise ValueError("Missing cycle parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        data, wavelengths, deployment_info = get_absorbance_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle)
+        return JsonResponse(
+            {"data": data, "wavelengths": wavelengths, "deployment_info": deployment_info})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_spectrum_in_deployment_full_info(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        data, wavelengths, deployment_info = get_spectrums_in_deployment_full_info(timestamp, sensor_id)
+        return JsonResponse(
+            {"data": data, "wavelengths": wavelengths, "deployment_info": deployment_info})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_absobance_spectrums_in_deployment_full_info(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        data, wavelengths, deployment_info = get_absorbance_spectrums_in_deployment_full_info(timestamp, sensor_id)
+        return JsonResponse(
+            {"data": data, "wavelengths": wavelengths, "deployment_info": deployment_info})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -673,7 +760,7 @@ def export_raw_spectra_csv(request):
 
     for spectrum in spectra:
         spectrum_type = spectrum.pfiona_spectrumtype.type
-        local_datetime = datetime.datetime.fromtimestamp(spectrum.pfiona_time.timestamp).strftime('%m/%d/%Y %H:%M:%S')
+        local_datetime = datetime.fromtimestamp(spectrum.pfiona_time.timestamp).strftime('%m/%d/%Y %H:%M:%S')
         deployment = spectrum.deployment
         cycle = spectrum.cycle
         id = spectrum.id
@@ -727,3 +814,52 @@ def prepare_export(request):
         return redirect(f'{url}{params}')
     else:
         return HttpResponse("No export available for the selected data type and file format.", status=400)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_deployment_list(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        deployment_list = get_deployment_list(sensor_id)
+        return JsonResponse(deployment_list, safe=False)
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required
+@require_http_methods(["DELETE"])
+@csrf_exempt
+def api_delete_spectrums_by_deployment(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        deployment_id = request.GET.get('deployment_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not deployment_id:
+            raise ValueError("Missing deployment_id parameter")
+
+        if not Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        # Call the function to delete spectrums
+        delete_spectrums_by_deployment(sensor_id, deployment_id)
+
+        return JsonResponse({'status': 'success', 'message': 'Spectrums deleted successfully'})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

@@ -60,17 +60,17 @@ const SpectrumChart = () => {
         }
     };
 
-    const fetchSpectrumData = async (cycle) => {
+const fetchSpectrumData = async (cycle) => {
         setLoading(true);
         try {
             const epochTimestamp = moment(timestamp).unix();
             const response = await fetch(`http://127.0.0.1:8000/api/get_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
             const result = await response.json();
-            if (!result || result.length === 0) {
-                throw new Error('Spectrums data is missing');
+            if (!result || !result.spectrums_data) {
+                throw new Error('Spectrums data is missing or invalid');
             }
 
-            const spectrumsData = result['spectrums_data'];
+            const spectrumsData = result.spectrums_data;
             const reactions = Object.keys(spectrumsData);
             if (reactions.length === 0) {
                 throw new Error('No reactions data available');
@@ -89,10 +89,8 @@ const SpectrumChart = () => {
 
             const firstReactionData = spectrumsData[selectedReaction] || spectrumsData[reactions[0]];
 
-            if (firstReactionData && firstReactionData.Standard && firstReactionData.Standard['0'] && firstReactionData.Standard['0'][0] && firstReactionData.Standard['0'][0].values) {
-                 setWavelengths(firstReactionData.Standard['0'][0].values.map(v => v.wavelength));
-            } else if (firstReactionData && firstReactionData.Blank && firstReactionData.Blank['0'] && firstReactionData.Blank['0'][0] && firstReactionData.Blank['0'][0].values) {
-                setWavelengths(firstReactionData.Blank['0'][0].values.map(v => v.wavelength));
+            if (firstReactionData && firstReactionData.Sample && firstReactionData.Sample['0'] && firstReactionData.Sample['0'][0] && firstReactionData.Sample['0'][0].values) {
+                setWavelengths(firstReactionData.Sample['0'][0].values.map(v => v.wavelength));
             } else {
                 throw new Error('Invalid data structure');
             }
@@ -100,7 +98,7 @@ const SpectrumChart = () => {
             setDeploymentInfo(result.deployment_info);
         } catch (error) {
             console.error('Error fetching spectrum data:', error);
-            setErrorMessage('Error fetching spectrum data. Please try again.');
+            setErrorMessage(`Error fetching spectrum data: ${error.message}. Please try again.`);
         } finally {
             setLoading(false);
         }

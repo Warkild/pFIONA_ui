@@ -21,8 +21,13 @@ urlpatterns = [
     path('get_cycle_count', views.api_get_cycle_count, name='api_get_cycle_count'),
     path('get_absorbance_spectrums_in_cycle', views.api_get_absorbance_spectrums_in_cycle,
          name='api_get_absorbance_spectrums_in_cycle'),
+    path('get_deployment_list', views.api_get_deployment_list,
+         name='api_get_deployment_list'),
     path('get_spectrums_in_cycle', views.api_get_spectrums_in_cycle, name='api_get_spectrums_in_cycle'),
-    path('get_spectrum_in_cycle_full_info', views.api_get_spectrum_in_cycle_full_info, name='api_get_spectrum_in_cycle_full_info'),
+    path('get_spectrums_in_cycle_full_info', views.api_get_spectrum_in_cycle_full_info, name='api_get_spectrum_in_cycle_full_info'),
+    path('get_spectrums_in_deployment_full_info', views.api_get_spectrum_in_deployment_full_info, name='api_get_spectrum_in_deployment_full_info'),
+    path('get_absorbance_spectrums_in_cycle_full_info', views.api_get_absorbance_spectrums_in_cycle_full_info, name='api_get_absorbance_spectrums_in_cycle_full_info'),
+    path('get_absorbance_spectrums_in_deployment_full_info', views.api_get_absobance_spectrums_in_deployment_full_info, name='api_get_absobance_spectrums_in_deployment_full_info'),
     path('test', views.test, name='test'),
     path('test2', views.test2, name='test2'),
     path('get_mean_absorbance_spectrums_in_cycle', views.api_get_mean_absorbance_spectrums_in_cycle, name='api_get_mean_absorbance_spectrums_in_cycle'),
@@ -31,5 +36,6 @@ urlpatterns = [
     path('export-raw-spectra/', views.export_raw_spectra_csv, name='export_raw_spectra_csv'),
     path('prepare-export/', views.prepare_export, name='prepare_export'),
     path('export_raw_spectra_csv/', views.prepare_export_raw_spectra_csv, name='prepare_export_raw_spectra_csv'),
-    path('get_lasts_spectrum_cycle_0', views.get_lasts_spectrum_cycle_0, name='get_lasts_spectrum_cycle_0')
+    path('get_lasts_spectrum_cycle_0', views.get_lasts_spectrum_cycle_0, name='get_lasts_spectrum_cycle_0'),
+    path('delete_spectrums/', views.api_delete_spectrums_by_deployment, name='api_delete_spectrums_by_deployment'),
 ]
