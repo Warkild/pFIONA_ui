@@ -93,7 +93,7 @@ def sensors_reagents(request, sensor_id):
     # REACTIONS
 
     volume_to_adds = Step.objects.filter(pfiona_reagent__in=reagents)
-    reactions = Reaction.objects.filter(step__in=volume_to_adds).distinct()
+    reactions = Reaction.objects.filter(step__in=volume_to_adds).distinct().order_by('name')
 
     reactions_data = [{
         'id': reaction.id,
