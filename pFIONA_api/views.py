@@ -510,6 +510,32 @@ def test(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_spectrum_in_cycle_full_info(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+        cycle = request.GET.get('cycle')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        data, wavelengths, deployment_info = get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle)
+        return JsonResponse(
+            {"data": data, "wavelengths": wavelengths, "deployment_info": deployment_info})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 @login_required
 @require_http_methods(["GET"])

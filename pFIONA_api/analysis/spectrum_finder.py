@@ -96,11 +96,14 @@ def get_spectrums_in_cycle(timestamp, sensor_id, cycle):
     return spectrums_data, wavelengths, deployment_info
 
 
+from collections import defaultdict
+from django.db.models import Min, Max, Q
+
+
 def get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
     # Retrieve the last spectrum before the given timestamp for the specified sensor
-    last_spectrum = Spectrum.objects.filter(pfiona_sensor_id=sensor_id, pfiona_time__timestamp__lt=timestamp) \
-        .order_by('-pfiona_time__timestamp') \
-        .first()
+    last_spectrum = Spectrum.objects.filter(pfiona_sensor_id=sensor_id, pfiona_time__timestamp__lt=timestamp).order_by(
+        '-pfiona_time__timestamp').first()
 
     if not last_spectrum:
         return None, None, None
@@ -108,8 +111,7 @@ def get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
     deployment_id = last_spectrum.deployment
 
     # Retrieve the start and end timestamps of the deployment and cycle in a single query
-    times = Spectrum.objects.filter(deployment=deployment_id) \
-        .aggregate(
+    times = Spectrum.objects.filter(deployment=deployment_id).aggregate(
         deployment_start_time=Min('pfiona_time__timestamp'),
         deployment_end_time=Max('pfiona_time__timestamp'),
         cycle_start_time=Min('pfiona_time__timestamp', filter=Q(cycle=cycle)),
@@ -122,21 +124,20 @@ def get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
     cycle_start_time = times['cycle_start_time']
     cycle_end_time = times['cycle_end_time']
 
-    # Retrieve all spectrums associated with the same deployment and cycle, excluding those with 'wavelength_monitored' in their type
-    spectrums = Spectrum.objects.filter(deployment=deployment_id, cycle=cycle) \
-        .select_related('pfiona_spectrumtype') \
-        .prefetch_related('value_set') \
-        .order_by('id')
+    # Retrieve all spectrums associated with the same deployment and cycle, excluding 'wavelength_monitored'
+    spectrums = Spectrum.objects.filter(deployment=deployment_id, cycle=cycle).select_related(
+        'pfiona_spectrumtype').prefetch_related('value_set').order_by('id')
 
-    spectrums_data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    spectrums_data = defaultdict(lambda: defaultdict(list))
     wavelengths = []
-    current_subcycle = defaultdict(lambda: defaultdict(int))
 
     for spectrum in spectrums:
-        # Retrieve the values associated with this spectrum
+        if spectrum.pfiona_spectrumtype.type.endswith('wavelength_monitored'):
+            continue
+
         values = list(spectrum.value_set.values('wavelength', 'value').order_by('wavelength'))
         if not wavelengths:
-            wavelengths = [v['wavelength'] for v in values]  # Collect wavelengths once
+            wavelengths = [v['wavelength'] for v in values]
 
         spectrum_data = {
             'id': spectrum.id,
@@ -146,15 +147,24 @@ def get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
             'deployment': spectrum.deployment,
             'values': values,
         }
+
         spectrum_type = spectrum.pfiona_spectrumtype.type
-        reaction_type = spectrum_type.split('_')[0]
+        parts = spectrum_type.split('_')
 
-        key = 'Blank' if 'Blank' in spectrum_type else 'Sample' if 'Sample' in spectrum_type else 'Standard'
-        if key in spectrum_type and 'Dark' in spectrum_type and spectrums_data[reaction_type][key][
-            current_subcycle[reaction_type][key]]:
-            current_subcycle[reaction_type][key] += 1
+        if 'Blank' in spectrum_type:
+            key = 'Blank'
+        elif 'Sample' in spectrum_type:
+            key = 'Sample'
+        elif 'Standard' in spectrum_type:
+            if len(parts) >= 4 and parts[2] == 'Dillution':
+                dilution = parts[3]
+                key = f'Standard_Dillution_{dilution}'
+            else:
+                key = 'Standard'
+        else:
+            key = spectrum_type
 
-        spectrums_data[reaction_type][key][current_subcycle[reaction_type][key]].append(spectrum_data)
+        spectrums_data[parts[0]][key].append(spectrum_data)
 
     deployment_info = {
         'deployment_id': deployment_id,

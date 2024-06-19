@@ -22,6 +22,7 @@ urlpatterns = [
     path('get_absorbance_spectrums_in_cycle', views.api_get_absorbance_spectrums_in_cycle,
          name='api_get_absorbance_spectrums_in_cycle'),
     path('get_spectrums_in_cycle', views.api_get_spectrums_in_cycle, name='api_get_spectrums_in_cycle'),
+    path('get_spectrum_in_cycle_full_info', views.api_get_spectrum_in_cycle_full_info, name='api_get_spectrum_in_cycle_full_info'),
     path('test', views.test, name='test'),
     path('test2', views.test2, name='test2'),
     path('get_mean_absorbance_spectrums_in_cycle', views.api_get_mean_absorbance_spectrums_in_cycle, name='api_get_mean_absorbance_spectrums_in_cycle'),
