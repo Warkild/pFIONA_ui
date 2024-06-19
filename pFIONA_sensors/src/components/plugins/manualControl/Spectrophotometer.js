@@ -51,8 +51,6 @@ const updateChartData = (data) => {
 
 
     const turnOnLight = () => {
-        console.log('IP Address:', SENSOR_IP);
-
         const url = `http://${SENSOR_IP}:5000/lamp/turn_on`;
 
         fetch(url, {
@@ -78,8 +76,6 @@ const updateChartData = (data) => {
     };
 
     const turnOffLight = () => {
-        console.log('IP Address:', SENSOR_IP);
-
         const url = `http://${SENSOR_IP}:5000/lamp/turn_off`;
 
         fetch(url, {
@@ -104,8 +100,35 @@ const updateChartData = (data) => {
             });
     };
 
+    const calibrate = () => {
+        setInAction(true);
+
+        const url = `http://${SENSOR_IP}:5000/spectrophotometer/calibrate`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setInAction(false);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setInAction(false);
+            });
+    };
+
     const checkLightStatus = () => {
-        console.log(sessionStorage.getItem('accessToken'))
         fetch(`http://${SENSOR_IP}:5000/lamp/is_active`, {
             method: 'GET',
             headers: {
@@ -133,7 +156,7 @@ const updateChartData = (data) => {
 
         const intervalId = setInterval(() => {
             checkLightStatus();
-        }, 8000);
+        }, 2000);
 
         return () => clearInterval(intervalId);
     }, []);
@@ -165,37 +188,37 @@ const updateChartData = (data) => {
 
 
     const scanNow = () => {
-    const url = `http://${SENSOR_IP}:5000/spectrophotometer/get_measure`;
+        const url = `http://${SENSOR_IP}:5000/spectrophotometer/get_measure`;
 
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-            'Content-Type': 'application/json',
-        },
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
         })
-        .then(data => {
-            console.log('Success:', data);
-            const newWavelengths = data.message.wavelengths;
-            const newIntensities = data.message.intensities;
-            const currentScan = {
-                standard_concentration: [{
-                    type: 'Current Scan',
-                    values: newWavelengths.map((wavelength, index) => ({ wavelength, value: newIntensities[index] }))
-                }]
-            };
-            updateChartData(currentScan);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-};
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                const newWavelengths = data.message.wavelengths;
+                const newIntensities = data.message.intensities;
+                const currentScan = {
+                    standard_concentration: [{
+                        type: 'Current Scan',
+                        values: newWavelengths.map((wavelength, index) => ({ wavelength, value: newIntensities[index] }))
+                    }]
+                };
+                updateChartData(currentScan);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
 
 
     return (
@@ -228,14 +251,22 @@ const updateChartData = (data) => {
                         </button>
                     )}
                     <p className={"text-sm mb-2"}>Spectrophotometer</p>
-                    <button className={`rounded-lg font-poppins py-2 mb-5 ${isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
+                    <button
+                        className={`rounded-lg font-poppins py-2 mb-5 ${isDeployed ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
                         onClick={scanNow}
                         disabled={isDeployed}
-                    >Scan now</button>
+                    >Scan now
+                    </button>
+                    <button
+                        className={`rounded-lg font-poppins py-2 mb-5 ${isDeployed || inAction ? 'bg-gray-200 text-gray-700 cursor-not-allowed' : 'bg-blue-600 text-white'}`}
+                        onClick={calibrate}
+                        disabled={isDeployed || inAction}
+                    >Calibrate
+                    </button>
                 </div>
                 <div className={"flex flex-col w-full ml-4 h-full"}>
-                    <div style={{ height: '400px' }}>
-                        <Line data={chartData} options={{ maintainAspectRatio: false }} />
+                    <div style={{height: '400px'}}>
+                        <Line data={chartData} options={{maintainAspectRatio: false}}/>
                     </div>
                 </div>
             </div>
