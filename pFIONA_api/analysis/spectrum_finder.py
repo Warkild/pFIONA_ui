@@ -106,7 +106,7 @@ from django.db.models import F, Q, Min, Max, OuterRef, Subquery
 from collections import defaultdict
 
 
-def get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
+def get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle, wavelength_monitored=False):
     # Retrieve the last spectrum before the given timestamp for the specified sensor
     last_spectrum = Spectrum.objects.filter(
         pfiona_sensor_id=sensor_id,
@@ -140,15 +140,24 @@ def get_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
     cycle_end_time = times['cycle_end_time']
 
     # Retrieve all spectrums associated with the same deployment and cycle, excluding 'wavelength_monitored'
-    spectrums = Spectrum.objects.filter(
-        deployment=deployment_id,
-        cycle=cycle,
-        pfiona_sensor_id=sensor_id
-    ).exclude(
-        pfiona_spectrumtype__type__endswith='wavelength_monitored'
-    ).select_related(
-        'pfiona_spectrumtype'
-    ).prefetch_related('value_set').order_by('id')
+    if wavelength_monitored:
+        spectrums = Spectrum.objects.filter(
+            deployment=deployment_id,
+            cycle=cycle,
+            pfiona_sensor_id=sensor_id
+        ).select_related(
+            'pfiona_spectrumtype'
+        ).prefetch_related('value_set').order_by('id')
+    else :
+        spectrums = Spectrum.objects.filter(
+            deployment=deployment_id,
+            cycle=cycle,
+            pfiona_sensor_id=sensor_id
+        ).exclude(
+            pfiona_spectrumtype__type__endswith='wavelength_monitored'
+        ).select_related(
+            'pfiona_spectrumtype'
+        ).prefetch_related('value_set').order_by('id')
 
     spectrums_data = defaultdict(lambda: defaultdict(list))
     wavelengths = []
@@ -428,7 +437,7 @@ def get_deployment_list(sensor_id):
     return list(deployment_list)
 
 
-def get_spectrums_in_deployment_full_info(timestamp, sensor_id):
+def get_spectrums_in_deployment_full_info(timestamp, sensor_id, wavelength_monitored=False):
     # Récupérer le nombre de cycles
     cycle_count = get_cycle_count(timestamp, sensor_id)
 
@@ -441,7 +450,7 @@ def get_spectrums_in_deployment_full_info(timestamp, sensor_id):
 
     for cycle in range(1, cycle_count + 1):
         spectrums_data, wavelengths, cycle_deployment_info = get_spectrums_in_cycle_full_info(timestamp, sensor_id,
-                                                                                              cycle)
+                                                                                              cycle, wavelength_monitored=wavelength_monitored)
 
         if spectrums_data:
             all_spectrums_data[cycle] = spectrums_data

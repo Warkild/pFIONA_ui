@@ -4,8 +4,11 @@ import { TailSpin } from 'react-loader-spinner';
 function ExportSpec() {
     const [deploymentData, setDeploymentData] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [exportingRaw, setExportingRaw] = useState(null);
-    const [exportingAbsorbance, setExportingAbsorbance] = useState(null);
+    const [exporting, setExporting] = useState(false);
+    const [exportingRawCsv, setExportingRawCsv] = useState(null);
+    const [exportingRawJson, setExportingRawJson] = useState(null);
+    const [exportingAbsorbanceCsv, setExportingAbsorbanceCsv] = useState(null);
+    const [exportingAbsorbanceJson, setExportingAbsorbanceJson] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     useEffect(() => {
@@ -22,7 +25,8 @@ function ExportSpec() {
     }, []);
 
     const handleExportRawData = (deploymentId, startTime, endTime) => {
-        setExportingRaw(deploymentId);
+        setExporting(true);
+        setExportingRawJson(deploymentId);
         const avgTimestamp = Math.floor((startTime + endTime) / 2);
         const url = `http://127.0.0.1:8000/api/get_spectrums_in_deployment_full_info?sensor_id=2&timestamp=${avgTimestamp}`;
 
@@ -38,16 +42,45 @@ function ExportSpec() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                setExportingRaw(null);
+                setExportingRawJson(null);
+                setExporting(false);
             })
             .catch(error => {
                 console.error("Error exporting data:", error);
-                setExportingRaw(null);
+                setExportingRawJson(null);
+                setExporting(false);
+            });
+    };
+
+    const handleExportRawCsvData = (deploymentId, startTime, endTime) => {
+        setExporting(true);
+        setExportingRawCsv(deploymentId);
+        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        const url = `http://127.0.0.1:8000/api/export_raw_spectra_csv?timestamp=${avgTimestamp}&sensor_id=2`;
+
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `spectrum_data_${avgTimestamp}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setExportingRawCsv(null);
+                setExporting(false);
+            })
+            .catch(error => {
+                console.error("Error exporting data:", error);
+                setExportingRawCsv(null);
+                setExporting(false);
             });
     };
 
     const handleExportAbsorbanceData = (deploymentId, startTime, endTime) => {
-        setExportingAbsorbance(deploymentId);
+        setExporting(true);
+        setExportingAbsorbanceJson(deploymentId);
         const avgTimestamp = Math.floor((startTime + endTime) / 2);
         const url = `http://127.0.0.1:8000/api/get_absorbance_spectrums_in_deployment_full_info?sensor_id=2&timestamp=${avgTimestamp}`;
 
@@ -63,11 +96,39 @@ function ExportSpec() {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                setExportingAbsorbance(null);
+                setExportingAbsorbanceJson(null);
+                setExporting(false);
             })
             .catch(error => {
                 console.error("Error exporting data:", error);
-                setExportingAbsorbance(null);
+                setExportingAbsorbanceJson(null);
+                setExporting(false);
+            });
+    };
+
+    const handleExportAbsorbanceCsvData = (deploymentId, startTime, endTime) => {
+        setExporting(true);
+        setExportingAbsorbanceCsv(deploymentId);
+        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        const url = `http://127.0.0.1:8000/api/export_absorbance_spectra_csv?timestamp=${avgTimestamp}&sensor_id=2`;
+
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `absorbance_data_${avgTimestamp}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setExportingAbsorbanceCsv(null);
+                setExporting(false);
+            })
+            .catch(error => {
+                console.error("Error exporting data:", error);
+                setExportingAbsorbanceCsv(null);
+                setExporting(false);
             });
     };
 
@@ -147,29 +208,33 @@ function ExportSpec() {
                             </td>
                             <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">
                                 <div className="flex space-x-6">
-                                    <button className={`text-blue-600 ${exportingRaw !== null || exportingAbsorbance !== null ? 'button-disabled text-gray-600' : ''}`} disabled={exportingRaw !== null || exportingAbsorbance !== null}>.csv</button>
-                                    <button className={`text-blue-600 ${exportingRaw !== null || exportingAbsorbance !== null ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportRawData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exportingRaw !== null || exportingAbsorbance !== null}>
-                                        {exportingRaw === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.json'}
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportRawCsvData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exporting}>
+                                        {exportingRawCsv === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.csv'}
+                                    </button>
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportRawData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exporting}>
+                                        {exportingRawJson === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.json'}
                                     </button>
                                 </div>
                             </td>
                             <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">
                                 <div className="flex space-x-6">
-                                    <button className={`text-blue-600 ${exportingRaw !== null || exportingAbsorbance !== null ? 'button-disabled text-gray-600' : ''}`} disabled={exportingRaw !== null || exportingAbsorbance !== null}>.csv</button>
-                                    <button className={`text-blue-600 ${exportingRaw !== null || exportingAbsorbance !== null ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportAbsorbanceData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exportingRaw !== null || exportingAbsorbance !== null}>
-                                        {exportingAbsorbance === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.json'}
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportAbsorbanceCsvData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exporting}>
+                                        {exportingAbsorbanceCsv === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.csv'}
+                                    </button>
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportAbsorbanceData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exporting}>
+                                        {exportingAbsorbanceJson === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.json'}
                                     </button>
                                 </div>
                             </td>
                             <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">
                                 <div className="flex space-x-6">
-                                    <button className={`text-blue-600 ${exportingRaw !== null || exportingAbsorbance !== null ? 'button-disabled text-gray-600' : ''}`} disabled={exportingRaw !== null || exportingAbsorbance !== null}>.csv</button>
-                                    <button className={`text-blue-600 ${exportingRaw !== null || exportingAbsorbance !== null ? 'button-disabled text-gray-600' : ''}`} disabled={exportingRaw !== null || exportingAbsorbance !== null}>.json</button>
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} disabled={exporting}>.csv</button>
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} disabled={exporting}>.json</button>
                                 </div>
                             </td>
                             <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">
                                 <div className="flex space-x-2">
-                                    <button className={`text-red-700 ${exportingRaw !== null || exportingAbsorbance !== null ? 'button-disabled text-gray-600': ''}`} disabled={exportingRaw !== null || exportingAbsorbance !== null} onClick={() => confirmDelete === deployment.deployment ? confirmDeleteAction(2, deployment.deployment) : handleDelete(2, deployment.deployment)}>
+                                    <button className={`text-red-700 ${exporting ? 'button-disabled text-gray-600': ''}`} disabled={exporting} onClick={() => confirmDelete === deployment.deployment ? confirmDeleteAction(2, deployment.deployment) : handleDelete(2, deployment.deployment)}>
                                         {confirmDelete === deployment.deployment ? 'Sure?' : 'Delete'}
                                     </button>
                                 </div>
