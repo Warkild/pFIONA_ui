@@ -3,18 +3,23 @@ import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
 
+
 const AbsorbanceChart = () => {
     const [cycleCount, setCycleCount] = useState(0);
     const [selectedCycle, setSelectedCycle] = useState('');
     const [selectedReaction, setSelectedReaction] = useState('');
     const [loading, setLoading] = useState(false);
-    const [timestamp, setTimestamp] = useState('');
+    const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm'));
     const [data, setData] = useState(null);
     const [wavelengths, setWavelengths] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [deploymentInfo, setDeploymentInfo] = useState(null);
     const [availableReactions, setAvailableReactions] = useState([]);
     const [allReactionsData, setAllReactionsData] = useState({});
+
+    useEffect(() => {
+        fetchCycleCount();
+    }, []);
 
     useEffect(() => {
         if (selectedCycle) {
@@ -37,8 +42,7 @@ const AbsorbanceChart = () => {
             const result = await response.json();
             if (result.cycle_count > 0) {
                 setCycleCount(result.cycle_count);
-                setSelectedCycle('1');
-                await fetchAbsorbanceData('1');
+                setSelectedCycle(result.cycle_count.toString());
             } else {
                 setCycleCount(0);
                 setSelectedCycle('');
