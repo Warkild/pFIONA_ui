@@ -80,7 +80,7 @@ function ReagentsList({ ip, reagents }) {
                         </thead>
                         {validReagents.length > 0 ? (
                             <tbody>
-                                {validReagents.map((reagent) => (
+                                {validReagents.sort((a, b) => a.name.localeCompare(b.name)).map((reagent) => (
                                     <tr key={reagent.id} className="border border-custom-gray-1">
                                         <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">{reagent.name}</td>
                                         <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">{reagent.volume.toFixed(2)}</td>
