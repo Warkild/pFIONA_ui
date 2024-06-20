@@ -58,7 +58,7 @@ def get_spectrums_in_cycle(timestamp, sensor_id, cycle):
 
     # Retrieve all spectrums associated with the same deployment and cycle, excluding those with 'wavelength_monitored' in their type
     spectrums = Spectrum.objects.filter(deployment=deployment_id, cycle=cycle) \
-        .exclude(pfiona_spectrumtype__type__icontains='wavelength_monitored', cycle=0) \
+        .exclude(pfiona_spectrumtype__type__icontains='wavelength_monitored') \
         .select_related('pfiona_spectrumtype') \
         .prefetch_related('value_set') \
         .order_by('id')

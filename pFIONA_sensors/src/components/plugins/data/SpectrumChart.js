@@ -60,7 +60,7 @@ const SpectrumChart = () => {
         }
     };
 
-const fetchSpectrumData = async (cycle) => {
+    const fetchSpectrumData = async (cycle) => {
         setLoading(true);
         try {
             const epochTimestamp = moment(timestamp).unix();
@@ -116,7 +116,6 @@ const fetchSpectrumData = async (cycle) => {
 
     const handleCycleChange = (cycle) => {
         setSelectedCycle(cycle);
-        fetchSpectrumData(cycle);
     };
 
     const handleReactionChange = (reaction) => {
