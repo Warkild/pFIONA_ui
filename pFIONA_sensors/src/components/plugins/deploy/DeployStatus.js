@@ -212,9 +212,9 @@ function DeployStatus({ connected }) {
                         </div>
                         <div className="flex flex-row items-center">
                             <div
-                                className={`w-5 h-5 rounded-full ${isLoadingSleeping ? 'bg-amber-500' : isErrorSleeping ? 'bg-red-600' : isSleeping ? 'bg-gray-500' : 'bg-green-600'}`}></div>
+                                className={`w-5 h-5 rounded-full ${isLoadingSleeping ? 'bg-amber-500' : isErrorSleeping ? 'bg-red-600' : isSleeping ? 'bg-purple-600' : connected ? "bg-green-600" : "bg-red-600"}`}></div>
                             <p className="ml-3">
-                                {isLoadingSleeping ? 'Loading' : isErrorSleeping ? errorMessageSleeping : isSleeping ? 'Sleeping' : 'Active'}
+                                {isLoadingSleeping ? 'Loading' : isErrorSleeping ? errorMessageSleeping : isSleeping ? 'Sleeping' : connected ? 'Active' : 'Not Connected'}
                             </p>
                         </div>
                     </div>
