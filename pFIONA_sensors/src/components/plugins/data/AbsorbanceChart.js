@@ -295,6 +295,11 @@ const AbsorbanceChart = () => {
                                                 }
                                             }
                                         }
+                                    },
+                                    elements: {
+                                        point: {
+                                            radius: 0
+                                        }
                                     }
                                 }}
                             />

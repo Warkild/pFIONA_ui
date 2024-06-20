@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
+import React, {useEffect, useState} from 'react';
+import {Line} from 'react-chartjs-2';
 import moment from 'moment';
 
 const SpectrumChart = () => {
@@ -136,9 +135,9 @@ const SpectrumChart = () => {
         'Blank_Reference': 'rgb(255, 0, 0)',        // Rouge
         'Blank_Dark': 'rgb(0, 0, 0)',           // Orange
         'Blank': 'rgb(255, 150, 0)',                // Jaune
-        'Sample_Reference': 'rgb(100, 211, 100)',   // Gris clair
+        'Sample_Reference': 'rgb(6,159,6)',   // Gris clair
         'Sample_Dark': 'rgb(0, 0, 0)',              // Noir
-        'Sample': 'rgb(50, 211, 0)',             // Gris foncé
+        'Sample': 'rgb(70,218,29)',             // Gris foncé
         'Standard_Reference': 'rgb(0, 0, 255)',     // Bleu
         'Standard_Dark': 'rgb(0, 0, 0)',          // Bleu foncé
         'Standard': 'rgb(0, 191, 255)',             // Bleu ciel
@@ -174,10 +173,10 @@ const SpectrumChart = () => {
 
     const generateChartData = (cycleData) => {
         if (!wavelengths || wavelengths.length === 0) {
-            return { labels: [], datasets: [] };
+            return {labels: [], datasets: []};
         }
 
-        const chartData = { labels: wavelengths.map(w => w.toFixed(2)), datasets: [] };
+        const chartData = {labels: wavelengths.map(w => w.toFixed(2)), datasets: []};
 
         for (const [type, subcycles] of Object.entries(cycleData || {})) {
             for (const [subcycle, spectrumList] of Object.entries(subcycles || {})) {
@@ -269,11 +268,20 @@ const SpectrumChart = () => {
                                 <div className="mb-4">
                                     <h3 className="font-bold text-lg mb-3">Deployment Information</h3>
                                     <div className="bg-gray-100 p-4 rounded-md shadow-sm">
-                                        <p className="text-sm"><strong>Deployment ID:</strong> {deploymentInfo.deployment_id}</p>
-                                        <p className="text-sm"><strong>Deployment Start Time:</strong> {moment.unix(deploymentInfo.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')}</p>
-                                        <p className="text-sm"><strong>Deployment End Time:</strong> {moment.unix(deploymentInfo.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}</p>
-                                        <p className="text-sm"><strong>Cycle Start Time:</strong> {moment.unix(deploymentInfo.cycle_start_time).format('YYYY-MM-DD HH:mm:ss')}</p>
-                                        <p className="text-sm"><strong>Cycle End Time:</strong> {moment.unix(deploymentInfo.cycle_end_time).format('YYYY-MM-DD HH:mm:ss')}</p>
+                                        <p className="text-sm"><strong>Deployment
+                                            ID:</strong> {deploymentInfo.deployment_id}</p>
+                                        <p className="text-sm"><strong>Deployment Start
+                                            Time:</strong> {moment.unix(deploymentInfo.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')}
+                                        </p>
+                                        <p className="text-sm"><strong>Deployment End
+                                            Time:</strong> {moment.unix(deploymentInfo.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}
+                                        </p>
+                                        <p className="text-sm"><strong>Cycle Start
+                                            Time:</strong> {moment.unix(deploymentInfo.cycle_start_time).format('YYYY-MM-DD HH:mm:ss')}
+                                        </p>
+                                        <p className="text-sm"><strong>Cycle End
+                                            Time:</strong> {moment.unix(deploymentInfo.cycle_end_time).format('YYYY-MM-DD HH:mm:ss')}
+                                        </p>
                                     </div>
                                 </div>
                             ) : (
@@ -307,7 +315,7 @@ const SpectrumChart = () => {
                 </div>
                 <div>
                     {selectedCycle && chartData && (
-                        <div className="mt-5" style={{ height: '500px' }}>
+                        <div className="mt-5" style={{height: '500px'}}>
                             <h2 className="text-lg font-bold mb-2">Cycle {selectedCycle}</h2>
                             <Line
                                 data={chartData}
@@ -347,6 +355,11 @@ const SpectrumChart = () => {
                                                     return label;
                                                 }
                                             }
+                                        }
+                                    },
+                                    elements: {
+                                        point: {
+                                            radius: 0
                                         }
                                     }
                                 }}
