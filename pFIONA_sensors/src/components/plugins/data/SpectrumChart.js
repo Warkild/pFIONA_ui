@@ -141,6 +141,9 @@ const SpectrumChart = () => {
         'Standard_Reference': 'rgb(0, 0, 255)',     // Bleu
         'Standard_Dark': 'rgb(0, 0, 0)',          // Bleu foncé
         'Standard': 'rgb(0, 191, 255)',             // Bleu ciel
+        'CRM_Reference': 'rgb(136,22,165)',     // Bleu
+        'CRM_Dark': 'rgb(0, 0, 0)',          // Bleu foncé
+        'CRM': 'rgb(186,86,211)',             // Bleu ciel
         'Standard_Dillution_0_Dark': 'rgb(0, 0, 0)',// Rouge
         'Standard_Dillution_1_Dark': 'rgb(0, 0, 0)',
         'Standard_Dillution_2_Dark': 'rgb(0, 0, 0)',
