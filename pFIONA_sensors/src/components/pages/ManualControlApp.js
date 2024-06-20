@@ -5,6 +5,7 @@ import Pumps from "../plugins/manualControl/Pumps";
 import Spectrophotometer from "../plugins/manualControl/Spectrophotometer";
 import AuxPump from "../plugins/manualControl/AuxPump";
 import PreEstablishedScan from "../plugins/manualControl/PreEstablishedScan";
+import Serial from "../plugins/manualControl/Serial";
 
 function ManualControlApp() {
     // State for deployment status
@@ -134,13 +135,18 @@ function ManualControlApp() {
                                          allowAnything={allowAnything}/>
                             </div>
                             <div className="flex flex-row justify-between pb-12">
-                                <PreEstablishedScan allowAnything={allowAnything} setInAction={setInAction} inAction={inAction} handleSpecFinish={handleSpecFinish}/>
+                                <PreEstablishedScan allowAnything={allowAnything} setInAction={setInAction}
+                                                    inAction={inAction} handleSpecFinish={handleSpecFinish}/>
+                            </div>
+                            <div className="flex flex-row justify-between pb-12">
+                                <Serial allowAnything={allowAnything} setInAction={setInAction}
+                                                    inAction={inAction}/>
                             </div>
                         </>
                     ) : (
                         <div className="font-montserrat rounded-lg border border-red-700 bg-red-100 text-red-700 mb-5">
                             <div className="flex flex-row h-min py-2 px-3">
-                                <img src="/static/img/ico/icons8-warning-red-512.svg" alt="Warning"
+                            <img src="/static/img/ico/icons8-warning-red-512.svg" alt="Warning"
                                      className="w-6 h-6 mr-2"/>
                                 <p>Sensor is disconnected. You can't use the manual mode.</p>
                             </div>
