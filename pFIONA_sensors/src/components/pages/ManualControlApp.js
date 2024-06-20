@@ -67,7 +67,8 @@ function ManualControlApp() {
 
     // Function to check connection status
     const checkStatus = () => {
-        fetch(`http://${SENSOR_IP}:5000/sensor/get_state`, {
+        if(sessionStorage.getItem('accessToken') != null) {
+            fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
@@ -88,6 +89,7 @@ function ManualControlApp() {
                 console.error('Error:', error);
                 setConnected(true);
             });
+        }
     };
 
     useEffect(() => {

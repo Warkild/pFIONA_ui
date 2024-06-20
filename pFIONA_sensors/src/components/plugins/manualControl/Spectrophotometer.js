@@ -51,7 +51,7 @@ const updateChartData = (data) => {
 
 
     const turnOnLight = () => {
-        const url = `http://${SENSOR_IP}:5000/lamp/turn_on`;
+        const url = `http://${sensor_ip}:5000/lamp/turn_on`;
 
         fetch(url, {
             method: 'POST',
@@ -76,7 +76,7 @@ const updateChartData = (data) => {
     };
 
     const turnOffLight = () => {
-        const url = `http://${SENSOR_IP}:5000/lamp/turn_off`;
+        const url = `http://${sensor_ip}:5000/lamp/turn_off`;
 
         fetch(url, {
             method: 'POST',
@@ -103,7 +103,7 @@ const updateChartData = (data) => {
     const calibrate = () => {
         setInAction(true);
 
-        const url = `http://${SENSOR_IP}:5000/spectrophotometer/calibrate`;
+        const url = `http://${sensor_ip}:5000/spectrophotometer/calibrate`;
 
         fetch(url, {
             method: 'POST',
@@ -129,7 +129,7 @@ const updateChartData = (data) => {
     };
 
     const checkLightStatus = () => {
-        fetch(`http://${SENSOR_IP}:5000/lamp/is_active`, {
+        fetch(`http://${sensor_ip}:5000/lamp/is_active`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -188,7 +188,7 @@ const updateChartData = (data) => {
 
 
     const scanNow = () => {
-        const url = `http://${SENSOR_IP}:5000/spectrophotometer/get_measure`;
+        const url = `http://${sensor_ip}:5000/spectrophotometer/get_measure`;
 
         fetch(url, {
             method: 'GET',

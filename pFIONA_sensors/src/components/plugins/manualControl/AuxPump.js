@@ -5,7 +5,7 @@ function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
     const [auxPumpRunning, setAuxPumpRunning] = useState(false);
 
     const turnOnAuxPump = () => {
-        const url = `http://${SENSOR_IP}:5000/auxpump/turn_on`;
+        const url = `http://${sensor_ip}:5000/auxpump/turn_on`;
 
         fetch(url, {
             method: 'POST',
@@ -33,7 +33,7 @@ function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
     };
 
     const turnOffAuxPump = () => {
-        const url = `http://${SENSOR_IP}:5000/auxpump/turn_off`;
+        const url = `http://${sensor_ip}:5000/auxpump/turn_off`;
 
         fetch(url, {
             method: 'POST',
@@ -61,7 +61,7 @@ function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
     };
 
     const getStatus = () => {
-    fetch(`http://${SENSOR_IP}:5000/auxpump/is_active`, {
+    fetch(`http://${sensor_ip}:5000/auxpump/is_active`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,

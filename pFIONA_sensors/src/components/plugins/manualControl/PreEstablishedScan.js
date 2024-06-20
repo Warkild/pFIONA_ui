@@ -19,7 +19,7 @@ function PreEstablishedScan({ inAction, setInAction, handleSpecFinish }) {
     };
 
     const launchScan = (scanType) => {
-        const url = `http://${SENSOR_IP}:5000/sensor/save_${scanType}_spectrum`;
+        const url = `http://${sensor_ip}:5000/sensor/save_${scanType}_spectrum`;
         setInAction(true);
         fetch(url, {
             method: 'POST',

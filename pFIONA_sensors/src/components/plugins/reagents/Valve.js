@@ -127,29 +127,31 @@ function Valve({ ip, reagents }) {
     /** AUTOMATION **/
 
     const checkStatus = () => {
-        fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
-            setConnected(true)
-            setError(null)
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            setConnected(false)
-            setError(-1)
-        });
+        if(sessionStorage.getItem('accessToken') != null) {
+            fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    setConnected(true)
+                    setError(null)
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setConnected(false)
+                    setError(-1)
+                });
+        }
     };
 
     useEffect(() => {

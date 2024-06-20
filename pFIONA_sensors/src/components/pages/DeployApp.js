@@ -10,27 +10,29 @@ function DeployApp({  }) {
     const [connected, setConnected] = useState(false);
 
     const checkStatus = () => {
-        fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+        if(sessionStorage.getItem('accessToken') != null) {
+            fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
             })
-            .then(data => {
-                console.log('Success:', data);
-                setConnected(true);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                setConnected(false);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    setConnected(true);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setConnected(false);
+                });
+        }
     };
 
     useEffect(() => {

@@ -22,7 +22,7 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed, allow
   };
 
   const getCurrentPort = () => {
-    fetch(`http://${SENSOR_IP}:5000/valve/get_valve`, {
+    fetch(`http://${sensor_ip}:5000/valve/get_valve`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
@@ -54,7 +54,7 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed, allow
     if (port <= 0) {
       setIsModalOpen(true);
     } else {
-      const url = `http://${SENSOR_IP}:5000/valve/change_valve`;
+      const url = `http://${sensor_ip}:5000/valve/change_valve`;
 
       fetch(url, {
         method: 'POST',
@@ -84,7 +84,7 @@ const ValvePort = ({ numberOfPorts = 8, inAction, setInAction, isDeployed, allow
   };
 
   const handleMoveAirPortClick = () => {
-    const url = `http://${SENSOR_IP}:5000/valve/go_air_port`;
+    const url = `http://${sensor_ip}:5000/valve/go_air_port`;
 
     fetch(url, {
       method: 'POST',

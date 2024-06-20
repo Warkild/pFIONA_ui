@@ -59,7 +59,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                 volumeRequest = -volumePump1
             }
 
-            const url = `http://${SENSOR_IP}:5000/steppump/1/run_pump`;
+            const url = `http://${sensor_ip}:5000/steppump/1/run_pump`;
 
             setInAction(true);
             setRunningPump1(true);
@@ -116,7 +116,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                 volumeRequest = -volumePump2
             }
 
-            const url = `http://${SENSOR_IP}:5000/steppump/2/run_pump`;
+            const url = `http://${sensor_ip}:5000/steppump/2/run_pump`;
 
             setInAction(true);
             setRunningPump2(true);
@@ -182,7 +182,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                 volumeRequest2 = -volumePump2
             }
 
-            const url = `http://${SENSOR_IP}:5000/steppump/1/run_both_pumps`;
+            const url = `http://${sensor_ip}:5000/steppump/1/run_both_pumps`;
 
             setInAction(true);
             setRunningBoth(true);

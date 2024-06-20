@@ -44,6 +44,7 @@ const SpectrumChart = () => {
             if (result.cycle_count > 0) {
                 setCycleCount(result.cycle_count);
                 setSelectedCycle(result.cycle_count.toString());
+                fetchSpectrumData(result.cycle_count.toString());
             } else {
                 setCycleCount(0);
                 setSelectedCycle('');
@@ -90,6 +91,8 @@ const SpectrumChart = () => {
 
             if (firstReactionData && firstReactionData.Sample && firstReactionData.Sample['0'] && firstReactionData.Sample['0'][0] && firstReactionData.Sample['0'][0].values) {
                 setWavelengths(firstReactionData.Sample['0'][0].values.map(v => v.wavelength));
+            } else if (firstReactionData && firstReactionData.Standard && firstReactionData.Standard['0'] && firstReactionData.Standard['0'][0] && firstReactionData.Standard['0'][0].values) {
+                setWavelengths(firstReactionData.Standard['0'][0].values.map(v => v.wavelength));
             } else {
                 throw new Error('Invalid data structure');
             }
@@ -148,14 +151,17 @@ const SpectrumChart = () => {
         'Standard_Dillution_1_Dark': 'rgb(0, 0, 0)',
         'Standard_Dillution_2_Dark': 'rgb(0, 0, 0)',
         'Standard_Dillution_3_Dark': 'rgb(0, 0, 0)',
-        'Standard_Dillution_0_Reference': 'rgb(255, 0, 0)',
-        'Standard_Dillution_0': 'rgb(255, 0, 0)',
-        'Standard_Dillution_1_Reference': 'rgb(255, 100, 0)',
-        'Standard_Dillution_1': 'rgb(255, 100, 0)',
-        'Standard_Dillution_2_Reference': 'rgb(255, 175, 0)',
-        'Standard_Dillution_2': 'rgb(255, 175, 0)',
-        'Standard_Dillution_3_Reference': 'rgb(255, 255, 0)',
-        'Standard_Dillution_3': 'rgb(255, 255, 0)',
+        'Standard_Dillution_4_Dark': 'rgb(0, 0, 0)',
+        'Standard_Dillution_0_Reference': 'rgb(191,9,9)',
+        'Standard_Dillution_0': 'rgb(191,9,9)',
+        'Standard_Dillution_1_Reference': 'rgb(255, 0, 0)',
+        'Standard_Dillution_1': 'rgb(255, 0, 0)',
+        'Standard_Dillution_2_Reference': 'rgb(255, 100, 0)',
+        'Standard_Dillution_2': 'rgb(255, 100, 0)',
+        'Standard_Dillution_3_Reference': 'rgb(255, 175, 0)',
+        'Standard_Dillution_3': 'rgb(255, 175, 0)',
+        'Standard_Dillution_4_Reference': 'rgb(255, 255, 0)',
+        'Standard_Dillution_4': 'rgb(255, 255, 0)',
 
 
     };
