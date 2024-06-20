@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function DeployStatus({  }) {
+function DeployStatus({ connected }) {
 
     /** DEPLOYED STATUS **/
     const [isLoadingDeployed, setIsLoadingDeployed] = useState(true);
@@ -222,8 +222,9 @@ function DeployStatus({  }) {
                         {!isDeployed ? (
                             <>
                                 <button
-                                    className={"bg-lime-500 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-lime-300"}
+                                    className={`rounded-lg font-poppins py-2 px-7 text-sm ${connected ? "bg-lime-500 hover:bg-lime-300 text-white" : "text-gray-600 bg-gray-300"}`}
                                     onClick={startDeploy}
+                                    disabled={!connected}
                                 >
                                     START DEPLOY
                                 </button>

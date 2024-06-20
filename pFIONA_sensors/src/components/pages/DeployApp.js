@@ -45,7 +45,7 @@ function DeployApp({  }) {
 
   return (
       <div className={"flex flex-col space-y-10"}>
-          <DeployStatus/>
+          <DeployStatus connected={connected}/>
           <div className={"flex flex-row justify-between"}>
               <DeployBasicSettings/>
               <DeployStatesInformation/>
