@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
-function DeployTransport({}) {
+function DeployTransport({connected}) {
     const [reagents, setReagents] = useState([]);
     const [selectedReagents, setSelectedReagents] = useState([]);
     const [primePortsClicked, setPrimePortsClicked] = useState(false);
@@ -96,13 +96,14 @@ function DeployTransport({}) {
                     />
                     <button
                         onClick={handlePrimePorts}
-                        className="bg-blue-600 mt-5 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected ? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        disabled={!connected}
                     >
                         {primePortsClicked ? 'Click again to confirm' : 'Prime Ports'}
                     </button>
                     <button
                         onClick={handleFlushAllPorts}
-                        className="bg-blue-600 mt-5 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-blue-400"
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected ? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
                     >
                         {flushPortsClicked ? 'Click again to confirm' : 'Flush All Ports'}
                     </button>
