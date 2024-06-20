@@ -140,7 +140,7 @@ function ManualControlApp() {
                             </div>
                             <div className="flex flex-row justify-between pb-12">
                                 <Serial allowAnything={allowAnything} setInAction={setInAction}
-                                                    inAction={inAction}/>
+                                                    inAction={inAction} isDeployed={isDeployed}/>
                             </div>
                         </>
                     ) : (
