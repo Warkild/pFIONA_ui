@@ -84,7 +84,24 @@ def get_spectrums_in_cycle(timestamp, sensor_id, cycle):
         spectrum_type = spectrum.pfiona_spectrumtype.type
         reaction_type = spectrum_type.split('_')[0]
 
-        key = 'Blank' if 'Blank' in spectrum_type else 'Sample' if 'Sample' in spectrum_type else 'CRM' if 'CRM' in spectrum_type else'Standard'
+        parts = spectrum_type.split('_')
+
+        if 'Blank' in spectrum_type:
+            key = 'Blank'
+        elif 'Sample' in spectrum_type:
+            key = 'Sample'
+        elif 'CRM' in spectrum_type:
+            key = 'CRM'
+        elif 'Standard' in spectrum_type:
+            if len(parts) >= 4 and parts[2] == 'Dillution':
+                dilution = parts[3]
+                key = f'Standard_Dillution_{dilution}'
+            else:
+                key = 'Standard'
+        else:
+            key = spectrum_type
+
+
         if key in spectrum_type and 'Dark' in spectrum_type and spectrums_data[reaction_type][key][
             current_subcycle[reaction_type][key]]:
             current_subcycle[reaction_type][key] += 1

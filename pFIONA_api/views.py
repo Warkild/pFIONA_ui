@@ -601,6 +601,32 @@ def api_get_spectrum_in_deployment_full_info(request):
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
+def api_get_monitored_wavelength_values_in_deployment(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        data, deployment_info = get_monitored_wavelength_values_in_deployment(timestamp, sensor_id)
+        return JsonResponse(
+            {"data": data, "deployment_info": deployment_info})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
 def api_get_absobance_spectrums_in_deployment_full_info(request):
     try:
         sensor_id = request.GET.get('sensor_id')
