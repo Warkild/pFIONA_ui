@@ -1,6 +1,7 @@
 from math import floor
 
-from django.db.models import Q, F, Max
+from django.db.models import Q, F, Max, When, Case, OuterRef, Value, IntegerField, Subquery
+from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
 
 import pFIONA_sensors.models as models
@@ -87,12 +88,18 @@ def create_reaction(name, standard_id, standard_concentration, volume_of_mixture
 
     sensor_id = floor(standard_id / 10000000)
 
-    max_id = \
-    models.Step.objects.filter(id__gte=sensor_id * 10000000, id__lte=(sensor_id + 1) * 10000000).aggregate(Max('id'))[
-        'id__max']
+    min_id = sensor_id * 10000000
+    max_id = ((sensor_id + 1) * 10000000)-1
 
-    if max_id is None:
-        max_id = sensor_id * 10000000
+    creating_id = None
+
+    existing_ids = set(models.Reaction.objects.filter(id__gte=min_id, id__lte=max_id).values_list('id', flat=True))
+
+    for possible_id in range(min_id, max_id + 1):
+        if possible_id not in existing_ids:
+            creating_id = possible_id
+            break
+
 
     reaction = models.Reaction.objects.create(name=name,
                                               standard_concentration=standard_concentration,
@@ -105,7 +112,7 @@ def create_reaction(name, standard_id, standard_concentration, volume_of_mixture
                                               multi_standard=multi_standard,
                                               multi_standard_time=multi_standard_time,
                                               reaction_time=reaction_time,
-                                              id=max_id + 1
+                                              id=creating_id
                                               )
 
     reaction.save()
@@ -127,16 +134,22 @@ def create_step(reagent_id, reaction_id, number, order):
 
     sensor_id = floor(reaction_id / 10000000)
 
-    max_id = models.Step.objects.filter(id__gte=sensor_id * 10000000, id__lte=(sensor_id + 1) * 10000000).aggregate(Max('id'))[
-        'id__max']
+    min_id = sensor_id * 10000000
+    max_id = ((sensor_id + 1) * 10000000)-1
 
-    if max_id is None:
-        max_id = sensor_id*10000000
+    creating_id = None
+
+    existing_ids = set(models.Step.objects.filter(id__gte=min_id, id__lte=max_id).values_list('id', flat=True))
+
+    for possible_id in range(min_id, max_id + 1):
+        if possible_id not in existing_ids:
+            creating_id = possible_id
+            break
 
     step = models.Step.objects.create(pfiona_reagent_id=reagent_id, pfiona_reaction_id=reaction_id,
                                       number=number,
                                       order=order,
-                                      id=max_id+1
+                                      id=creating_id
                                       )
     step.save()
 
@@ -147,15 +160,20 @@ def create_monitored_wavelength(reaction_id, wavelength):
 
     sensor_id = floor(reaction_id / 10000000)
 
-    max_id = \
-    models.WavelengthMonitored.objects.filter(id__gte=sensor_id * 10000000, id__lte=(sensor_id + 1) * 10000000).aggregate(Max('id'))[
-        'id__max']
+    min_id = sensor_id * 10000000
+    max_id = ((sensor_id + 1) * 10000000) - 1
 
-    if max_id is None:
-        max_id = sensor_id * 10000000
+    creating_id = None
+
+    existing_ids = set(models.WavelengthMonitored.objects.filter(id__gte=min_id, id__lte=max_id).values_list('id', flat=True))
+
+    for possible_id in range(min_id, max_id + 1):
+        if possible_id not in existing_ids:
+            creating_id = possible_id
+            break
 
     monitored_wavelength = models.WavelengthMonitored.objects.create(pfiona_reaction_id=reaction_id,
-                                                                     wavelength=wavelength, id=max_id+1)
+                                                                     wavelength=wavelength, id=creating_id)
     monitored_wavelength.save()
 
     return monitored_wavelength

@@ -1,4 +1,4 @@
-import React, { Component, useState } from "react";
+import React, {Component, useEffect, useState} from "react";
 import { createRoot } from "react-dom/client";
 import Overview from "../plugins/reagents/Overview";
 import ReagentsList from "../plugins/reagents/ReagentsList";
@@ -8,12 +8,48 @@ import CurrentReaction from "../plugins/reagents/CurrentReaction";
 
 function ReagentsApp({ip}) {
 
+    // State for connection status
+    const [connected, setConnected] = useState(false);
+
+    const checkStatus = () => {
+        fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setConnected(true);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                setConnected(false);
+            });
+    };
+
+    useEffect(() => {
+        checkStatus();
+        const intervalId = setInterval(() => {
+            checkStatus();
+        }, 5000);
+
+        return () => clearInterval(intervalId);
+    }, []);
+
   return (
       <div className={"flex flex-col space-y-10"}>
           <Overview reagents={reagents_json}/>
-          <ReagentsList ip={ip} reagents={reagents_json}/>
-          <Valve ip={ip} reagents={reagents_json}/>
-          <ReactionsBuilder ip={ip} reactions={reactions_json}/>
+          <ReagentsList reagents={reagents_json} connected={connected}/>
+          <Valve reagents={reagents_json}/>
+          <ReactionsBuilder reactions={reactions_json}/>
           <CurrentReaction reactions={reactions_json}/>
       </div>
   );

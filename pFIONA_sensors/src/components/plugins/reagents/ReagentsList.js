@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Alert from "../universal/Alert";
 
-function ReagentsList({ ip, reagents }) {
+function ReagentsList({ reagents, connected }) {
     const validReagents = reagents.filter(reagent => reagent.volume_max > 0);
 
     /** ALERT BOX **/
@@ -14,7 +14,7 @@ function ReagentsList({ ip, reagents }) {
 
     /** FULLY FILLED ***/
     const fullyFilled = () => {
-        fetch(`http://${ip}:5000/sensor/fully_filled`, {
+        fetch(`http://${sensor_ip}:5000/sensor/fully_filled`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
@@ -60,8 +60,9 @@ function ReagentsList({ ip, reagents }) {
                     </div>
                     <div className="h-10">
                         <button
-                            className="bg-blue-600 text-white font-poppins px-8 py-1 rounded-md hover:bg-blue-400"
+                            className={`font-poppins px-8 py-1 rounded-md ${connected ? "bg-blue-600 text-white hover:bg-blue-400": "text-gray-600 bg-gray-300" }`}
                             onClick={fullyFilled}
+                            disabled={!connected}
                         >
                             Fully Filled
                         </button>
