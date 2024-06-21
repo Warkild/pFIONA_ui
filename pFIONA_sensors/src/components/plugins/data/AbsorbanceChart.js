@@ -129,6 +129,11 @@ const AbsorbanceChart = () => {
             Blank: [0, 0, 255],  // Blue
             Sample: [0, 255, 0], // Green
             Standard: [255, 0, 0], // Red
+            Standard_Dillution_0: [191, 9, 9], // Red
+            Standard_Dillution_1: [255, 0, 0], // Red
+            Standard_Dillution_2: [255, 100, 0], // Red
+            Standard_Dillution_3: [255, 175, 0], // Red
+            Standard_Dillution_4: [255, 255, 0], // Red
         };
 
         for (const [type, subcycles] of Object.entries(cycleData || {})) {
