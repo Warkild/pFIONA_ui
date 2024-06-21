@@ -267,6 +267,28 @@ def api_is_deployed(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_is_stop_deploying_in_progress(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        is_stop_deploying_in_progress = q.is_stop_deploying_in_progress(sensor_id)
+
+        return JsonResponse({'status': 'success', 'data': is_stop_deploying_in_progress})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 @login_required
 @require_http_methods(["GET"])

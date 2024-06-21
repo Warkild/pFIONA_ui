@@ -37,6 +37,37 @@ function DeployStatus({ connected }) {
             });
     };
 
+
+    /** STOP DEPLOYING STATUS **/
+
+    const [isStopDeploying, setIsStopDeploying] = useState();
+
+    const checkStopDeployingStatus = () => {
+        fetch(`/api/is_stop_deploying_in_progress?sensor_id=${sensor_id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                setErrorMessageDeployed("Unable to connect")
+                setIsStopDeploying(false)
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            setIsStopDeploying(data.data)
+            console.log('Success:', data);
+        })
+        .catch(error => {
+            setErrorMessageDeployed(`There is an error : ${error.message}`)
+            setIsStopDeploying(false)
+            console.error('Error:', error);
+        });
+    };
+
     /** SLEEPING STATUS **/
     const [isLoadingSleeping, setIsLoadingSleeping] = useState(true);
     const [isErrorSleeping, setIsErrorSleeping] = useState(false);
@@ -75,10 +106,12 @@ function DeployStatus({ connected }) {
     useEffect(() => {
         checkDeployedStatus();
         checkSleepingStatus();
+        checkStopDeployingStatus();
 
         const intervalId = setInterval(() => {
             checkDeployedStatus();
             checkSleepingStatus();
+            checkStopDeployingStatus();
         }, 5000);
 
         return () => clearInterval(intervalId);
@@ -130,6 +163,7 @@ function DeployStatus({ connected }) {
             })
             .then(data => {
                 setStopDeploySuccess(true);
+                setIsStopDeploying(true)
                 setTimeout(() => setStopDeploySuccess(false), 5000);
             })
             .catch(error => {
@@ -232,10 +266,11 @@ function DeployStatus({ connected }) {
                         ) : (
                             <>
                                 <button
-                                    className={"bg-red-600 rounded-lg text-white font-poppins py-2 px-7 text-sm hover:bg-red-400"}
+                                    className={`rounded-lg text-white font-poppins py-2 px-7 text-sm ${isStopDeploying ? 'bg-amber-500' : 'bg-red-600 hover:bg-red-400'}`}
                                     onClick={stopDeploy}
+                                    disabled={isStopDeploying}
                                 >
-                                    STOP DEPLOY</button>
+                                    {isStopDeploying ? 'STOP DEPLOYING IN PROGRESS' : 'STOP DEPLOY'}</button>
                             </>
                         )}
                         {stopDeploySuccess &&

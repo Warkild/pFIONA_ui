@@ -410,6 +410,11 @@ def is_deployed(sensor_id):
     states_tab = json.loads(states)
     return state_dict['Deployed'] in states_tab or state_dict['Stop_deploying_in_progress'] in states_tab
 
+def is_stop_deploying_in_progress(sensor_id):
+    states = models.Sensor.objects.get(id=sensor_id).last_states
+    states_tab = json.loads(states)
+    return state_dict['Stop_deploying_in_progress'] in states_tab
+
 
 def is_sleeping(sensor_id):
     states = models.Sensor.objects.get(id=sensor_id).last_states
