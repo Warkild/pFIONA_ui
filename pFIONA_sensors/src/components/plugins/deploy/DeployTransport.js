@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Select from 'react-select';
 
-function DeployTransport({connected}) {
+function DeployTransport({connected, isDeployed}) {
     const [reagents, setReagents] = useState([]);
     const [selectedReagents, setSelectedReagents] = useState([]);
     const [primePortsClicked, setPrimePortsClicked] = useState(false);
@@ -96,14 +96,15 @@ function DeployTransport({connected}) {
                     />
                     <button
                         onClick={handlePrimePorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected ? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
-                        disabled={!connected}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        disabled={!connected || isDeployed}
                     >
                         {primePortsClicked ? 'Click again to confirm' : 'Prime Ports'}
                     </button>
                     <button
                         onClick={handleFlushAllPorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected ? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        disabled={!connected || isDeployed}
                     >
                         {flushPortsClicked ? 'Click again to confirm' : 'Flush All Ports'}
                     </button>

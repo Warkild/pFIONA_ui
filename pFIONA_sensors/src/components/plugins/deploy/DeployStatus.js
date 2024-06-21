@@ -1,44 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-function DeployStatus({ connected }) {
+function DeployStatus({ connected, isDeployed, setIsDeployed, isLoadingDeployed, isErrorDeployed, errorMessageDeployed }) {
 
-    /** DEPLOYED STATUS **/
-    const [isLoadingDeployed, setIsLoadingDeployed] = useState(true);
-    const [isErrorDeployed, setIsErrorDeployed] = useState(false);
-    const [errorMessageDeployed, setErrorMessageDeployed] = useState('');
-    const [isDeployed, setIsDeployed] = useState();
-
-    const checkDeployedStatus = () => {
-        fetch(`/api/is_deployed?sensor_id=${sensor_id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    setErrorMessageDeployed("Unable to connect");
-                    setIsErrorDeployed(true);
-                    setIsLoadingDeployed(false);
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                setIsDeployed(data.data);
-                setIsLoadingDeployed(false);
-                console.log('Success:', data);
-            })
-            .catch(error => {
-                setErrorMessageDeployed(`There is an error : ${error.message}`);
-                setIsErrorDeployed(true);
-                setIsLoadingDeployed(false);
-                console.error('Error:', error);
-            });
-    };
-
-
-    /** STOP DEPLOYING STATUS **/
+        /** STOP DEPLOYING STATUS **/
 
     const [isStopDeploying, setIsStopDeploying] = useState();
 
@@ -104,12 +68,10 @@ function DeployStatus({ connected }) {
     };
 
     useEffect(() => {
-        checkDeployedStatus();
         checkSleepingStatus();
         checkStopDeployingStatus();
 
         const intervalId = setInterval(() => {
-            checkDeployedStatus();
             checkSleepingStatus();
             checkStopDeployingStatus();
         }, 5000);
