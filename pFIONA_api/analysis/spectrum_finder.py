@@ -363,6 +363,9 @@ def get_monitored_wavelength_values_in_deployment(timestamp, sensor_id):
                 for type_key, wavelength_values in types.items()} for cycle, types in cycles.items()} for
         reaction, cycles in all_monitored_wavelength_values.items()}
 
+    deployment_info.pop('cycle_start_time', None)
+    deployment_info.pop('cycle_end_time', None)
+
     return all_monitored_wavelength_values, deployment_info
 
 

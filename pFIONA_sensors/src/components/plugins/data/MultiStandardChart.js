@@ -16,6 +16,9 @@ const MultiStandardChart = () => {
     const [availableCycles, setAvailableCycles] = useState([]);
     const [deploymentInfo, setDeploymentInfo] = useState(null);
     const [standardDillutionCycleInfo, setStandardDillutionCycleInfo] = useState('');
+    const [cycleStartTime, setCycleStartTime] = useState('');
+    const [cycleEndTime, setCycleEndTime] = useState('');
+    const [standardConcentration, setStandardConcentration] = useState(null);
 
     useEffect(() => {
         if (data) {
@@ -27,6 +30,7 @@ const MultiStandardChart = () => {
             setAvailableReactions(reactionsWithStandards);
             if (reactionsWithStandards.length > 0) {
                 setSelectedReaction(reactionsWithStandards[0]);
+                fetchStandardConcentration(reactionsWithStandards[0]);
                 setErrorMessage('');
             } else {
                 setErrorMessage(`No multi standard associated for any reaction in deployment ${deploymentInfo.deployment_id}, begin at ${moment.unix(deploymentInfo.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')} and end at ${moment.unix(deploymentInfo.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}`);
@@ -51,11 +55,15 @@ const MultiStandardChart = () => {
     useEffect(() => {
         if (selectedCycle && selectedReaction) {
             const cycleData = data[selectedReaction][selectedCycle];
-            const { standardDillutionData, cycleInfo } = getLastStandardDillutionData(selectedReaction, selectedCycle);
+            const { standardDillutionData, cycleInfo, cycleStart, cycleEnd } = getLastStandardDillutionData(selectedReaction, selectedCycle);
             setChartData(generateChartData(cycleData, standardDillutionData));
             setStandardDillutionCycleInfo(cycleInfo);
+
+            // Set cycle start and end times
+            setCycleStartTime(cycleData.cycle_start_time ? moment.unix(cycleData.cycle_start_time).format('YYYY-MM-DD HH:mm:ss') : '');
+            setCycleEndTime(cycleData.cycle_end_time ? moment.unix(cycleData.cycle_end_time).format('YYYY-MM-DD HH:mm:ss') : '');
         }
-    }, [selectedCycle, selectedReaction]);
+    }, [selectedCycle, selectedReaction, standardConcentration]);
 
     const fetchData = async () => {
         setLoading(true);
@@ -71,6 +79,16 @@ const MultiStandardChart = () => {
             setErrorMessage('Error fetching data. Please try again.');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchStandardConcentration = async (reactionName) => {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/get_standard_concentration?reaction_name=${reactionName}`);
+            const result = await response.json();
+            setStandardConcentration(result.standard_concentration);
+        } catch (error) {
+            console.error('Error fetching standard concentration:', error);
         }
     };
 
@@ -113,24 +131,29 @@ const MultiStandardChart = () => {
         for (let i = cycleIndex - 1; i >= 0; i--) {
             const previousCycle = cycles[i];
             if (data[reaction][previousCycle]["Standard_Dillution_0"]) {
-                const cycleInfo = `Standard Dillution from cycle ${previousCycle}, between ${moment.unix(deploymentInfo.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')} and ${moment.unix(deploymentInfo.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}`;
-                return { standardDillutionData: data[reaction][previousCycle], cycleInfo };
+                const cycleDetails = data[reaction][previousCycle];
+                const cycleInfo = `Standard Dillution from cycle ${previousCycle}, between ${moment.unix(cycleDetails.cycle_start_time).format('YYYY-MM-DD HH:mm:ss')} and ${moment.unix(cycleDetails.cycle_end_time).format('YYYY-MM-DD HH:mm:ss')}`;
+                return { standardDillutionData: cycleDetails, cycleInfo, cycleStart: cycleDetails.cycle_start_time, cycleEnd: cycleDetails.cycle_end_time };
             }
         }
-        return { standardDillutionData: null, cycleInfo: '' };
+        return { standardDillutionData: null, cycleInfo: '', cycleStart: '', cycleEnd: '' };
     };
 
     const generateChartData = (cycleData, standardDillutionData) => {
+        if (standardConcentration === null) {
+            return { labels: [], datasets: [] };
+        }
+
         const labels = [];
         const datasetMap = {};
         const dataPointsMap = {};
 
         const dilutionLabels = {
             "Standard_Dillution_0": 0,
-            "Standard_Dillution_1": 0.25,
-            "Standard_Dillution_2": 0.5,
-            "Standard_Dillution_3": 0.75,
-            "Standard_Dillution_4": 1.0,
+            "Standard_Dillution_1": standardConcentration * 0.25,
+            "Standard_Dillution_2": standardConcentration * 0.5,
+            "Standard_Dillution_3": standardConcentration * 0.75,
+            "Standard_Dillution_4": standardConcentration * 1.0,
         };
 
         const wavelengths = Object.keys(cycleData["Standard_Dillution_0"] || standardDillutionData["Standard_Dillution_0"] || {});
@@ -279,7 +302,7 @@ const MultiStandardChart = () => {
                                         type="button"
                                         onClick={handlePreviousCycle}
                                         disabled={loading || availableCycles.indexOf(selectedCycle) === 0}
-                                        className="mr-2 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        className={`mr-2 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${availableCycles.indexOf(selectedCycle) === 0 ? 'bg-gray-300' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                                     >
                                         Previous
                                     </button>
@@ -287,7 +310,7 @@ const MultiStandardChart = () => {
                                         type="button"
                                         onClick={handleNextCycle}
                                         disabled={loading || availableCycles.indexOf(selectedCycle) === availableCycles.length - 1}
-                                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        className={`inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${availableCycles.indexOf(selectedCycle) === availableCycles.length - 1 ? 'bg-gray-300' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                                     >
                                         Next
                                     </button>
@@ -298,7 +321,10 @@ const MultiStandardChart = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Select Reaction:
                                     <select
-                                        onChange={(e) => setSelectedReaction(e.target.value)}
+                                        onChange={(e) => {
+                                            setSelectedReaction(e.target.value);
+                                            fetchStandardConcentration(e.target.value);
+                                        }}
                                         value={selectedReaction}
                                         disabled={loading}
                                         className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
@@ -315,51 +341,59 @@ const MultiStandardChart = () => {
                         </div>
                     )}
                 </div>
-                <div>
+                <div className="md:w-1/2">
                     {chartData && (
-                        <div className="mt-5" style={{ height: '500px' }}>
-                            <Line
-                                data={chartData}
-                                options={{
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    scales: {
-                                        x: {
-                                            type: 'linear',
-                                            title: {
-                                                display: true,
-                                                text: 'Dilution Level',
-                                            },
-                                        },
-                                        y: {
-                                            title: {
-                                                display: true,
-                                                text: 'Value',
-                                            },
-                                        },
-                                    },
-                                    plugins: {
-                                        tooltip: {
-                                            callbacks: {
-                                                title: function (context) {
-                                                    return context[0].label; // Dilution level
+                        <>
+                            <div className="text-sm text-gray-500 mb-2">
+                                Deployment Start Time: {deploymentInfo && moment.unix(deploymentInfo.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')} - Deployment End Time: {deploymentInfo && moment.unix(deploymentInfo.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}
+                            </div>
+                            <div className="text-sm text-gray-500 mb-2">
+                                Cycle Start Time: {cycleStartTime} - Cycle End Time: {cycleEndTime}
+                            </div>
+                            <div className="mt-5" style={{ height: '500px' }}>
+                                <Line
+                                    data={chartData}
+                                    options={{
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        scales: {
+                                            x: {
+                                                type: 'linear',
+                                                title: {
+                                                    display: true,
+                                                    text: 'Dilution Level',
                                                 },
-                                                label: function (context) {
-                                                    let label = context.dataset.label || '';
-                                                    if (label) {
-                                                        label += ': ';
+                                            },
+                                            y: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Value',
+                                                },
+                                            },
+                                        },
+                                        plugins: {
+                                            tooltip: {
+                                                callbacks: {
+                                                    title: function (context) {
+                                                        return context[0].label; // Dilution level
+                                                    },
+                                                    label: function (context) {
+                                                        let label = context.dataset.label || '';
+                                                        if (label) {
+                                                            label += ': ';
+                                                        }
+                                                        if (context.parsed.y !== null) {
+                                                            label += context.parsed.y.toFixed(2); // round value to 2 decimal places
+                                                        }
+                                                        return label;
                                                     }
-                                                    if (context.parsed.y !== null) {
-                                                        label += context.parsed.y.toFixed(2); // round value to 2 decimal places
-                                                    }
-                                                    return label;
                                                 }
                                             }
                                         }
-                                    }
-                                }}
-                            />
-                        </div>
+                                    }}
+                                />
+                            </div>
+                        </>
                     )}
                 </div>
                 <div>
