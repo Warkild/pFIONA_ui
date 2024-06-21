@@ -361,7 +361,7 @@ const MultiStandardChart = () => {
                                                 type: 'linear',
                                                 title: {
                                                     display: true,
-                                                    text: 'Dilution Level',
+                                                    text: 'Concentration',
                                                 },
                                             },
                                             y: {
