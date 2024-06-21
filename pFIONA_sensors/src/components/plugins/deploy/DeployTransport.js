@@ -104,15 +104,27 @@ function DeployTransport({connected, isDeployed}) {
                     />
                     <button
                         onClick={handlePrimePorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed || isFlushPort ? isPrimePort ? "bg-lime-500 text-white" : "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
-                        disabled={!connected || isDeployed || isFlushPort}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${
+                            !connected || isDeployed || isFlushPort 
+                                ? "text-gray-600 bg-gray-300" 
+                                : isPrimePort 
+                                    ? "bg-lime-500 text-white" 
+                                    : "bg-blue-600 hover:bg-blue-400 text-white"
+                        }`}
+                        disabled={!connected || isDeployed || isFlushPort || isPrimePort }
                     >
                         {isPrimePort ? 'Priming port' : primePortsClicked ? 'Click again to confirm' : 'Prime Ports'}
                     </button>
                     <button
                         onClick={handleFlushAllPorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed || isPrimePort ? isFlushPort ? "bg-lime-500 text-white" : "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
-                        disabled={!connected || isDeployed || isPrimePort}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${
+                            !connected || isDeployed || isPrimePort 
+                                ? "text-gray-600 bg-gray-300" 
+                                : isFlushPort 
+                                    ? "bg-lime-500 text-white" 
+                                    : "bg-blue-600 hover:bg-blue-400 text-white"
+                        }`}
+                        disabled={!connected || isDeployed || isFlushPort || isPrimePort }
                     >
                         {isFlushPort ? 'Flushing Port' : flushPortsClicked ? 'Click again to confirm' : 'Flush All Ports'}
                     </button>
