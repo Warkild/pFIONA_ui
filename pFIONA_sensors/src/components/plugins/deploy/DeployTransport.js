@@ -96,14 +96,14 @@ function DeployTransport({connected, isDeployed}) {
                     />
                     <button
                         onClick={handlePrimePorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
                         disabled={!connected || isDeployed}
                     >
                         {primePortsClicked ? 'Click again to confirm' : 'Prime Ports'}
                     </button>
                     <button
                         onClick={handleFlushAllPorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
                         disabled={!connected || isDeployed}
                     >
                         {flushPortsClicked ? 'Click again to confirm' : 'Flush All Ports'}
