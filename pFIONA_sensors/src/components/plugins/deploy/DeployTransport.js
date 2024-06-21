@@ -70,11 +70,12 @@ function DeployTransport({connected, isDeployed}) {
             return;
         }
         setIsFlushPort(true)
-        fetch(`http://${sensor_ip}/sensor/flush_all_ports`, {
+        fetch(`http://${sensor_ip}:5000/sensor/valve_port_flushing`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
+            body: JSON.stringify(requestBody)
         })
         .then(response => response.json())
         .then(data => {
