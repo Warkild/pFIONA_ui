@@ -26,6 +26,8 @@ function DeployTransport({connected, isDeployed}) {
             .catch(error => console.error('Error fetching reagents:', error));
     }, [sensor_id]);
 
+    const [isPrimePort, setIsPrimePort] = useState(false)
+
     const handlePrimePorts = () => {
         if (!primePortsClicked) {
             setPrimePortsClicked(true);
@@ -38,6 +40,7 @@ function DeployTransport({connected, isDeployed}) {
             reagents: selectedReagentNames
         };
 
+        setIsPrimePort(true)
         fetch(`http://${sensor_ip}:5000/sensor/valve_port_priming`, {
             method: 'POST',
             headers: {
@@ -50,20 +53,23 @@ function DeployTransport({connected, isDeployed}) {
         .then(data => {
             console.log('Success:', data);
             setPrimePortsClicked(false);
+            setIsPrimePort(false)
         })
         .catch(error => {
             console.error('Error:', error);
             setPrimePortsClicked(false);
+            setIsPrimePort(false)
         });
     };
 
+    const [isFlushPort, setIsFlushPort] = useState(false)
     const handleFlushAllPorts = () => {
         if (!flushPortsClicked) {
             setFlushPortsClicked(true);
             setTimeout(() => setFlushPortsClicked(false), 3000); // Reset after 3 seconds
             return;
         }
-
+        setIsFlushPort(true)
         fetch(`http://${sensor_ip}/sensor/flush_all_ports`, {
             method: 'POST',
             headers: {
@@ -74,10 +80,12 @@ function DeployTransport({connected, isDeployed}) {
         .then(data => {
             console.log('Success:', data);
             setFlushPortsClicked(false);
+            setIsFlushPort(false)
         })
         .catch(error => {
             console.error('Error:', error);
             setFlushPortsClicked(false);
+            setIsFlushPort(false)
         });
     };
 
@@ -96,17 +104,17 @@ function DeployTransport({connected, isDeployed}) {
                     />
                     <button
                         onClick={handlePrimePorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
-                        disabled={!connected || isDeployed}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed || isFlushPort ? isPrimePort ? "bg-lime-500 text-white" : "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        disabled={!connected || isDeployed || isFlushPort}
                     >
-                        {primePortsClicked ? 'Click again to confirm' : 'Prime Ports'}
+                        {isPrimePort ? 'Priming port' : primePortsClicked ? 'Click again to confirm' : 'Prime Ports'}
                     </button>
                     <button
                         onClick={handleFlushAllPorts}
-                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed? "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
-                        disabled={!connected || isDeployed}
+                        className={`mt-5 rounded-lg font-poppins py-2 px-7 text-sm ${connected || !isDeployed || isPrimePort ? isFlushPort ? "bg-lime-500 text-white" : "bg-blue-600 hover:bg-blue-400 text-white" : "text-gray-600 bg-gray-300"}`}
+                        disabled={!connected || isDeployed || isPrimePort}
                     >
-                        {flushPortsClicked ? 'Click again to confirm' : 'Flush All Ports'}
+                        {isFlushPort ? 'Flushing Port' : flushPortsClicked ? 'Click again to confirm' : 'Flush All Ports'}
                     </button>
                 </div>
             </div>
