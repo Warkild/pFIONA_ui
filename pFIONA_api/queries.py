@@ -86,10 +86,10 @@ def create_reaction(name, standard_id, standard_concentration, volume_of_mixture
 
     standard = models.Reagent.objects.get(id=standard_id)
 
-    sensor_id = floor(standard_id / 10000000)
+    sensor_id = floor(standard_id / 10000000000)
 
-    min_id = sensor_id * 10000000
-    max_id = ((sensor_id + 1) * 10000000)-1
+    min_id = sensor_id * 10000000000
+    max_id = ((sensor_id + 1) * 10000000000)-1
 
     creating_id = None
 
@@ -132,10 +132,10 @@ def create_step(reagent_id, reaction_id, number, order):
     :return: Step object
     """
 
-    sensor_id = floor(reaction_id / 10000000)
+    sensor_id = floor(reaction_id / 10000000000)
 
-    min_id = sensor_id * 10000000
-    max_id = ((sensor_id + 1) * 10000000)-1
+    min_id = sensor_id * 10000000000
+    max_id = ((sensor_id + 1) * 10000000000)-1
 
     creating_id = None
 
@@ -158,10 +158,10 @@ def create_step(reagent_id, reaction_id, number, order):
 
 def create_monitored_wavelength(reaction_id, wavelength):
 
-    sensor_id = floor(reaction_id / 10000000)
+    sensor_id = floor(reaction_id / 10000000000)
 
-    min_id = sensor_id * 10000000
-    max_id = ((sensor_id + 1) * 10000000) - 1
+    min_id = sensor_id * 10000000000
+    max_id = ((sensor_id + 1) * 10000000000) - 1
 
     creating_id = None
 
