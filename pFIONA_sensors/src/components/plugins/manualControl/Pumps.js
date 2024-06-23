@@ -29,7 +29,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
      * ALERT MESSAGE
      */
 
-    // Alert box state
+        // Alert box state
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Alert box error message
@@ -273,7 +273,31 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
         try {
             setInAction(true)
             setSlewingPump1(true)
-            console.log("SUCCESS");
+            if (flowRatePump1 >= 1) {
+                const url = `http://${sensor_ip}:5000/steppump/1/slew`;
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    },
+                    body: JSON.stringify({
+                        "flow_rate1": parseInt(flowRatePump1),
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            setInAction(false)
+                            setSlewingPump1(false)
+                            return response.json().then(errorData => {
+                                throw new Error(`Network response was not ok: ${errorData.message}`);
+                            });
+                        }
+                        return response.json();
+                    })
+            } else {
+                setAlertModalText("Flow rate of pump 1 must be positive")
+            }
         } catch (error) {
             setAlertModalText(error.message);
             setIsModalOpen(true);
@@ -284,7 +308,31 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
         try {
             setInAction(true)
             setSlewingPump2(true)
-            console.log("SUCCESS");
+            if (flowRatePump2 >= 1) {
+                const url = `http://${sensor_ip}:5000/steppump/2/slew`;
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    },
+                    body: JSON.stringify({
+                        "flow_rate2": parseInt(flowRatePump2),
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            setInAction(false)
+                            setSlewingPump2(false)
+                            return response.json().then(errorData => {
+                                throw new Error(`Network response was not ok: ${errorData.message}`);
+                            });
+                        }
+                        return response.json();
+                    })
+            } else {
+                setAlertModalText("Flow rate of pump 2 must be positive")
+            }
         } catch (error) {
             setAlertModalText(error.message);
             setIsModalOpen(true);
@@ -295,7 +343,32 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
         try {
             setInAction(true)
             setSlewingPumpBoth(true)
-            console.log("SUCCESS");
+            if (flowRatePump1 >= 1 && flowRatePump2 >= 1) {
+                const url = `http://${sensor_ip}:5000/steppump/1/slew_both_pumps`;
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    },
+                    body: JSON.stringify({
+                        "flow_rate1": parseInt(flowRatePump1),
+                        "flow_rate2": parseInt(flowRatePump2),
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            setInAction(false)
+                            setSlewingPumpBoth(false)
+                            return response.json().then(errorData => {
+                                throw new Error(`Network response was not ok: ${errorData.message}`);
+                            });
+                        }
+                        return response.json();
+                    })
+            } else {
+                setAlertModalText("Flow rate of pump 1 and 2 must be positive")
+            }
         } catch (error) {
             setAlertModalText(error.message);
             setIsModalOpen(true);
@@ -304,9 +377,28 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
 
     const endSlewPump1 = () => {
         try {
-            setInAction(false)
-            setSlewingPump1(false)
-            console.log("SUCCESS");
+            const url = `http://${sensor_ip}:5000/steppump/1/slew`;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                },
+                body: JSON.stringify({
+                    "flow_rate1": 0,
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`Network response was not ok: ${errorData.message}`);
+                        });
+                    } else {
+                        setInAction(false)
+                        setSlewingPump1(false)
+                    }
+                    return response.json();
+                })
         } catch (error) {
             setAlertModalText(error.message);
             setIsModalOpen(true);
@@ -315,9 +407,28 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
 
     const endSlewPump2 = () => {
         try {
-            setInAction(false)
-            setSlewingPump2(false)
-            console.log("SUCCESS");
+            const url = `http://${sensor_ip}:5000/steppump/2/slew`;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                },
+                body: JSON.stringify({
+                    "flow_rate2": 0,
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`Network response was not ok: ${errorData.message}`);
+                        });
+                    } else {
+                        setInAction(false)
+                        setSlewingPump2(false)
+                    }
+                    return response.json();
+                })
         } catch (error) {
             setAlertModalText(error.message);
             setIsModalOpen(true);
@@ -326,9 +437,29 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
 
     const endSlewPumpBoth = () => {
         try {
-            setInAction(false)
-            setSlewingPumpBoth(false)
-            console.log("SUCCESS");
+            const url = `http://${sensor_ip}:5000/steppump/2/slew_both_pumps`;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                },
+                body: JSON.stringify({
+                    "flow_rate1": 0,
+                    "flow_rate2": 0,
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`Network response was not ok: ${errorData.message}`);
+                        });
+                    } else {
+                        setInAction(false)
+                        setSlewingPumpBoth(false)
+                    }
+                    return response.json();
+                })
         } catch (error) {
             setAlertModalText(error.message);
             setIsModalOpen(true);
@@ -349,10 +480,10 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         <input
                             type="number"
                             className={`text-center w-full remove-arrow rounded-lg mb-2 ${
-                              (inAction && !allowAnything) || 
-                              (isDeployed) || 
-                              (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
-                              ? 'bg-gray-200' : ''
+                                (inAction && !allowAnything) ||
+                                (isDeployed) ||
+                                (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                                    ? 'bg-gray-200' : ''
                             }`}
                             value={volumePump1}
                             onChange={(e) => {
@@ -364,10 +495,10 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         <input
                             type="number"
                             className={`text-center w-full remove-arrow rounded-lg mb-2 ${
-                              (inAction && !allowAnything) || 
-                              (isDeployed) || 
-                              (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
-                              ? 'bg-gray-200' : ''
+                                (inAction && !allowAnything) ||
+                                (isDeployed) ||
+                                (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                                    ? 'bg-gray-200' : ''
                             }`}
                             value={flowRatePump1}
                             onChange={(e) => {
@@ -383,15 +514,15 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                                 type="checkbox"
                                 id="toogle-ad-pump-1"
                                 className={`relative w-[6.5rem] h-7 p-px border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-purple-600 checked:border-purple-600 focus:checked:border-purple-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-teal-200 before:inline-block before:size-6 before:bg-white checked:before:bg-white before:translate-x-0 checked:before:translate-x-[4.7rem] before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200 ${
-                              (inAction && !allowAnything) || 
-                              (isDeployed) || 
-                              (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
-                              ? 'bg-teal-200' : 'bg-teal-500'}`}
+                                    (inAction && !allowAnything) ||
+                                    (isDeployed) ||
+                                    (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
+                                        ? 'bg-teal-200' : 'bg-teal-500'}`}
                                 onChange={(e) => {
                                     setAspirateDispensePump1(e.target.checked);
                                 }}
                                 checked={aspirateDispensePump1}
-                            disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))}
+                                disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))}
                             />
                             <label htmlFor="toogle-ad-pump-1"
                                    className="text-sm text-gray-500 ms-3 dark:text-neutral-400">Dispense</label>
@@ -403,10 +534,10 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         <input
                             type="number"
                             className={`text-center w-full remove-arrow rounded-lg mb-2 ${
-                              (inAction && !allowAnything) || 
-                              (isDeployed) || 
-                              (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
-                              ? 'bg-gray-200' : ''
+                                (inAction && !allowAnything) ||
+                                (isDeployed) ||
+                                (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                                    ? 'bg-gray-200' : ''
                             }`}
                             value={volumePump2}
                             onChange={(e) => {
@@ -418,10 +549,10 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         <input
                             type="number"
                             className={`text-center w-full remove-arrow rounded-lg mb-2 ${
-                              (inAction && !allowAnything) || 
-                              (isDeployed) || 
-                              (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
-                              ? 'bg-gray-200' : ''
+                                (inAction && !allowAnything) ||
+                                (isDeployed) ||
+                                (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                                    ? 'bg-gray-200' : ''
                             }`}
                             value={flowRatePump2}
                             onChange={(e) => {
@@ -439,10 +570,10 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                                 type="checkbox"
                                 id="toogle-ad-pump-2"
                                 className={`relative w-[6.5rem] h-7 p-px border-transparent text-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none checked:bg-none checked:text-purple-600 checked:border-purple-600 focus:checked:border-purple-600 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-teal-200 before:inline-block before:size-6 before:bg-white checked:before:bg-white before:translate-x-0 checked:before:translate-x-[4.7rem] before:rounded-full before:shadow before:transform before:ring-0 before:transition before:ease-in-out before:duration-200 dark:before:bg-neutral-400 dark:checked:before:bg-blue-200 ${
-                              (inAction && !allowAnything) || 
-                              (isDeployed) || 
-                              (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
-                              ? 'bg-teal-200' : 'bg-teal-500'}`}
+                                    (inAction && !allowAnything) ||
+                                    (isDeployed) ||
+                                    (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
+                                        ? 'bg-teal-200' : 'bg-teal-500'}`}
                                 onChange={(e) => {
                                     setAspirateDispensePump2(e.target.checked);
                                 }}
@@ -489,7 +620,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                             (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
                                 ? runningPump2 ? 'bg-green-600 cursor-not-allowed text-white' : 'bg-gray-200 cursor-not-allowed text-gray-700'
                                 : 'bg-blue-600 text-white'
-                        }`}                        onClick={runPump2}
+                        }`} onClick={runPump2}
                         disabled={(inAction && !allowAnything) || isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))}
                     >
                         {runningPump2 ? "Running" : "Run Pump 2"}
@@ -497,9 +628,9 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                 </div>
                 <div className="flex flex-row justify-between">
                     <button
-                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump1 ? "bg-red-600 text-white" : 
-                          ((isDeployed || (inAction && !allowAnything) || slewingPumpBoth) ? 
-                          "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
+                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump1 ? "bg-red-600 text-white" :
+                            ((isDeployed || (inAction && !allowAnything) || slewingPumpBoth) ?
+                                "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
                         onClick={slewingPump1 ? endSlewPump1 : !((inAction && !allowAnything) ||
                             isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPumpBoth || slewingPumpBoth))
                         ) ? slewPump1 : null}
@@ -510,9 +641,9 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         {slewingPump1 ? "Stop" : "Slew Pump 1"}
                     </button>
                     <button
-                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPumpBoth ? "bg-red-600 text-white" : 
-                      ((isDeployed || (inAction && !allowAnything) || slewingPump1 || slewingPump2) ? 
-                      "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
+                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPumpBoth ? "bg-red-600 text-white" :
+                            ((isDeployed || (inAction && !allowAnything) || slewingPump1 || slewingPump2) ?
+                                "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
                         onClick={slewingPumpBoth ? endSlewPumpBoth : !((inAction && !allowAnything) ||
                             isDeployed || (allowAnything && (runningPump1 || slewingPump1 || runningPump2 || slewingPump2))
                         ) ? slewPumpBoth : null}
@@ -523,9 +654,9 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         {slewingPumpBoth ? "Stop" : "Slew Both"}
                     </button>
                     <button
-                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump2 ? "bg-red-600 text-white" : 
-  ((isDeployed || (inAction && !allowAnything) || slewingPumpBoth) ? 
-  "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
+                        className={`w-3/12 rounded-lg font-poppins py-2 text-sm ${slewingPump2 ? "bg-red-600 text-white" :
+                            ((isDeployed || (inAction && !allowAnything) || slewingPumpBoth) ?
+                                "bg-gray-200 cursor-not-allowed text-gray-700" : "bg-blue-600 text-white")}`}
                         onClick={slewingPump2 ? endSlewPump2 : !((inAction && !allowAnything) ||
                             isDeployed || (allowAnything && (runningPump2 || slewingPump2 || runningPumpBoth || slewingPumpBoth))
                         ) ? slewPump2 : null}
