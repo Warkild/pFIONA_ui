@@ -450,12 +450,16 @@ def get_last_states(sensor_id):
     return models.Sensor.objects.get(id=sensor_id).last_states
 
 
-def get_standard_concentration(reaction_name=None, reaction_id=None):
+def get_standard_concentration(reaction_name=None, reaction_id=None, sensor_id=None):
     try:
         if reaction_id is not None:
             reaction = models.Reaction.objects.get(id=reaction_id)
-        elif reaction_name is not None:
-            reaction = models.Reaction.objects.get(name=reaction_name)
+        elif reaction_name is not None and sensor_id is not None:
+            reaction = models.Reaction.objects.get(
+                name=reaction_name,
+                standard__pfiona_sensor_id=sensor_id,
+            )
+            print(reaction)
         else:
             return None
         return reaction.standard_concentration
