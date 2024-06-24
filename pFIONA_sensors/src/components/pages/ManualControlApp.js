@@ -8,19 +8,22 @@ import PreEstablishedScan from "../plugins/manualControl/PreEstablishedScan";
 import Serial from "../plugins/manualControl/Serial";
 
 function ManualControlApp() {
+
     // State for deployment status
+    // Global var shared with every subcomponent
     const [isLoadingDeployed, setIsLoadingDeployed] = useState(true);
-    const [isErrorDeployed, setIsErrorDeployed] = useState(false);
-    const [errorMessageDeployed, setErrorMessageDeployed] = useState('');
     const [isDeployed, setIsDeployed] = useState();
 
     // State for connection status
     const [connected, setConnected] = useState(false);
 
     // State for action status
+    // Global var shared with every subcomponent
     const [inAction, setInAction] = useState(false);
 
     // State for allowing anything
+    // Global var shared with every subcomponent
+    // Global var shared with every subcomponent
     const [allowAnything, setAllowAnything] = useState(false);
 
     // State for preestablished scan
@@ -36,8 +39,6 @@ function ManualControlApp() {
         })
             .then(response => {
                 if (!response.ok) {
-                    setErrorMessageDeployed("Unable to connect");
-                    setIsErrorDeployed(true);
                     setIsLoadingDeployed(false);
                     throw new Error('Network response was not ok');
                 }
@@ -49,13 +50,12 @@ function ManualControlApp() {
                 console.log('Success:', data);
             })
             .catch(error => {
-                setErrorMessageDeployed(`There is an error: ${error.message}`);
-                setIsErrorDeployed(true);
                 setIsLoadingDeployed(false);
                 console.error('Error:', error);
             });
     };
 
+    // Check the status of deployment every 5 seconds
     useEffect(() => {
         checkDeployedStatus();
         const intervalId = setInterval(() => {
@@ -68,7 +68,7 @@ function ManualControlApp() {
     // Function to check connection status
     const checkStatus = () => {
         if(sessionStorage.getItem('accessToken') != null) {
-            fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
+            fetch(`http://${sensor_ip}:${sensor_port}/sensor/get_state`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
@@ -92,6 +92,7 @@ function ManualControlApp() {
         }
     };
 
+    // Check if the sensor is connected every 5 seconds
     useEffect(() => {
         checkStatus();
         const intervalId = setInterval(() => {
@@ -101,6 +102,9 @@ function ManualControlApp() {
         return () => clearInterval(intervalId);
     }, []);
 
+
+    // Use for pre-established scan and spectrophotometer
+    // When pre-established scan is finished, increase value to launch useEffect function in Spectrophotometer comp
     const handleSpecFinish = () => {
         setPreScanCount(preScanCount+1)
     };
@@ -169,6 +173,7 @@ function ManualControlApp() {
     );
 }
 
+// Launch component if a div with id manual_control_app is present in templates pages
 const manualControlDiv = document.getElementById("manual_control_app");
 if (manualControlDiv) {
     const root = createRoot(manualControlDiv);

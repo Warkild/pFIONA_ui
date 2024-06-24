@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, registerables } from 'chart.js';
-import Alert from "../universal/Alert";
+import React, {useEffect, useState} from 'react';
+import {Line} from 'react-chartjs-2';
+import {Chart as ChartJS, registerables} from 'chart.js';
 
 ChartJS.register(...registerables);
 
-function Spectrophotometer({ inAction, setInAction, isDeployed, preScanCount }) {
+function Spectrophotometer({inAction, setInAction, isDeployed, preScanCount}) {
+
+    // Component to manage spectrophotometer
 
     // Light Status
     const [lightStatus, setLightStatus] = useState(false);
@@ -16,42 +17,41 @@ function Spectrophotometer({ inAction, setInAction, isDeployed, preScanCount }) 
         datasets: []
     });
 
-const updateChartData = (data) => {
-    const spectra = data.standard_concentration;
-    console.log('Updating chart data with:', spectra);
+    // Update chart.js comp with new data
+    const updateChartData = (data) => {
+        const spectra = data.standard_concentration;
 
-    const colors = [
-        'rgba(255, 99, 132, 1)', // Rouge
-        'rgba(54, 162, 235, 1)', // Bleu
-        'rgba(75, 192, 192, 1)'  // Vert
-    ];
+        const colors = [
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(75, 192, 192, 1)'
+        ];
 
-    const backgroundColors = [
-        'rgba(255, 99, 132, 0.2)', // Rouge
-        'rgba(54, 162, 235, 0.2)', // Bleu
-        'rgba(75, 192, 192, 0.2)'  // Vert
-    ];
+        const backgroundColors = [
+            'rgba(255, 99, 132, 0.2)',
+            'rgba(54, 162, 235, 0.2)',
+            'rgba(75, 192, 192, 0.2)'
+        ];
 
-    const datasets = spectra.map((spectrum, index) => ({
-        label: `Intensity - ${spectrum.type}`,
-        data: spectrum.values.map(v => v.value),
-        borderColor: colors[index % colors.length],
-        backgroundColor: backgroundColors[index % backgroundColors.length],
-    }));
+        const datasets = spectra.map((spectrum, index) => ({
+            label: `Intensity - ${spectrum.type}`,
+            data: spectrum.values.map(v => v.value),
+            borderColor: colors[index % colors.length],
+            backgroundColor: backgroundColors[index % backgroundColors.length],
+        }));
 
-    const labels = spectra[0].values.map(v => Math.round(v.wavelength * 10) / 10);
+        const labels = spectra[0].values.map(v => Math.round(v.wavelength * 10) / 10);
 
-    setChartData({
-        labels: labels,
-        datasets: datasets
-    });
-};
-
-
+        setChartData({
+            labels: labels,
+            datasets: datasets
+        });
+    };
 
 
+    // Turn on the light of sensor's spectrophotometer
     const turnOnLight = () => {
-        const url = `http://${sensor_ip}:5000/lamp/turn_on`;
+        const url = `http://${sensor_ip}:${sensor_port}/lamp/turn_on`;
 
         fetch(url, {
             method: 'POST',
@@ -67,7 +67,6 @@ const updateChartData = (data) => {
                 return response.json();
             })
             .then(data => {
-                console.log('Success:', data);
                 setLightStatus(true);
             })
             .catch(error => {
@@ -75,8 +74,9 @@ const updateChartData = (data) => {
             });
     };
 
+    // Turn off the light of sensor's spectrophotometer
     const turnOffLight = () => {
-        const url = `http://${sensor_ip}:5000/lamp/turn_off`;
+        const url = `http://${sensor_ip}:${sensor_port}/lamp/turn_off`;
 
         fetch(url, {
             method: 'POST',
@@ -92,7 +92,6 @@ const updateChartData = (data) => {
                 return response.json();
             })
             .then(data => {
-                console.log('Success:', data);
                 setLightStatus(false);
             })
             .catch(error => {
@@ -100,10 +99,11 @@ const updateChartData = (data) => {
             });
     };
 
+    // Send request to sensor to calibrate the spectrophotometer
     const calibrate = () => {
         setInAction(true);
 
-        const url = `http://${sensor_ip}:5000/spectrophotometer/calibrate`;
+        const url = `http://${sensor_ip}:${sensor_port}/spectrophotometer/calibrate`;
 
         fetch(url, {
             method: 'POST',
@@ -119,7 +119,6 @@ const updateChartData = (data) => {
                 return response.json();
             })
             .then(data => {
-                console.log('Success:', data);
                 setInAction(false);
             })
             .catch(error => {
@@ -128,8 +127,9 @@ const updateChartData = (data) => {
             });
     };
 
+    // Check the light status for sensor
     const checkLightStatus = () => {
-        fetch(`http://${sensor_ip}:5000/lamp/is_active`, {
+        fetch(`http://${sensor_ip}:${sensor_port}/lamp/is_active`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -143,7 +143,6 @@ const updateChartData = (data) => {
                 return response.json();
             })
             .then(data => {
-                console.log('Success:', data);
                 setLightStatus(data.message === "true");
             })
             .catch(error => {
@@ -151,6 +150,8 @@ const updateChartData = (data) => {
             });
     };
 
+
+    // Check the light status every 5 seconds
     useEffect(() => {
         checkLightStatus();
 
@@ -161,34 +162,34 @@ const updateChartData = (data) => {
         return () => clearInterval(intervalId);
     }, []);
 
+    // When news spectra is finished, check the update, load and display new specs
     useEffect(() => {
-    if (preScanCount !== 0) {
-        fetch(`http://127.0.0.1:8000/api/get_lasts_spectrum_cycle_0?sensor_id=2`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+        if (preScanCount !== 0) {
+            fetch(`/api/get_lasts_spectrum_cycle_0?sensor_id=${sensor_id}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
             })
-            .then(data => {
-                console.log('Success:', data);
-                updateChartData(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-}, [preScanCount]);
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    updateChartData(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }, [preScanCount]);
 
-
+    // Get the current spectra from the sensor spectrophotometer
     const scanNow = () => {
-        const url = `http://${sensor_ip}:5000/spectrophotometer/get_measure`;
+        const url = `http://${sensor_ip}:${sensor_port}/spectrophotometer/get_measure`;
 
         fetch(url, {
             method: 'GET',
@@ -204,13 +205,12 @@ const updateChartData = (data) => {
                 return response.json();
             })
             .then(data => {
-                console.log('Success:', data);
                 const newWavelengths = data.message.wavelengths;
                 const newIntensities = data.message.intensities;
                 const currentScan = {
                     standard_concentration: [{
                         type: 'Current Scan',
-                        values: newWavelengths.map((wavelength, index) => ({ wavelength, value: newIntensities[index] }))
+                        values: newWavelengths.map((wavelength, index) => ({wavelength, value: newIntensities[index]}))
                     }]
                 };
                 updateChartData(currentScan);
