@@ -133,7 +133,7 @@ const ValvePort = ({numberOfPorts = 8, inAction, setInAction, isDeployed, allowA
     };
 
     // Create ports array dynamically
-    const ports = generatePorts(maxPort);
+    const ports = generatePorts(numberOfPorts);
 
     return (
         <div className={"w-1/6 flex flex-col"}>
