@@ -15,7 +15,7 @@ function ManualControlApp() {
     const [isDeployed, setIsDeployed] = useState();
 
     // State for connection status
-    const [connected, setConnected] = useState(true);
+    const [connected, setConnected] = useState(false);
 
     // State for action status
     const [inAction, setInAction] = useState(false);
@@ -87,7 +87,7 @@ function ManualControlApp() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                setConnected(true);
+                setConnected(false);
             });
         }
     };
@@ -142,27 +142,27 @@ function ManualControlApp() {
                             </div>
                             <div className="flex flex-row justify-between pb-12">
                                 <Serial allowAnything={allowAnything} setInAction={setInAction}
-                                                    inAction={inAction} isDeployed={isDeployed}/>
+                                        inAction={inAction} isDeployed={isDeployed}/>
                             </div>
+                            <label className="mb-4 font-montserrat">
+                                <input
+                                    type="checkbox"
+                                    checked={allowAnything}
+                                    onChange={(e) => setAllowAnything(e.target.checked)}
+                                    className="mr-2"
+                                />
+                                Allow Anything
+                            </label>
                         </>
                     ) : (
                         <div className="font-montserrat rounded-lg border border-red-700 bg-red-100 text-red-700 mb-5">
                             <div className="flex flex-row h-min py-2 px-3">
-                            <img src="/static/img/ico/icons8-warning-red-512.svg" alt="Warning"
+                                <img src="/static/img/ico/icons8-warning-red-512.svg" alt="Warning"
                                      className="w-6 h-6 mr-2"/>
                                 <p>Sensor is disconnected. You can't use the manual mode.</p>
                             </div>
                         </div>
                     )}
-                    <label className="mb-4 font-montserrat">
-                        <input
-                            type="checkbox"
-                            checked={allowAnything}
-                            onChange={(e) => setAllowAnything(e.target.checked)}
-                            className="mr-2"
-                        />
-                        Allow Anything
-                    </label>
                 </div>
             )}
         </>
