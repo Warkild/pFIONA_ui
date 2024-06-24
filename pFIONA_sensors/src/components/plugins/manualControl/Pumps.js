@@ -7,7 +7,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
      * VARIABLES
      */
 
-        // Pump 1
+    // Pump 1
     const [volumePump1, setVolumePump1] = useState(0);
     const [flowRatePump1, setFlowRatePump1] = useState(0);
     const [aspirateDispensePump1, setAspirateDispensePump1] = useState(true); // default true : dispense
@@ -29,7 +29,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
      * ALERT MESSAGE
      */
 
-        // Alert box state
+    // Alert box state
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Alert box error message
@@ -59,7 +59,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                 volumeRequest = -volumePump1
             }
 
-            const url = `http://${sensor_ip}:5000/steppump/1/run_pump`;
+            const url = `http://${sensor_ip}:${sensor_port}/steppump/1/run_pump`;
 
             setInAction(true);
             setRunningPump1(true);
@@ -116,7 +116,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                 volumeRequest = -volumePump2
             }
 
-            const url = `http://${sensor_ip}:5000/steppump/2/run_pump`;
+            const url = `http://${sensor_ip}:${sensor_port}/steppump/2/run_pump`;
 
             setInAction(true);
             setRunningPump2(true);
@@ -182,7 +182,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                 volumeRequest2 = -volumePump2
             }
 
-            const url = `http://${sensor_ip}:5000/steppump/1/run_both_pumps`;
+            const url = `http://${sensor_ip}:${sensor_port}/steppump/1/run_both_pumps`;
 
             setInAction(true);
             setRunningBoth(true);
@@ -225,6 +225,9 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
         }
     }
 
+    /**
+     * Check values before launch
+     * **/
     const checkValuesPump1 = () => {
         let volumePump1isInt = !isNaN(parseInt(volumePump1, 10));
         if (!volumePump1isInt) {
@@ -274,7 +277,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
             setInAction(true)
             setSlewingPump1(true)
             if (flowRatePump1 >= 1) {
-                const url = `http://${sensor_ip}:5000/steppump/1/slew`;
+                const url = `http://${sensor_ip}:${sensor_port}/steppump/1/slew`;
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -309,7 +312,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
             setInAction(true)
             setSlewingPump2(true)
             if (flowRatePump2 >= 1) {
-                const url = `http://${sensor_ip}:5000/steppump/2/slew`;
+                const url = `http://${sensor_ip}:${sensor_port}/steppump/2/slew`;
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -344,7 +347,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
             setInAction(true)
             setSlewingPumpBoth(true)
             if (flowRatePump1 >= 1 && flowRatePump2 >= 1) {
-                const url = `http://${sensor_ip}:5000/steppump/1/slew_both_pumps`;
+                const url = `http://${sensor_ip}:${sensor_port}/steppump/1/slew_both_pumps`;
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -377,7 +380,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
 
     const endSlewPump1 = () => {
         try {
-            const url = `http://${sensor_ip}:5000/steppump/1/slew`;
+            const url = `http://${sensor_ip}:${sensor_port}/steppump/1/slew`;
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -407,7 +410,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
 
     const endSlewPump2 = () => {
         try {
-            const url = `http://${sensor_ip}:5000/steppump/2/slew`;
+            const url = `http://${sensor_ip}:${sensor_port}/steppump/2/slew`;
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -437,7 +440,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
 
     const endSlewPumpBoth = () => {
         try {
-            const url = `http://${sensor_ip}:5000/steppump/2/slew_both_pumps`;
+            const url = `http://${sensor_ip}:${sensor_port}/steppump/2/slew_both_pumps`;
             fetch(url, {
                 method: 'POST',
                 headers: {

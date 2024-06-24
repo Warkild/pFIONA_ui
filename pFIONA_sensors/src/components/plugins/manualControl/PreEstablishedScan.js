@@ -3,23 +3,31 @@ import Select from 'react-select';
 import Alert from "../universal/Alert";
 
 function PreEstablishedScan({ inAction, setInAction, handleSpecFinish }) {
+
+    // This component is used to manage pre-established scan (blank / sample / standard) for a selected reaction
+
+    // List of reactions from database
     const [reactionNames, setReactionNames] = useState([]);
+
+    // Selected reaction by user
     const [selectedReaction, setSelectedReaction] = useState(null);
 
-    // Fetch the reaction names from the API
+    // Fetch the reaction names from the Django's API
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/api/get_current_reaction/${sensor_id}`)
+        fetch(`/api/get_current_reaction/${sensor_id}`)
             .then(response => response.json())
             .then(data => setReactionNames(data.reaction_names))
             .catch(error => console.error('Error fetching reaction names:', error));
     }, [sensor_id]);
 
+    // Function do change selected reaction when new reaction is selected
     const handleReactionChange = (selectedOption) => {
         setSelectedReaction(selectedOption);
     };
 
+    // Launch scan in sensor
     const launchScan = (scanType) => {
-        const url = `http://${sensor_ip}:5000/sensor/save_${scanType}_spectrum`;
+        const url = `http://${sensor_ip}:${sensor_port}/sensor/save_${scanType}_spectrum`;
         setInAction(true);
         fetch(url, {
             method: 'POST',

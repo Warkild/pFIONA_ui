@@ -287,7 +287,7 @@ def get_mean_absorbance_spectrums_in_cycle(timestamp, sensor_id, cycle):
     return mean_absorbance_data, wavelengths, deployment_info
 
 
-def get_monitored_wavelength_values(timestamp, sensor_id, cycle):
+def get_monitored_wavelength_values_in_cycle(timestamp, sensor_id, cycle):
     mean_absorbance_data, wavelengths, deployment_info = get_mean_absorbance_spectrums_in_cycle(timestamp, sensor_id,
                                                                                                 cycle)
 
@@ -298,7 +298,7 @@ def get_monitored_wavelength_values(timestamp, sensor_id, cycle):
 
     for reaction, types in mean_absorbance_data.items():
         # Récupérer l'objet Reaction correspondant au nom de la réaction
-        reaction_obj = Reaction.objects.get(name=reaction)
+        reaction_obj = Reaction.objects.get(name=reaction, standard__pfiona_sensor_id=sensor_id)
 
         # Récupérer toutes les longueurs d'onde surveillées pour cette réaction
         monitored_wavelengths = list(
@@ -336,7 +336,7 @@ def get_monitored_wavelength_values_in_deployment(timestamp, sensor_id):
     deployment_info = None
 
     for cycle in range(1, total_cycles + 1):
-        monitored_wavelength_values, deployment_info = get_monitored_wavelength_values(timestamp, sensor_id, cycle)
+        monitored_wavelength_values, deployment_info = get_monitored_wavelength_values_in_cycle(timestamp, sensor_id, cycle)
 
         if monitored_wavelength_values:
             # Extraire les temps de début et de fin de cycle
@@ -369,58 +369,12 @@ def get_monitored_wavelength_values_in_deployment(timestamp, sensor_id):
     return all_monitored_wavelength_values, deployment_info
 
 
-def get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id):
-    # Obtenir le nombre de cycles pour le déploiement
-    total_cycles = get_cycle_count(timestamp, sensor_id)
-
-    all_monitored_wavelength_values = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
-    deployment_info = None
-
-    for cycle in range(1, total_cycles + 1):
-        monitored_wavelength_values, deployment_info = get_monitored_wavelength_values(timestamp, sensor_id, cycle)
-
-        if monitored_wavelength_values:
-            # Extraire les temps de début et de fin de cycle
-            cycle_start_time = deployment_info.pop('cycle_start_time', None)
-            cycle_end_time = deployment_info.pop('cycle_end_time', None)
-
-            for reaction, types in monitored_wavelength_values.items():
-                if cycle not in all_monitored_wavelength_values[reaction]:
-                    all_monitored_wavelength_values[reaction][cycle] = defaultdict(dict)
-
-                # Ajouter les temps de début et de fin de cycle
-                all_monitored_wavelength_values[reaction][cycle]['cycle_start_time'] = cycle_start_time
-                all_monitored_wavelength_values[reaction][cycle]['cycle_end_time'] = cycle_end_time
-
-                for type_key, wavelength_values in types.items():
-                    wavelengths = sorted(wavelength_values.keys())
-                    if len(wavelengths) > 1:
-                        # Garder la dernière longueur d'onde
-                        last_wavelength = wavelengths[-1]
-                        last_value = wavelength_values[last_wavelength]
-
-                        # Faire la soustraction pour toutes les autres longueurs d'onde
-                        for wavelength in wavelengths[:-1]:
-                            if type_key not in all_monitored_wavelength_values[reaction][cycle]:
-                                all_monitored_wavelength_values[reaction][cycle][type_key] = {}
-                            subtracted_value = wavelength_values[wavelength] - last_value
-                            all_monitored_wavelength_values[reaction][cycle][type_key][wavelength] = subtracted_value
-
-    # Convertir defaultdict en dict pour assurer la sérialisation JSON
-    all_monitored_wavelength_values = {reaction: {
-        cycle: {type_key: dict(wavelength_values) if isinstance(wavelength_values, defaultdict) else wavelength_values
-                for type_key, wavelength_values in types.items()} for cycle, types in cycles.items()} for
-        reaction, cycles in all_monitored_wavelength_values.items()}
-
-    return all_monitored_wavelength_values, deployment_info
-
-
 def calculate_concentration_for_deployment(timestamp, sensor_id):
     monitored_wavelength_values, deployment_info = get_monitored_wavelength_values_in_deployment(timestamp, sensor_id)
     concentrations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
 
     for reaction, cycles in monitored_wavelength_values.items():
-        std_conc = get_standard_concentration(reaction_name=reaction)
+        std_conc = get_standard_concentration(reaction_name=reaction, sensor_id=sensor_id)
         for cycle, types in cycles.items():
             cycle_start_time = types.get('cycle_start_time')
             cycle_end_time = types.get('cycle_end_time')
@@ -471,7 +425,7 @@ def calculate_concentration_for_deployment(timestamp, sensor_id):
                     else:
                         # Find the last cycle with standard dillutions
                         last_standard_dillution_data = get_last_standard_dillution(reaction, cycle, wavelength,
-                                                                                   monitored_wavelength_values)
+                                                                                   monitored_wavelength_values, sensor_id)
                         if last_standard_dillution_data:
                             dilution_levels, absorbance_values = last_standard_dillution_data
                             slope, intercept = np.polyfit(dilution_levels, absorbance_values, 1)
@@ -494,7 +448,7 @@ def calculate_concentration_for_deployment(timestamp, sensor_id):
     return concentrations, deployment_info
 
 
-def get_last_standard_dillution(reaction, cycle, wavelength, monitored_wavelength_values):
+def get_last_standard_dillution(reaction, cycle, wavelength, monitored_wavelength_values, sensor_id):
     cycles = sorted(monitored_wavelength_values[reaction].keys())
     cycle_index = cycles.index(cycle)
 
@@ -513,7 +467,7 @@ def get_last_standard_dillution(reaction, cycle, wavelength, monitored_wavelengt
                 for dilution, absorbances in standard_dilution_data.items():
                     if wavelength in absorbances:
                         dilution_level = int(dilution.split('_')[-1]) * 0.25 * get_standard_concentration(
-                            reaction_name=reaction)
+                            reaction_name=reaction, sensor_id=sensor_id)
                         dilution_levels.append(dilution_level)
                         absorbance_values.append(absorbances[wavelength])
 

@@ -1,11 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import Alert from "../universal/Alert";
 
-function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
+function AuxPump({inAction, setInAction, isDeployed, allowAnything}) {
+
+    // This component is used to manage aux pump
+
+    // Status if aux pump running
     const [auxPumpRunning, setAuxPumpRunning] = useState(false);
 
+    // Function to turn on pump throw sensor API
     const turnOnAuxPump = () => {
-        const url = `http://${sensor_ip}:5000/auxpump/turn_on`;
+        const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_on`;
 
         fetch(url, {
             method: 'POST',
@@ -32,8 +36,9 @@ function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
             });
     };
 
+    // Function to turn off pump throw sensor API
     const turnOffAuxPump = () => {
-        const url = `http://${sensor_ip}:5000/auxpump/turn_off`;
+        const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_off`;
 
         fetch(url, {
             method: 'POST',
@@ -60,38 +65,41 @@ function AuxPump({ inAction, setInAction, isDeployed, allowAnything }) {
             });
     };
 
+    // Function to get the state of aux pump from sensor
     const getStatus = () => {
-    fetch(`http://${sensor_ip}:5000/auxpump/is_active`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Success:', data);
-      setAuxPumpRunning(JSON.parse(data.message));
-    })
-    .catch(error => {
-      console.error('Error:', error);
-    });
-  };
+        fetch(`http://${sensor_ip}:${sensor_port}/auxpump/is_active`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                setAuxPumpRunning(JSON.parse(data.message));
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
 
+
+    // Check the real aux pump status from the sensor every 5 seconds
     useEffect(() => {
-    getStatus();
+        getStatus();
 
-    const intervalId = setInterval(() => {
-      getStatus();
-    }, 2000);
+        const intervalId = setInterval(() => {
+            getStatus();
+        }, 2000);
 
-    return () => clearInterval(intervalId);
-  }, []);
+        return () => clearInterval(intervalId);
+    }, []);
 
     return (
         <div className={"w-2/12 flex flex-col"}>

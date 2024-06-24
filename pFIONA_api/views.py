@@ -524,7 +524,7 @@ def test(request):
         if not q.models.Sensor.objects.filter(id=sensor_id).exists():
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
-        absorbance_data, deployment_info = get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id)
+        absorbance_data, deployment_info = get_spectrums_in_deployment_full_info(timestamp, sensor_id)
         return JsonResponse(
             {"spectrums_data": absorbance_data, "deployment_info": deployment_info})
 
