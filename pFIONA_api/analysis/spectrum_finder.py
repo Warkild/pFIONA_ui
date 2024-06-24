@@ -416,9 +416,7 @@ def get_monitored_wavelength_values_absorbance_substraction(timestamp, sensor_id
 
 
 def calculate_concentration_for_deployment(timestamp, sensor_id):
-    monitored_wavelength_values, deployment_info = get_monitored_wavelength_values_absorbance_substraction(timestamp,
-                                                                                                           sensor_id)
-
+    monitored_wavelength_values, deployment_info = get_monitored_wavelength_values_in_deployment(timestamp, sensor_id)
     concentrations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
 
     for reaction, cycles in monitored_wavelength_values.items():
@@ -430,24 +428,98 @@ def calculate_concentration_for_deployment(timestamp, sensor_id):
             abs_sample = types.get('Sample', {})
             abs_standard = types.get('Standard', {})
 
-            for wavelength in abs_sample.keys():
-                if wavelength in abs_blank and wavelength in abs_standard:
-                    abs_sample_val = abs_sample[wavelength]
-                    abs_blank_val = abs_blank[wavelength]
-                    abs_standard_val = abs_standard[wavelength]
+            wavelengths = sorted(list(abs_sample.keys()))
+            if wavelengths:
+                reference_wavelength = wavelengths[-1]
 
-                    conc = concentration(abs_sample_val, abs_blank_val, abs_standard_val, std_conc)
-                    concentrations[reaction][cycle]['concentration'][wavelength] = conc
-                    concentrations[reaction][cycle]['cycle_start_time'] = cycle_start_time
-                    concentrations[reaction][cycle]['cycle_end_time'] = cycle_end_time
+            if any(key.startswith('Standard_Dillution') for key in types.keys()):
+                # Handle the case with standard dilutions
+                standard_dilution_data = {key: types[key] for key in types.keys() if
+                                          key.startswith('Standard_Dillution')}
+                for wavelength in wavelengths[:-1]:
+                    # Collect the dilution levels and corresponding absorbance values
+                    dilution_levels = []
+                    absorbance_values = []
 
-    # Convertir defaultdict en dict pour assurer la sérialisation JSON
+                    for dilution, absorbances in standard_dilution_data.items():
+                        if wavelength in absorbances:
+                            dilution_level = int(dilution.split('_')[-1]) * 0.25 * std_conc
+                            absorbance_value = absorbances[wavelength]
+                            dilution_levels.append(dilution_level)
+                            absorbance_values.append(absorbance_value)
+
+                    # Calculate the linear regression
+                    slope, intercept = np.polyfit(dilution_levels, absorbance_values, 1)
+
+                    if wavelength in abs_sample:
+                        sample_absorbance = abs_sample[wavelength]
+                        sample_concentration = (sample_absorbance - intercept) / slope
+                        concentrations[reaction][cycle]['concentration'][wavelength] = sample_concentration
+
+            else:
+                # Handle the regular case with blank/sample/standard or find last standard dillution
+                for wavelength in wavelengths[:-1]:
+                    if wavelength in abs_blank and reference_wavelength in abs_blank and wavelength in abs_standard and reference_wavelength in abs_standard:
+                        # Regular case with blank/sample/standard
+                        abs_sample_val = abs_sample[wavelength] - abs_sample[reference_wavelength]
+                        abs_blank_val = abs_blank[wavelength] - abs_blank[reference_wavelength]
+                        abs_standard_val = abs_standard[wavelength] - abs_standard[reference_wavelength]
+
+                        conc = concentration(abs_sample_val, abs_blank_val, abs_standard_val, std_conc)
+                        concentrations[reaction][cycle]['concentration'][wavelength] = conc
+
+                    else:
+                        # Find the last cycle with standard dillutions
+                        last_standard_dillution_data = get_last_standard_dillution(reaction, cycle, wavelength,
+                                                                                   monitored_wavelength_values)
+                        if last_standard_dillution_data:
+                            dilution_levels, absorbance_values = last_standard_dillution_data
+                            slope, intercept = np.polyfit(dilution_levels, absorbance_values, 1)
+
+                            if wavelength in abs_sample:
+                                sample_absorbance = abs_sample[wavelength]
+                                sample_concentration = (sample_absorbance - intercept) / slope
+                                concentrations[reaction][cycle]['concentration'][wavelength] = sample_concentration
+
+            # Store cycle start and end times
+            concentrations[reaction][cycle]['cycle_start_time'] = cycle_start_time
+            concentrations[reaction][cycle]['cycle_end_time'] = cycle_end_time
+
+    # Convert defaultdict to dict to ensure JSON serialization
     concentrations = {reaction: {
         cycle: {type_key: dict(wavelength_values) if isinstance(wavelength_values, defaultdict) else wavelength_values
                 for type_key, wavelength_values in types.items()} for cycle, types in cycles.items()} for
         reaction, cycles in concentrations.items()}
 
     return concentrations, deployment_info
+
+
+def get_last_standard_dillution(reaction, cycle, wavelength, monitored_wavelength_values):
+    cycles = sorted(monitored_wavelength_values[reaction].keys())
+    cycle_index = cycles.index(cycle)
+
+    for i in range(cycle_index - 1, -1, -1):
+        previous_cycle = cycles[i]
+        if any(key.startswith('Standard_Dillution') for key in
+               monitored_wavelength_values[reaction][previous_cycle].keys()):
+            standard_dilution_data = {key: monitored_wavelength_values[reaction][previous_cycle][key] for key in
+                                      monitored_wavelength_values[reaction][previous_cycle].keys() if
+                                      key.startswith('Standard_Dillution')}
+
+            if wavelength in list(standard_dilution_data.values())[0].keys():
+                dilution_levels = []
+                absorbance_values = []
+
+                for dilution, absorbances in standard_dilution_data.items():
+                    if wavelength in absorbances:
+                        dilution_level = int(dilution.split('_')[-1]) * 0.25 * get_standard_concentration(
+                            reaction_name=reaction)
+                        dilution_levels.append(dilution_level)
+                        absorbance_values.append(absorbances[wavelength])
+
+                return dilution_levels, absorbance_values
+
+    return None
 
 
 def get_deployment_list(sensor_id):

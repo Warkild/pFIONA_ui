@@ -3,7 +3,7 @@ import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
 
-const ConcentrationChart = () => {
+const ConcentrationChart = ({ }) => {
     const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm'));
     const [selectedReaction, setSelectedReaction] = useState('');
     const [loading, setLoading] = useState(false);
@@ -11,12 +11,6 @@ const ConcentrationChart = () => {
     const [chartData, setChartData] = useState(null);
     const [availableReactions, setAvailableReactions] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
-
-    useEffect(() => {
-        if (timestamp) {
-            fetchConcentrationData();
-        }
-    }, [timestamp]);
 
     useEffect(() => {
         if (selectedReaction && data) {
@@ -86,13 +80,12 @@ const ConcentrationChart = () => {
     };
 
     const getColor = (wavelength) => {
-        // You can implement a color map here if needed
         const colors = {
             '810.0': 'rgb(255, 99, 132)',
             '660.0': 'rgb(54, 162, 235)',
             '880.0': 'rgb(75, 192, 192)',
         };
-        return colors[wavelength] || 'rgb(0, 0, 0)'; // default to black
+        return colors[wavelength] || 'rgb(0, 0, 0)';
     };
 
     return (
@@ -116,6 +109,14 @@ const ConcentrationChart = () => {
                                 />
                             </label>
                         </div>
+                        <button
+                            type="button"
+                            onClick={fetchConcentrationData}
+                            disabled={loading}
+                            className="mt-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Fetch Deployment
+                        </button>
                     </form>
                     {!loading && errorMessage && <div className="text-red-500 mb-5">{errorMessage}</div>}
                     <div className="mt-4">
@@ -145,7 +146,7 @@ const ConcentrationChart = () => {
                                 options={{
                                     responsive: true,
                                     maintainAspectRatio: false,
-                                    animation: false, // Désactiver les animations
+                                    animation: false,
                                     scales: {
                                         x: {
                                             title: {
@@ -164,7 +165,7 @@ const ConcentrationChart = () => {
                                         tooltip: {
                                             callbacks: {
                                                 title: function (context) {
-                                                    return context[0].label; // Cycle start time
+                                                    return context[0].label;
                                                 },
                                                 label: function (context) {
                                                     let label = context.dataset.label || '';
@@ -172,7 +173,7 @@ const ConcentrationChart = () => {
                                                         label += ': ';
                                                     }
                                                     if (context.parsed.y !== null) {
-                                                        label += context.parsed.y.toFixed(2); // round concentration to 2 decimal places
+                                                        label += context.parsed.y.toFixed(2);
                                                     }
                                                     return label;
                                                 }
