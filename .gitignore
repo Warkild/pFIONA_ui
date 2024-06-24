@@ -13,3 +13,6 @@ pFIONA_ui/__pycache__/settings.cpython-311.pyc
 /pFIONA_sensors/node_modules
 /pFIONA_api/__pycache__
 /pFIONA_api/migrations/__pycache__
+/pFIONA_sensors/templatetags/__pycache__
+/theme/__pycache__
+/pFIONA_api/analysis/__pycache__

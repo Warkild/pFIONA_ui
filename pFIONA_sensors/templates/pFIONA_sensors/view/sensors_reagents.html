@@ -18,6 +18,7 @@
         let reagents_json = {{ reagents_json|safe }}
         let reactions_json = {{ reactions_json|safe }}
         let sensor_id = {{ id }}
+        let sensor_ip = "{{ ip_address }}";
     </script>
     <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>

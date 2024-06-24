@@ -16,7 +16,8 @@
         </div>
     </div>
     <script>
-        let sensor_id = {{ id }}
+        let sensor_id = "{{ id }}";
+        let sensor_ip = "{{ ip_address }}"
     </script>
     <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>

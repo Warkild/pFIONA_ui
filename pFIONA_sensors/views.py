@@ -4,17 +4,20 @@ import json
 
 from django.db import transaction
 
-from pFIONA_sensors import queries as q, models
+from pFIONA_api import queries as q
+
+import pandas as pd
 
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework_simplejwt.tokens import RefreshToken
 
-from pFIONA_auth.serializers import CustomTokenObtainPairSerializer
 from pFIONA_sensors.models import Sensor, Reagent, Step, Reaction, Spectrum
-from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm
+from pFIONA_api.analysis.formula import absorbance
+from pFIONA_api.analysis.spectrum_finder import *
+from .decorators import admin_required
+from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm, SensorSettingsForm
 
 
 @login_required()
@@ -56,7 +59,8 @@ def sensors_manual(request, sensor_id):
 def sensors_deploy(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     q.is_deployed(sensor_id)
-    return render(request, 'pFIONA_sensors/view/sensors_deploy.html', {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,})
+    return render(request, 'pFIONA_sensors/view/sensors_deploy.html',
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, })
 
 
 @login_required()
@@ -89,7 +93,7 @@ def sensors_reagents(request, sensor_id):
     # REACTIONS
 
     volume_to_adds = Step.objects.filter(pfiona_reagent__in=reagents)
-    reactions = Reaction.objects.filter(step__in=volume_to_adds).distinct()
+    reactions = Reaction.objects.filter(step__in=volume_to_adds).distinct().order_by('name')
 
     reactions_data = [{
         'id': reaction.id,
@@ -97,6 +101,8 @@ def sensors_reagents(request, sensor_id):
     } for reaction in reactions]
 
     reactions_json = json.dumps(reactions_data)
+
+    print(reactions_json)
 
     # RENDER
 
@@ -132,6 +138,7 @@ def sensors_reagents_valve_update(request, sensor_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_delete(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
     reactions = q.get_reactions_associated_reagent(reagent_id)
@@ -144,6 +151,7 @@ def sensors_reagent_delete(request, sensor_id, reagent_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_deletion(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
 
@@ -155,8 +163,6 @@ def sensors_reagent_deletion(request, sensor_id, reagent_id):
         reaction_ids_from_volume_to_add = set(vta.pfiona_reaction_id for vta in volume_to_adds)
         reaction_ids = standard_reaction_ids.union(reaction_ids_from_volume_to_add)
 
-        Sensor.objects.filter(actual_reaction_id__in=reaction_ids).update(actual_reaction=None)
-
         Reaction.objects.filter(id__in=reaction_ids).delete()
 
         reagent.delete()
@@ -165,6 +171,7 @@ def sensors_reagent_deletion(request, sensor_id, reagent_id):
 
 
 @login_required()
+@admin_required
 def sensors_reaction_delete(request, sensor_id, reaction_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     sensor.actual_reaction_id = None
@@ -177,6 +184,7 @@ def sensors_reaction_delete(request, sensor_id, reaction_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_edit(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)
     reagent_form = ReagentEditForm(request.POST or None, instance=reagent, prefix='reagent')
@@ -194,13 +202,22 @@ def sensors_reagent_edit(request, sensor_id, reagent_id):
 
 
 @login_required()
+@admin_required
 def sensors_reagent_add(request, sensor_id):
     if request.method == 'POST':
         reagent_form = ReagentEditForm(request.POST, prefix='reagent')
         if reagent_form.is_valid():
+            max_id = \
+                Reagent.objects.filter(id__gte=sensor_id * 10000000,
+                                                          id__lte=(sensor_id + 1) * 10000000).aggregate(Max('id'))[
+                    'id__max']
+
+            if max_id is None:
+                max_id = sensor_id * 10000000
             new_reagent = reagent_form.save(commit=False)
             new_reagent.pfiona_sensor_id = sensor_id
             new_reagent.volume = 0
+            new_reagent.id = max_id + 1
             new_reagent.save()
             return redirect('sensors_reagents', sensor_id=sensor_id)
     else:
@@ -213,33 +230,46 @@ def sensors_reagent_add(request, sensor_id):
 
 
 @login_required
+@admin_required
 def sensors_settings(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')
     lat_long_form = SensorLatLongForm(request.POST or None, instance=sensor, prefix='lat_long')
+    sensor_settings_form = SensorSettingsForm(request.POST or None, instance=sensor, prefix='settings')
 
     if request.method == 'POST':
-        print("********************")
-        print(f"{request.method}")
-        print(f"{request.POST}")
         if 'submit_name_notes' in request.POST:
             name_notes_form = SensorNameAndNotesForm(request.POST, instance=sensor, prefix='name_notes')
             if name_notes_form.is_valid():
                 name_notes_form.save()
                 return redirect('sensors_settings', sensor_id=sensor_id)
-        if 'submit_lat_long' in request.POST:
+            # Reinitialize other forms to preserve the existing values
+            lat_long_form = SensorLatLongForm(None, instance=sensor, prefix='lat_long')
+            sensor_settings_form = SensorSettingsForm(None, instance=sensor, prefix='settings')
+        elif 'submit_lat_long' in request.POST:
             lat_long_form = SensorLatLongForm(request.POST, instance=sensor, prefix='lat_long')
-            print(lat_long_form.is_valid())
             if lat_long_form.is_valid():
                 lat_long_form.save()
                 return redirect('sensors_settings', sensor_id=sensor_id)
+            # Reinitialize other forms to preserve the existing values
+            name_notes_form = SensorNameAndNotesForm(None, instance=sensor, prefix='name_notes')
+            sensor_settings_form = SensorSettingsForm(None, instance=sensor, prefix='settings')
+        elif 'submit_sensor_settings' in request.POST:
+            sensor_settings_form = SensorSettingsForm(request.POST, instance=sensor, prefix='settings')
+            if sensor_settings_form.is_valid():
+                sensor_settings_form.save()
+                return redirect('sensors_settings', sensor_id=sensor_id)
+            # Reinitialize other forms to preserve the existing values
+            name_notes_form = SensorNameAndNotesForm(None, instance=sensor, prefix='name_notes')
+            lat_long_form = SensorLatLongForm(None, instance=sensor, prefix='lat_long')
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor,
-                   'lat_long_form': lat_long_form})
+                   'lat_long_form': lat_long_form, 'sensor_settings_form': sensor_settings_form})
 
 
 @login_required()
+@admin_required
 def sensors_reaction_add(request, sensor_id):
     reagents_json = q.get_utils_reagents(sensor_id, return_json=True)
 
@@ -250,10 +280,11 @@ def sensors_reaction_add(request, sensor_id):
 
 
 @login_required()
+@admin_required
 def sensors_reaction_edit(request, sensor_id, reaction_id):
     reagents_json = q.get_utils_reagents(sensor_id, return_json=True)
 
-    reaction_json = q.get_reaction_details(reaction_id)
+    reaction_json = q.get_reaction_details(reaction_id=reaction_id, sensor_id=sensor_id)
 
     return render(request, 'pFIONA_sensors/view/sensors_reaction_edit.html', {
         'id': sensor_id,
@@ -262,49 +293,3 @@ def sensors_reaction_edit(request, sensor_id, reaction_id):
     })
 
 
-@login_required()
-def export_spectra_csv(request):
-    start_timestamp_ms = request.GET.get('start')
-    end_timestamp_ms = request.GET.get('end')
-    sensor_id = request.GET.get('sensor_id')
-
-    response = HttpResponse(
-        content_type='text/csv',
-        headers={'Content-Disposition': 'attachment; filename="spectra.csv"'},
-    )
-    writer = csv.writer(response)
-
-    if start_timestamp_ms and end_timestamp_ms:
-        start_timestamp = int(start_timestamp_ms) // 1000
-        end_timestamp = int(end_timestamp_ms) // 1000
-
-        query = Spectrum.objects.filter(
-            pfiona_time__timestamp__gte=start_timestamp,
-            pfiona_time__timestamp__lte=end_timestamp,
-            pfiona_sensor=sensor_id
-        ).select_related('pfiona_spectrumtype', 'pfiona_time')
-    else:
-        query = Spectrum.objects.all().select_related('pfiona_spectrumtype', 'pfiona_time')
-
-    spectra = query
-    all_wavelengths = sorted(set(value.wavelength for spectrum in spectra for value in spectrum.value_set.all()))
-    header = ['SpectrumType', 'Timestamp (Local Time)'] + [str(wl) for wl in all_wavelengths]
-    writer.writerow(header)
-
-    for spectrum in spectra:
-        spectrum_type = spectrum.pfiona_spectrumtype.type
-        local_datetime = datetime.datetime.fromtimestamp(spectrum.pfiona_time.timestamp).strftime('%m/%d/%Y %H:%M:%S')
-        values_dict = {value.wavelength: value.value for value in spectrum.value_set.all()}
-        row = [spectrum_type, local_datetime] + [values_dict.get(wl, '') for wl in all_wavelengths]
-        writer.writerow(row)
-
-    return response
-
-
-@login_required
-def prepare_export_spectra_csv(request):
-    return render(request, "prepare_export.html", {
-        'sensor_id': request.GET.get('sensor_id', ''),
-        'start': request.GET.get('start', ''),
-        'end': request.GET.get('end', '')
-    })
