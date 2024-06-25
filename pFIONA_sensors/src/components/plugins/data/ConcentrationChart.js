@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
+import React, {useEffect, useState} from 'react';
+import {Line} from 'react-chartjs-2';
 import moment from 'moment';
 
-const ConcentrationChart = ({ }) => {
+const ConcentrationChart = ({}) => {
     const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm'));
     const [selectedReaction, setSelectedReaction] = useState('');
     const [loading, setLoading] = useState(false);
@@ -12,18 +11,12 @@ const ConcentrationChart = ({ }) => {
     const [availableReactions, setAvailableReactions] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
 
-    useEffect(() => {
-        if (selectedReaction && data) {
-            setChartData(generateChartData(data.spectrums_data[selectedReaction]));
-        }
-    }, [selectedReaction, data]);
-
     const fetchConcentrationData = async () => {
         setLoading(true);
         setErrorMessage('');
         try {
             const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`http://127.0.0.1:8000/api/get_concentration_for_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
+            const response = await fetch(`/api/get_concentration_for_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
             const result = await response.json();
             setData(result);
             const reactions = Object.keys(result.spectrums_data);
@@ -48,15 +41,22 @@ const ConcentrationChart = ({ }) => {
         setSelectedReaction(event.target.value);
     };
 
-    const generateChartData = (reactionData) => {
-        if (!reactionData) {
-            return { labels: [], datasets: [] };
+    useEffect(() => {
+        if (selectedReaction && data && data.spectrums_data[selectedReaction]) {
+            setChartData(generateChartData(data.spectrums_data[selectedReaction]));
         }
+    }, [selectedReaction, data]);
 
-        const labels = [];
-        const datasetMap = {};
+    const generateChartData = (reactionData) => {
+    if (!reactionData) {
+        return { labels: [], datasets: [] };
+    }
 
-        for (const [cycle, values] of Object.entries(reactionData)) {
+    const labels = [];
+    const datasetMap = {};
+
+    for (const [cycle, values] of Object.entries(reactionData)) {
+        if (values.concentration) {
             const cycleStartTime = moment.unix(values.cycle_start_time).format('YYYY-MM-DD HH:mm:ss');
             labels.push(cycleStartTime);
 
@@ -73,11 +73,12 @@ const ConcentrationChart = ({ }) => {
                 datasetMap[wavelength].data.push(concentration);
             }
         }
+    }
 
-        const datasets = Object.values(datasetMap);
+    const datasets = Object.values(datasetMap);
 
-        return { labels, datasets };
-    };
+    return { labels, datasets };
+};
 
     const getColor = (wavelength) => {
         const colors = {
@@ -140,7 +141,7 @@ const ConcentrationChart = ({ }) => {
                 </div>
                 <div>
                     {chartData && (
-                        <div className="mt-5" style={{ height: '500px' }}>
+                        <div className="mt-5" style={{height: '500px'}}>
                             <Line
                                 data={chartData}
                                 options={{

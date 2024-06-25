@@ -8,7 +8,7 @@ function DeployTransport({connected, isDeployed}) {
     const [flushPortsClicked, setFlushPortsClicked] = useState(false);
 
     useEffect(() => {
-        fetch(`http://127.0.0.1:8000/api/get_current_reagents_for_current_reaction/${sensor_id}`)
+        fetch(`/api/get_current_reagents_for_current_reaction/${sensor_id}`)
             .then(response => response.json())
             .then(data => {
                 if (data.status === "success" && data.reaction_names) {

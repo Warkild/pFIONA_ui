@@ -10,7 +10,7 @@ import {useState} from "react";
 
 // Fonction pour obtenir les JWT tokens
 function fetchAndStoreJwt() {
-  fetch('http://127.0.0.1:8000/jwt/', { // Assurez-vous que l'URL est correcte
+  fetch('/jwt/', { // Assurez-vous que l'URL est correcte
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'

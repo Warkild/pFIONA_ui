@@ -70,7 +70,7 @@ const MultiStandardChart = () => {
         setErrorMessage('');
         try {
             const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`http://127.0.0.1:8000/api/get_monitored_wavelength_values_in_deployment?sensor_id=2&timestamp=${epochTimestamp}`);
+            const response = await fetch(`/api/get_monitored_wavelength_values_in_deployment?sensor_id=2&timestamp=${epochTimestamp}`);
             const result = await response.json();
             setData(result.data);
             setDeploymentInfo(result.deployment_info);
@@ -84,7 +84,7 @@ const MultiStandardChart = () => {
 
     const fetchStandardConcentration = async (reactionName) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/get_standard_concentration?reaction_name=${reactionName}`);
+            const response = await fetch(`/api/get_standard_concentration?reaction_name=${reactionName}`);
             const result = await response.json();
             setStandardConcentration(result.standard_concentration);
         } catch (error) {
