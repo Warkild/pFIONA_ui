@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Line} from 'react-chartjs-2';
 import moment from 'moment';
 
-const SpectrumChart = () => {
+const SpectrumChart = ({}) => {
     const [cycleCount, setCycleCount] = useState(0);
     const [selectedCycle, setSelectedCycle] = useState('');
     const [selectedReaction, setSelectedReaction] = useState('');
@@ -60,64 +60,57 @@ const SpectrumChart = () => {
         }
     };
 
-const fetchSpectrumData = async (cycle) => {
-    setLoading(true);
-    try {
-        const epochTimestamp = moment(timestamp).unix();
-        const response = await fetch(`http://127.0.0.1:8000/api/get_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
-        const result = await response.json();
+    const fetchSpectrumData = async (cycle) => {
+        setLoading(true);
+        try {
+            const epochTimestamp = moment(timestamp).unix();
+            const response = await fetch(`http://127.0.0.1:8000/api/get_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
+            const result = await response.json();
 
-        if (!result || !result.spectrums_data) {
-            throw new Error('Spectrums data is missing or invalid');
-        }
+            if (!result || !result.spectrums_data) {
+                throw new Error('Spectrums data is missing or invalid');
+            }
 
-        const spectrumsData = result.spectrums_data;
-        const reactions = Object.keys(spectrumsData);
-        if (reactions.length === 0) {
-            throw new Error('No reactions data available');
-        }
+            const spectrumsData = result.spectrums_data;
+            const reactions = Object.keys(spectrumsData);
+            if (reactions.length === 0) {
+                throw new Error('No reactions data available');
+            }
 
-        setAvailableReactions(reactions);
-        setAllReactionsData(spectrumsData);
+            setAvailableReactions(reactions);
+            setAllReactionsData(spectrumsData);
 
-        if (reactions.includes(selectedReaction)) {
-            setData(spectrumsData[selectedReaction] || {});
-        } else {
             const firstReaction = reactions[0];
             setSelectedReaction(firstReaction);
             setData(spectrumsData[firstReaction] || {});
-        }
 
-        const firstReactionData = spectrumsData[selectedReaction] || spectrumsData[reactions[0]];
-
-        let wavelengths = [];
-        if (firstReactionData) {
-            for (const key in firstReactionData) {
-                const values = firstReactionData[key]?.['0']?.[0]?.values;
-                if (values) {
-                    wavelengths = values.map(v => v.wavelength);
-                    break;
+            let wavelengths = [];
+            for (const [reaction, types] of Object.entries(spectrumsData)) {
+                for (const [typeKey, subcycles] of Object.entries(types)) {
+                    for (const [subcycle, spectrumList] of Object.entries(subcycles)) {
+                        if (spectrumList.length > 0 && spectrumList[0].values.length > 0) {
+                            wavelengths = spectrumList[0].values.map(v => v[0]);
+                            break;
+                        }
+                    }
+                    if (wavelengths.length > 0) break;
                 }
+                if (wavelengths.length > 0) break;
             }
 
             if (wavelengths.length === 0) {
                 throw new Error('Invalid data structure: No valid values found in Sample or Standard');
             }
-        } else {
-            throw new Error('Invalid data structure: No data for selected reaction');
+
+            setWavelengths(wavelengths);
+            setDeploymentInfo(result.deployment_info);
+        } catch (error) {
+            console.error('Error fetching spectrum data:', error);
+            setErrorMessage(`Error fetching spectrum data: ${error.message}. Please try again.`);
+        } finally {
+            setLoading(false);
         }
-
-        setWavelengths(wavelengths);
-        setDeploymentInfo(result.deployment_info);
-    } catch (error) {
-        console.error('Error fetching spectrum data:', error);
-        setErrorMessage(`Error fetching spectrum data: ${error.message}. Please try again.`);
-    } finally {
-        setLoading(false);
-    }
-};
-
-
+    };
 
     const handleTimestampChange = (event) => {
         setTimestamp(event.target.value);
@@ -175,8 +168,6 @@ const fetchSpectrumData = async (cycle) => {
         'Standard_Dillution_3': 'rgb(255, 175, 0)',
         'Standard_Dillution_4_Reference': 'rgb(255, 255, 0)',
         'Standard_Dillution_4': 'rgb(255, 255, 0)',
-
-
     };
 
     const getRandomColor = () => {
@@ -207,7 +198,7 @@ const fetchSpectrumData = async (cycle) => {
                         const typeKey = extractType(spectrum.spectrumtype);
                         chartData.datasets.push({
                             label: `${typeKey} Subcycle ${subcycle}`,
-                            data: spectrum.values.map(v => v.value),
+                            data: spectrum.values.map(v => v[1]),
                             borderColor: colorMap[typeKey] || getRandomColor(), // Use random color if not found
                             fill: false,
                             tension: 0.1 // Optional: to smooth the line
