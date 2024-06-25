@@ -12,7 +12,7 @@ function ExportSpec() {
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     useEffect(() => {
-        fetch("/get_deployment_list?sensor_id=2")
+        fetch("/api/get_deployment_list?sensor_id=2")
             .then(response => response.json())
             .then(data => {
                 setDeploymentData(data);
