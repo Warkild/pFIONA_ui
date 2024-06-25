@@ -16,7 +16,7 @@ const ConcentrationChart = ({}) => {
         setErrorMessage('');
         try {
             const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`http://127.0.0.1:8000/api/get_concentration_for_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
+            const response = await fetch(`/api/get_concentration_for_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
             const result = await response.json();
             setData(result);
             const reactions = Object.keys(result.spectrums_data);

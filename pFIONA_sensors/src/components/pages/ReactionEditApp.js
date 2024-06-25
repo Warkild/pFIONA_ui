@@ -127,7 +127,7 @@ function ReactionEditApp() {
                     setIsModalOpen(true);
                 } else {
                     console.log("Success:", data);
-                    window.location.href = `http://127.0.0.1:8000/sensors/${reagents_json[0]['sensor_id']}/reagents`;
+                    window.location.href = `/sensors/${reagents_json[0]['sensor_id']}/reagents`;
                 }
             })
             .catch(error => {

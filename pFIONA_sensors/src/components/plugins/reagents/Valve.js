@@ -59,7 +59,7 @@ function Valve({ ip, reagents }) {
     const handleSave = () => {
         if(checkForDuplicates(selectedPorts)) {
             setSaveText("Saving...")
-            fetch(`http://127.0.0.1:8000/sensors/${reagents[0].sensor_id}/reagents/update_valve`, {
+            fetch(`/sensors/${reagents[0].sensor_id}/reagents/update_valve`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

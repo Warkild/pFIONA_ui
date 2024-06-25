@@ -12,7 +12,7 @@ function ExportSpec() {
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/get_deployment_list?sensor_id=2")
+        fetch("/get_deployment_list?sensor_id=2")
             .then(response => response.json())
             .then(data => {
                 setDeploymentData(data);
@@ -28,7 +28,7 @@ function ExportSpec() {
         setExporting(true);
         setExportingRawJson(deploymentId);
         const avgTimestamp = Math.floor((startTime + endTime) / 2);
-        const url = `http://127.0.0.1:8000/api/get_spectrums_in_deployment_full_info?sensor_id=2&timestamp=${avgTimestamp}`;
+        const url = `/api/get_spectrums_in_deployment_full_info?sensor_id=2&timestamp=${avgTimestamp}`;
 
         fetch(url)
             .then(response => response.json())
@@ -56,7 +56,7 @@ function ExportSpec() {
         setExporting(true);
         setExportingRawCsv(deploymentId);
         const avgTimestamp = Math.floor((startTime + endTime) / 2);
-        const url = `http://127.0.0.1:8000/api/export_raw_spectra_csv?timestamp=${avgTimestamp}&sensor_id=2`;
+        const url = `/api/export_raw_spectra_csv?timestamp=${avgTimestamp}&sensor_id=2`;
 
         fetch(url)
             .then(response => response.blob())
@@ -82,7 +82,7 @@ function ExportSpec() {
         setExporting(true);
         setExportingAbsorbanceJson(deploymentId);
         const avgTimestamp = Math.floor((startTime + endTime) / 2);
-        const url = `http://127.0.0.1:8000/api/get_absorbance_spectrums_in_deployment_full_info?sensor_id=2&timestamp=${avgTimestamp}`;
+        const url = `/api/get_absorbance_spectrums_in_deployment_full_info?sensor_id=2&timestamp=${avgTimestamp}`;
 
         fetch(url)
             .then(response => response.json())
@@ -110,7 +110,7 @@ function ExportSpec() {
         setExporting(true);
         setExportingAbsorbanceCsv(deploymentId);
         const avgTimestamp = Math.floor((startTime + endTime) / 2);
-        const url = `http://127.0.0.1:8000/api/export_absorbance_spectra_csv?timestamp=${avgTimestamp}&sensor_id=2`;
+        const url = `/api/export_absorbance_spectra_csv?timestamp=${avgTimestamp}&sensor_id=2`;
 
         fetch(url)
             .then(response => response.blob())

@@ -39,7 +39,7 @@ const SpectrumChart = ({}) => {
         setErrorMessage('');
         try {
             const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`http://127.0.0.1:8000/api/get_cycle_count?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
+            const response = await fetch(`/api/get_cycle_count?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
             const result = await response.json();
             if (result.cycle_count > 0) {
                 setCycleCount(result.cycle_count);
@@ -64,7 +64,7 @@ const SpectrumChart = ({}) => {
         setLoading(true);
         try {
             const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`http://127.0.0.1:8000/api/get_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
+            const response = await fetch(`/api/get_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
             const result = await response.json();
 
             if (!result || !result.spectrums_data) {
