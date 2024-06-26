@@ -109,18 +109,22 @@ const EmergencyStopAndRestart = ({}) => {
     };
 
     return connected ? (
-        <div className="flex space-x-4">
+        <div className="flex space-x-10">
             <img
                 onDoubleClick={handleEmergencyStop}
                 src="/static/img/ico/icons8-open-hand-512.svg"
                 alt="Stop"
                 className="w-10 h-10 mr-2 cursor-pointer"
+                style={{filter: 'invert(22%) sepia(80%) saturate(2871%) hue-rotate(346deg) brightness(87%) contrast(97%)'}}
+                title="STOP"
             />
             <img
                 onDoubleClick={handleRestart}
                 src="/static/img/ico/icons8-restart-512.svg"
                 alt="Restart"
                 className="w-10 h-10 mr-2 cursor-pointer"
+                style={{filter: 'invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%)'}}
+                title="Restart Sensor"
             />
         </div>
     ) : null;

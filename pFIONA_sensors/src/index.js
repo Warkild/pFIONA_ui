@@ -5,6 +5,7 @@ import ReactionAddApp from "./components/pages/ReactionAddApp"
 import ReactionEditApp from "./components/pages/ReactionEditApp"
 import DataApp from "./components/pages/DataApp"
 import DeployApp from "./components/pages/DeployApp"
+import LogAndDatabase from "./components/plugins/universal/LogAndDatabase";
 import EmergencyStopAndRestart from "./components/plugins/universal/EmergencyStopAndRestart";
 import {useState} from "react";
 

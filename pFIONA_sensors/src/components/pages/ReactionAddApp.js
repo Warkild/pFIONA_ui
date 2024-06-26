@@ -48,6 +48,10 @@ function ReactionAddApp() {
     const [multiStandard, setMultiStandard] = useState(false);
     const [multiStandardTime, setMultiStandardTime] = useState(360);
 
+    //CRM
+    const [crm, setCrm] = useState(false);
+    const [crmTime, setCrmTime] = useState(7);
+
     // REACTION TIME
     const [reactionTime, setReactionTime] = useState(0);
 
@@ -105,6 +109,8 @@ function ReactionAddApp() {
             multi_standard: multiStandard,
             multi_standard_time: multiStandardTime,
             reaction_time: reactionTime,
+            crm:crm,
+            crm_time:crmTime
         };
 
         const apiUrl = "/api/add_reaction"; // Your Django API URL
@@ -330,12 +336,35 @@ function ReactionAddApp() {
                         </label>
                     </div>
                     <div className={"flex flex-col w-3/12"}>
-                        <label className={"font-montserrat text-sm pb-2"}>Multi Standard Time</label>
+                        <label className={"font-montserrat text-sm pb-2"}>Multi Standard Time (min)</label>
                         <input
                             type="number"
                             value={multiStandardTime}
                             onChange={(e) => setMultiStandardTime(e.target.value)}
-                            placeholder="Multi Standard Time"
+                            placeholder="Multi Standard Time (min)"
+                            className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        />
+                    </div>
+                </div>
+                <div className={"flex flex-row space-x-10 w-full pb-10"}>
+                    <div>
+                        <label>
+                            <input
+                                type="checkbox"
+                                className={"form-checkbox focus:outline-none rounded-lg mr-3"}
+                                checked={crm}
+                                onChange={(e) => setCrm(e.target.checked)}
+                            />
+                            CRM
+                        </label>
+                    </div>
+                    <div className={"flex flex-col w-3/12"}>
+                        <label className={"font-montserrat text-sm pb-2"}>CRM TIme (day)</label>
+                        <input
+                            type="number"
+                            value={crmTime}
+                            onChange={(e) => setCrmTime(e.target.value)}
+                            placeholder="CRM TIme (day)"
                             className="mt-1 remove-arrow block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                         />
                     </div>

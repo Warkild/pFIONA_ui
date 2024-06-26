@@ -82,12 +82,18 @@ def validate_reaction_data(data):
         raise ValidationError('Number of standard must be at least 1')
 
     if data['multi_standard_time'] == "":
-        raise ValidationError('Number of standard cannot be empty')
+        raise ValidationError('Multi standard cannot be empty')
 
     if int(data['multi_standard_time']) < 0:
-        raise ValidationError('Number of standard must be at least 0')
+        raise ValidationError('Multi standard must be at least 0')
 
     if int(data['reaction_time']) < 0:
         raise ValidationError('Reaction time must be at least 0')
+
+    if data['crm_time'] == "":
+        raise ValidationError('CRM time cannot be empty')
+
+    if int(data['crm_time']) < 0:
+        raise ValidationError('CRM time must be at least 0')
 
     return True  # If all validations pass, return True
