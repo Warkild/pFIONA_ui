@@ -80,20 +80,20 @@ def export_absorbance_data(timestamp, sensor_id):
     all_absorbance_data, all_wavelengths, deployment_info = get_absorbance_spectrums_in_deployment_full_info(timestamp,
                                                                                                              sensor_id)
 
-    if not all_absorbance_data:
+    if not all_absorbance_data or not isinstance(all_absorbance_data, dict):
         return HttpResponse("No absorbance data found for the given timestamp and sensor ID.", status=404)
 
     data = []
     for cycle, reactions in all_absorbance_data.items():
         for reaction, types in reactions.items():
             for spectrum_type, spectrum_list in types.items():
-                for spectrum in spectrum_list:
-                    for wavelength, absorbance_value in spectrum.items():
+                for wavelength_index, absorbance_values in spectrum_list.items():
+                    for wavelength, absorbance_value in enumerate(absorbance_values):
                         row = {
                             'Cycle': cycle,
                             'Reaction': reaction,
                             'Type': spectrum_type,
-                            'Wavelength': wavelength,
+                            'Wavelength': all_wavelengths[wavelength],
                             'Absorbance': absorbance_value
                         }
                         data.append(row)
