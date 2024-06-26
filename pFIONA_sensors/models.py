@@ -48,6 +48,8 @@ class Reaction(models.Model):
     reaction_time = models.IntegerField(default=30)
     multi_standard = models.IntegerField(default=False)
     multi_standard_time = models.IntegerField(default=360)
+    crm = models.IntegerField(default=False)
+    crm_time = models.IntegerField(default=7)
     number_of_standard = models.IntegerField(default=2)
     number_of_blank = models.IntegerField(default=2)
     number_of_sample = models.IntegerField(default=2)
