@@ -46,34 +46,37 @@ def sensors_add(request):
 @login_required()
 def sensors_manual(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
+    user_groups = request.user.groups.values_list('name', flat=True)
 
     return render(request, 'pFIONA_sensors/view/sensors_manual.html',
                   {
                       'id': sensor_id,
                       'ip_address': sensor.ip_address,
                       'sensor': sensor,
+                      'user_groups': user_groups,
                   })
 
 
 @login_required()
 def sensors_deploy(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
-    q.is_deployed(sensor_id)
+    user_groups = request.user.groups.values_list('name', flat=True)
     return render(request, 'pFIONA_sensors/view/sensors_deploy.html',
-                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, })
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,'user_groups': user_groups, })
 
 
 @login_required()
 def sensors_data(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
-    # q.get_last_spectrum_all_type('Phosphate', 1715802907)
+    user_groups = request.user.groups.values_list('name', flat=True)
     return render(request, 'pFIONA_sensors/view/sensors_data.html',
-                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, })
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, 'user_groups': user_groups,})
 
 
 @login_required()
 def sensors_reagents(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
+    user_groups = request.user.groups.values_list('name', flat=True)
 
     # REAGENTS
 
@@ -112,6 +115,7 @@ def sensors_reagents(request, sensor_id):
         'reagents_json': reagents_json,
         'reactions_json': reactions_json,
         'sensor': sensor,
+        'user_groups': user_groups,
     })
 
 
@@ -236,6 +240,7 @@ def sensors_settings(request, sensor_id):
     name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')
     lat_long_form = SensorLatLongForm(request.POST or None, instance=sensor, prefix='lat_long')
     sensor_settings_form = SensorSettingsForm(request.POST or None, instance=sensor, prefix='settings')
+    user_groups = request.user.groups.values_list('name', flat=True)
 
     if request.method == 'POST':
         if 'submit_name_notes' in request.POST:
@@ -265,7 +270,7 @@ def sensors_settings(request, sensor_id):
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor,
-                   'lat_long_form': lat_long_form, 'sensor_settings_form': sensor_settings_form})
+                   'lat_long_form': lat_long_form, 'sensor_settings_form': sensor_settings_form, 'user_groups':user_groups})
 
 
 @login_required()

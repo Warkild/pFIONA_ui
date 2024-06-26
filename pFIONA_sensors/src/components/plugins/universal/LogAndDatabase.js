@@ -95,7 +95,7 @@ const LogAndDatabase = ({  }) => {
     };
 
     return connected ? (
-        <div className="flex space-x-4">
+        <div className="flex space-x-10">
             <a
                 href={logUrl}
                 download="log.txt"
@@ -107,6 +107,7 @@ const LogAndDatabase = ({  }) => {
                     src="/static/img/ico/icons8-file-512.svg"
                     alt="Get Log"
                     className={'w-10 h-10'}
+                    style={{filter: 'invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%)'}}
                 />
             </a>
             <a
@@ -117,9 +118,10 @@ const LogAndDatabase = ({  }) => {
                 title="Download Database"
             >
                 <img
-                    src="/static/img/ico/icons8-server-512.svg"
+                    src="/static/img/ico/icons8-folder-512.svg"
                     alt="Get Database"
-                    className={'w-10 h-10'}
+                    className="w-10 h-10"
+                    style={{filter: 'invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%)'}}
                 />
             </a>
         </div>
