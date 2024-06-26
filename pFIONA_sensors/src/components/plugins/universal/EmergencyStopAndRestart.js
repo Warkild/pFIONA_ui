@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {createRoot} from "react-dom/client";
 
-const EmergencyStopAndRestart = ({ emergencyStopUrl, restartUrl }) => {
+const EmergencyStopAndRestart = ({}) => {
 
     const [connected, setConnected] = useState(false);
 
@@ -50,6 +50,7 @@ const EmergencyStopAndRestart = ({ emergencyStopUrl, restartUrl }) => {
         setEmergencyStopClicked(prev => prev + 1);
         setTimeout(() => setEmergencyStopClicked(0), 2000);
         if (emergencyStopClicked + 1 === 2 && sessionStorage.getItem('accessToken') != null) {
+            const emergencyStopUrl =  `http://${sensor_ip}:5000/sensor/stop_deploy`
             fetch(emergencyStopUrl, {
                 method: 'POST',
                 headers: {
@@ -57,7 +58,7 @@ const EmergencyStopAndRestart = ({ emergencyStopUrl, restartUrl }) => {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 },
                 body: JSON.stringify({
-                    action: 'emergencyStop',
+                    now: 'True',
                 }),
             })
                 .then(response => {
@@ -80,6 +81,7 @@ const EmergencyStopAndRestart = ({ emergencyStopUrl, restartUrl }) => {
         setRestartClicked(prev => prev + 1);
         setTimeout(() => setRestartClicked(0), 2000);
         if (restartClicked + 1 === 2 && sessionStorage.getItem('accessToken') != null) {
+            const restartUrl =  `http://${sensor_ip}:5000/sensor/restart`
             fetch(restartUrl, {
                 method: 'POST',
                 headers: {
@@ -107,21 +109,21 @@ const EmergencyStopAndRestart = ({ emergencyStopUrl, restartUrl }) => {
     };
 
     return connected ? (
-    <div className="flex space-x-4">
-        <img
-            onDoubleClick={handleEmergencyStop}
-            src="/static/img/ico/icons8-stop-512.svg"
-            alt="Checked"
-            className="w-6 h-6 mr-2 cursor-pointer"
-        />
-        <img
-            onDoubleClick={handleRestart}
-            src="/static/img/ico/icons8-restart-512.svg"
-            alt="Checked"
-            className="w-6 h-6 mr-2 cursor-pointer"
-        />
-    </div>
-) : null;
+        <div className="flex space-x-4">
+            <img
+                onDoubleClick={handleEmergencyStop}
+                src="/static/img/ico/icons8-open-hand-512.svg"
+                alt="Stop"
+                className="w-10 h-10 mr-2 cursor-pointer"
+            />
+            <img
+                onDoubleClick={handleRestart}
+                src="/static/img/ico/icons8-restart-512.svg"
+                alt="Restart"
+                className="w-10 h-10 mr-2 cursor-pointer"
+            />
+        </div>
+    ) : null;
 };
 
 export default EmergencyStopAndRestart;

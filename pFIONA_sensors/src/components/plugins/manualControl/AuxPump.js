@@ -1,92 +1,141 @@
 import React, {useEffect, useState} from 'react';
+import Alert from "../universal/Alert";
 
 function AuxPump({inAction, setInAction, isDeployed, allowAnything}) {
 
-    // This component is used to manage aux pump
+    /**
+     * ALERT MESSAGE
+     */
 
-    // Status if aux pump running
+        // Alert box state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Alert box error message
+
+    const [alertModalText, setAlertModalText] = useState("");
+
+    // Alert box close
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+    /**
+     * COMPONENT AUX PUMP
+     */
+
+        // This component is used to manage aux pump
+
+        // Status if aux pump running
     const [auxPumpRunning, setAuxPumpRunning] = useState(false);
 
     // Function to turn on pump throw sensor API
     const turnOnAuxPump = () => {
         const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_on`;
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+        try {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                },
             })
-            .then(data => {
-                console.log('Success:', data);
-                setAuxPumpRunning(true);
-                setInAction(true);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                setAuxPumpRunning(false);
-                setInAction(false);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`Network response was not ok: ${errorData.message}`);
+                        });
+                    }
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    setAuxPumpRunning(true);
+                    setInAction(true);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setAuxPumpRunning(false);
+                    setInAction(false);
+                    setAlertModalText(error.message);
+                    setIsModalOpen(true);
+                });
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+            setAuxPumpRunning(false);
+            setInAction(false);
+        }
     };
 
     // Function to turn off pump throw sensor API
     const turnOffAuxPump = () => {
         const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_off`;
 
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+        try {
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                },
             })
-            .then(data => {
-                console.log('Success:', data);
-                setAuxPumpRunning(false);
-                setInAction(false);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                setAuxPumpRunning(false);
-                setInAction(false);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`Network response was not ok: ${errorData.message}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    setAuxPumpRunning(false);
+                    setInAction(false);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setAlertModalText(error.message);
+                    setIsModalOpen(true);
+                });
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+
     };
 
     // Function to get the state of aux pump from sensor
     const getStatus = () => {
-        fetch(`http://${sensor_ip}:${sensor_port}/auxpump/is_active`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+        try {
+            fetch(`http://${sensor_ip}:${sensor_port}/auxpump/is_active`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    'Content-Type': 'application/json',
+                },
             })
-            .then(data => {
-                console.log('Success:', data);
-                setAuxPumpRunning(JSON.parse(data.message));
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(`Network response was not ok: ${errorData.message}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Success:', data);
+                    setAuxPumpRunning(JSON.parse(data.message));
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setAlertModalText(error.message);
+                    setIsModalOpen(true);
+                });
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+
     };
 
 
@@ -132,6 +181,7 @@ function AuxPump({inAction, setInAction, isDeployed, allowAnything}) {
                     )}
                 </div>
             </div>
+            <Alert isOpen={isModalOpen} onRequestClose={closeModal} text={alertModalText}/>
         </div>
     );
 }

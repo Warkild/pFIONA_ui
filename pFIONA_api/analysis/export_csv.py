@@ -4,7 +4,8 @@ import pandas as pd
 from django.http import HttpResponse
 from datetime import datetime
 
-from pFIONA_api.analysis.spectrum_finder import get_absorbance_spectrums_in_deployment_full_info
+from pFIONA_api.analysis.spectrum_finder import get_absorbance_spectrums_in_deployment_full_info, \
+    get_concentration_in_deployment
 from pFIONA_sensors.models import Spectrum
 
 
@@ -115,6 +116,49 @@ def export_absorbance_data(timestamp, sensor_id):
 
     # Write the data
     for row in pivoted_df.itertuples(index=False):
+        writer.writerow(row)
+
+    return response
+
+
+def export_concentration_data(timestamp, sensor_id):
+    all_concentration_data, deployment_info = get_concentration_in_deployment(timestamp, sensor_id)
+
+    if not all_concentration_data:
+        return HttpResponse("No concentration data found for the given timestamp and sensor ID.", status=404)
+
+    data = []
+    # Iterate through the concentration data and structure it for CSV export
+    for reaction, cycles in all_concentration_data.items():
+        for cycle, values in cycles.items():
+            if 'concentration' not in values or not values['concentration']:
+                continue  # Skip cycles without concentration data
+            for wavelength, concentration in values['concentration'].items():
+                row = {
+                    'Cycle': cycle,
+                    'Start Time': values['cycle_start_time'],
+                    'End Time': values['cycle_end_time'],
+                    'Reaction': reaction,
+                    'Wavelength': wavelength,
+                    'Concentration': concentration
+                }
+                data.append(row)
+
+    # Convert the data to a DataFrame
+    df = pd.DataFrame(data)
+
+    # Create CSV response
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': 'attachment; filename="concentration_data.csv"'},
+    )
+    writer = csv.writer(response)
+
+    # Write the header
+    writer.writerow(df.columns)
+
+    # Write the data
+    for row in df.itertuples(index=False):
         writer.writerow(row)
 
     return response
