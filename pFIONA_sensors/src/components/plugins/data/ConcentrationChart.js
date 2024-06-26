@@ -12,6 +12,8 @@ const ConcentrationChart = ({  }) => {
     const [chartData, setChartData] = useState(null); // Data for the chart
     const [availableReactions, setAvailableReactions] = useState([]); // List of available reactions
     const [errorMessage, setErrorMessage] = useState(''); // Error message to display
+    const [startDate, setStartDate] = useState(''); // Start date for filtering data
+    const [endDate, setEndDate] = useState(''); // End date for filtering data
 
     // Function to fetch concentration data from the API
     const fetchConcentrationData = async () => {
@@ -28,6 +30,9 @@ const ConcentrationChart = ({  }) => {
             if (reactions.length > 0) {
                 setSelectedReaction(reactions[0]); // Automatically select the first reaction
             }
+            // Set default start and end dates based on the deployment info
+            setStartDate(moment.unix(result.deployment_info.deployment_start_time).format('YYYY-MM-DDTHH:mm'));
+            setEndDate(moment.unix(result.deployment_info.deployment_end_time).format('YYYY-MM-DDTHH:mm'));
         } catch (error) {
             console.error('Error fetching concentration data:', error); // Log error to the console
             setErrorMessage('Error fetching concentration data. Please try again.'); // Display error message
@@ -47,6 +52,23 @@ const ConcentrationChart = ({  }) => {
         setSelectedReaction(event.target.value); // Update the selected reaction state
     };
 
+    // Handler for changes in the start date input
+    const handleStartDateChange = (event) => {
+        setStartDate(event.target.value); // Update the start date state
+    };
+
+    // Handler for changes in the end date input
+    const handleEndDateChange = (event) => {
+        setEndDate(event.target.value); // Update the end date state
+    };
+
+    // Handler for updating the chart data based on selected dates
+    const handleDateChange = () => {
+        if (selectedReaction && data && data.spectrums_data[selectedReaction]) {
+            setChartData(generateChartData(data.spectrums_data[selectedReaction])); // Generate chart data for the selected reaction and dates
+        }
+    };
+
     // Effect to update chart data whenever selected reaction or data changes
     useEffect(() => {
         if (selectedReaction && data && data.spectrums_data[selectedReaction]) {
@@ -62,10 +84,12 @@ const ConcentrationChart = ({  }) => {
 
         const labels = []; // Labels for the x-axis (cycle start times)
         const datasetMap = {}; // Map to hold datasets for different wavelengths
+        const startEpoch = startDate ? moment(startDate).unix() : null; // Convert start date to epoch time
+        const endEpoch = endDate ? moment(endDate).unix() : null; // Convert end date to epoch time
 
         // Loop through each cycle in the reaction data
         for (const [cycle, values] of Object.entries(reactionData)) {
-            if (values.concentration) { // Check if concentration data is available for the cycle
+            if (values.concentration && (!startEpoch || values.cycle_start_time >= startEpoch) && (!endEpoch || values.cycle_start_time <= endEpoch)) {
                 const cycleStartTime = moment.unix(values.cycle_start_time).format('YYYY-MM-DD HH:mm:ss'); // Format the cycle start time
                 labels.push(cycleStartTime); // Add the formatted start time to labels
 
@@ -167,6 +191,39 @@ const ConcentrationChart = ({  }) => {
                         </div>
                     )}
                 </div>
+                {chartData && ( // Show date filters only if chart data is available
+                <div className="flex mt-5 items-center">
+                    <div className="mr-3">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Start Date:
+                            <input
+                                type="datetime-local"
+                                value={startDate}
+                                onChange={handleStartDateChange}
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            />
+                        </label>
+                    </div>
+                    <div className="mr-3">
+                        <label className="block text-sm font-medium text-gray-700">
+                            End Date:
+                            <input
+                                type="datetime-local"
+                                value={endDate}
+                                onChange={handleEndDateChange}
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            />
+                        </label>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={handleDateChange}
+                        className="text-center justify-center mt-5 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        Change
+                    </button>
+                </div>
+            )}
                 <div>
                     {chartData && ( // Only show the chart if chart data is available
                         <div className="mt-5" style={{ height: '500px' }}>
