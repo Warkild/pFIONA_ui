@@ -7,7 +7,6 @@ import DataApp from "./components/pages/DataApp"
 import DeployApp from "./components/pages/DeployApp"
 import LogAndDatabase from "./components/plugins/universal/LogAndDatabase";
 import EmergencyStopAndRestart from "./components/plugins/universal/EmergencyStopAndRestart";
-import EmergencyStop from "./components/plugins/universal/EmergencyStop";
 import {useState} from "react";
 
 // Fonction pour obtenir les JWT tokens

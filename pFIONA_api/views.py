@@ -75,7 +75,9 @@ def api_add_reaction(request):
                                      int(data['number_of_standard']),
                                      bool(data['multi_standard']),
                                      int(data['multi_standard_time']),
-                                     int(data['reaction_time'])
+                                     int(data['reaction_time']),
+                                     bool(data['crm']),
+                                     int(data['crm_time'])
                                      )
 
         for key, step in enumerate(data['steps']):
@@ -126,7 +128,9 @@ def api_edit_reaction(request):
                                      int(data['number_of_standard']),
                                      bool(data['multi_standard']),
                                      int(data['multi_standard_time']),
-                                     int(data['reaction_time'])
+                                     int(data['reaction_time']),
+                                     bool(data['crm']),
+                                     int(data['crm_time'])
                                      )
 
         q.delete_all_step(data['id'])
@@ -696,9 +700,8 @@ def test2(request):
         if not q.models.Sensor.objects.filter(id=sensor_id).exists():
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
-        absorbance_data, deployment_info = calculate_concentration_for_deployment(timestamp, sensor_id)
         return JsonResponse(
-            {"spectrums_data": absorbance_data, "deployment_info": deployment_info})
+            {"spectrums_data": 2, "deployment_info": 2})
 
     except ValueError as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)

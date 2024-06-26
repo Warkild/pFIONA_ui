@@ -65,7 +65,7 @@ def get_utils_reagents(sensor_id, return_json=False):
 
 def create_reaction(name, standard_id, standard_concentration, volume_of_mixture, volume_to_push_to_flow_cell,
                     number_of_blank, number_of_sample, number_of_standard, multi_standard, multi_standard_time,
-                    reaction_time):
+                    reaction_time, crm, crm_time):
     """
     Create a reaction in database
 
@@ -80,6 +80,8 @@ def create_reaction(name, standard_id, standard_concentration, volume_of_mixture
     :param multi_standard : True or False for multi-standard reaction
     :param multi_standard_time : Time for multi-standard reaction
     :param reaction_time : Time for reaction
+    :param crm : True or False for crm in reaction
+    :param multi_standard_time : Time for each crm
 
     :return: Reaction object
     """
@@ -112,7 +114,9 @@ def create_reaction(name, standard_id, standard_concentration, volume_of_mixture
                                               multi_standard=multi_standard,
                                               multi_standard_time=multi_standard_time,
                                               reaction_time=reaction_time,
-                                              id=creating_id
+                                              id=creating_id,
+                                              crm=crm,
+                                              crm_time=crm_time,
                                               )
 
     reaction.save()
@@ -231,7 +235,9 @@ def get_reaction_details(reaction_id=None, reaction_name=None, sensor_id=None):
         'number_of_blank': reaction.number_of_blank,
         'number_of_sample': reaction.number_of_sample,
         'number_of_standard': reaction.number_of_standard,
-        'reaction_time': reaction.reaction_time
+        'reaction_time': reaction.reaction_time,
+        'crm': reaction.crm,
+        'crm_time' : reaction.crm_time
     })
 
     return reaction_json
@@ -249,7 +255,7 @@ def delete_all_step(reaction_id):
 
 def update_reaction(reaction_id, name, standard_id, standard_concentration, volume_of_mixture,
                     volume_to_push_to_flow_cell, number_of_blank, number_of_sample, number_of_standard,
-                    multi_standard, multi_standard_time, reaction_time):
+                    multi_standard, multi_standard_time, reaction_time, crm, crm_time):
     """
     Update a reaction in database
 
@@ -265,6 +271,8 @@ def update_reaction(reaction_id, name, standard_id, standard_concentration, volu
     :param multi_standard : True or False for multi-standard reaction
     :param multi_standard_time : Time for multi-standard reaction
     :param reaction_time : Time of reaction
+    :param crm : True or False for crm in reaction
+    :param multi_standard_time : Time for each crm
 
     :return: Reaction object
     """
@@ -281,6 +289,8 @@ def update_reaction(reaction_id, name, standard_id, standard_concentration, volu
     reaction.multi_standard = multi_standard
     reaction.multi_standard_time = multi_standard_time
     reaction.reaction_time = reaction_time
+    reaction.crm = crm
+    reaction.crm_time = crm_time
     reaction.save()
 
     return reaction
