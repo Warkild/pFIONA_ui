@@ -13,10 +13,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 import pFIONA_api.queries as q
-from pFIONA_api.analysis.export_csv import export_raw_data, export_absorbance_data
+from pFIONA_api.analysis.export_csv import export_raw_data, export_absorbance_data, export_concentration_data
 from pFIONA_api.analysis.formula import absorbance
 from pFIONA_api.analysis.spectrum_finder import *
 from pFIONA_api.validation import validate_reaction_data
+from pFIONA_sensors.decorators import admin_required
 
 
 @login_required()
@@ -266,6 +267,7 @@ def api_is_deployed(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -564,6 +566,7 @@ def api_get_spectrum_in_cycle_full_info(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
@@ -594,6 +597,7 @@ def api_get_absorbance_spectrums_in_cycle_full_info(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
@@ -620,6 +624,7 @@ def api_get_spectrum_in_deployment_full_info(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
@@ -645,6 +650,7 @@ def api_get_monitored_wavelength_values_in_deployment(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 @login_required
 @require_http_methods(["GET"])
@@ -770,7 +776,7 @@ def api_get_concentration_for_deployment(request):
         if not q.models.Sensor.objects.filter(id=sensor_id).exists():
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
-        absorbance_data, deployment_info = calculate_concentration_for_deployment(timestamp, sensor_id)
+        absorbance_data, deployment_info = get_concentration_in_deployment(timestamp, sensor_id)
         return JsonResponse(
             {"spectrums_data": absorbance_data, "deployment_info": deployment_info})
 
@@ -886,9 +892,11 @@ def api_get_deployment_list(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 @login_required
 @require_http_methods(["DELETE"])
 @csrf_exempt
+@admin_required
 def api_delete_spectrums_by_deployment(request):
     try:
         sensor_id = request.GET.get('sensor_id')
@@ -927,7 +935,6 @@ def export_raw_spectra_csv(request):
     return response
 
 
-
 @login_required
 def export_absorbance_spectra_csv(request):
     timestamp = request.GET.get('timestamp')
@@ -935,6 +942,19 @@ def export_absorbance_spectra_csv(request):
 
     if int(timestamp) and sensor_id:
         response = export_absorbance_data(int(timestamp), sensor_id)
+    else:
+        response = HttpResponse("Invalid parameters", status=400)
+
+    return response
+
+
+@login_required
+def export_concentration_csv(request):
+    timestamp = request.GET.get('timestamp')
+    sensor_id = request.GET.get('sensor_id')
+
+    if int(timestamp) and sensor_id:
+        response = export_concentration_data(int(timestamp), sensor_id)
     else:
         response = HttpResponse("Invalid parameters", status=400)
 

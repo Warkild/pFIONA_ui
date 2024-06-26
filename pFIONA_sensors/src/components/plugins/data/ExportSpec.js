@@ -9,6 +9,8 @@ function ExportSpec() {
     const [exportingRawJson, setExportingRawJson] = useState(null);
     const [exportingAbsorbanceCsv, setExportingAbsorbanceCsv] = useState(null);
     const [exportingAbsorbanceJson, setExportingAbsorbanceJson] = useState(null);
+    const [exportingConcentrationCsv, setExportingConcentrationCsv] = useState(null);
+    const [exportingConcentrationJson, setExportingConcentrationJson] = useState(null);
     const [confirmDelete, setConfirmDelete] = useState(null);
 
     useEffect(() => {
@@ -132,6 +134,62 @@ function ExportSpec() {
             });
     };
 
+    // Function to handle exporting concentration data as JSON
+    const handleExportConcentrationData = (deploymentId, startTime, endTime) => {
+        setExporting(true);
+        setExportingConcentrationJson(deploymentId);
+        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        const url = `/api/get_concentration_for_deployment?sensor_id=2&timestamp=${avgTimestamp}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const jsonStr = JSON.stringify(data);
+                const blob = new Blob([jsonStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `concentration_data_${avgTimestamp}.json`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setExportingConcentrationJson(null);
+                setExporting(false);
+            })
+            .catch(error => {
+                console.error("Error exporting data:", error);
+                setExportingConcentrationJson(null);
+                setExporting(false);
+            });
+    };
+
+    // Function to handle exporting concentration data as CSV
+    const handleExportConcentrationCsvData = (deploymentId, startTime, endTime) => {
+        setExporting(true);
+        setExportingConcentrationCsv(deploymentId);
+        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        const url = `/api/export_concentration_csv?timestamp=${avgTimestamp}&sensor_id=2`;
+
+        fetch(url)
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `concentration_data_${avgTimestamp}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setExportingConcentrationCsv(null);
+                setExporting(false);
+            })
+            .catch(error => {
+                console.error("Error exporting data:", error);
+                setExportingConcentrationCsv(null);
+                setExporting(false);
+            });
+    };
+
     const handleDelete = (sensorId, deploymentId) => {
         setConfirmDelete(deploymentId);
         setTimeout(() => {
@@ -228,8 +286,12 @@ function ExportSpec() {
                             </td>
                             <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">
                                 <div className="flex space-x-6">
-                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} disabled={exporting}>.csv</button>
-                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} disabled={exporting}>.json</button>
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportConcentrationCsvData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exporting}>
+                                        {exportingConcentrationCsv === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.csv'}
+                                    </button>
+                                    <button className={`text-blue-600 ${exporting ? 'button-disabled text-gray-600' : ''}`} onClick={() => handleExportConcentrationData(deployment.deployment, deployment.start_time, deployment.end_time)} disabled={exporting}>
+                                        {exportingConcentrationJson === deployment.deployment ? <TailSpin height={20} width={20} color="blue" /> : '.json'}
+                                    </button>
                                 </div>
                             </td>
                             <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">

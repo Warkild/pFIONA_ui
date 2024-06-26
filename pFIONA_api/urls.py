@@ -37,6 +37,7 @@ urlpatterns = [
     path('get_concentration_for_deployment', views.api_get_concentration_for_deployment, name='api_get_concentration_for_deployment'),
     path('export_raw_spectra_csv/', views.export_raw_spectra_csv, name='export_raw_spectra_csv'),
     path('export_absorbance_spectra_csv/', views.export_absorbance_spectra_csv, name='export_absorbance_spectra_csv'),
+    path('export_concentration_csv/', views.export_concentration_csv, name='export_concentration_csv'),
     path('get_lasts_spectrum_cycle_0', views.get_lasts_spectrum_cycle_0, name='get_lasts_spectrum_cycle_0'),
     path('delete_spectrums/', views.api_delete_spectrums_by_deployment, name='api_delete_spectrums_by_deployment'),
 ]

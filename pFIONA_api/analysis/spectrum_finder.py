@@ -400,13 +400,22 @@ def get_monitored_wavelength_values_in_deployment(timestamp, sensor_id):
                 for type_key, wavelength_values in types.items()} for cycle, types in cycles.items()} for
         reaction, cycles in all_monitored_wavelength_values.items()}
 
-    deployment_info.pop('cycle_start_time', None)
-    deployment_info.pop('cycle_end_time', None)
+    if deployment_info['cycle_start_time']:
+        deployment_info.pop('cycle_start_time', None)
+    if deployment_info['cycle_end_time']:
+        deployment_info.pop('cycle_end_time', None)
 
     return all_monitored_wavelength_values, deployment_info
 
 
-def calculate_concentration_for_deployment(timestamp, sensor_id):
+def get_concentration_in_deployment(timestamp, sensor_id):
+
+    # Récupérer le nombre de cycles
+    cycle_count = get_cycle_count(timestamp, sensor_id)
+
+    if cycle_count == 0:
+        return None, None
+
     monitored_wavelength_values, deployment_info = get_monitored_wavelength_values_in_deployment(timestamp, sensor_id)
     concentrations = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
 
