@@ -278,6 +278,13 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
             setSlewingPump1(true)
             if (flowRatePump1 >= 1) {
                 const url = `http://${sensor_ip}:${sensor_port}/steppump/1/slew`;
+                let slewFlowRatePump1;
+                if(!aspirateDispensePump1) {
+                    // if aspirate, set flowrate to negative
+                    slewFlowRatePump1 = -flowRatePump1;
+                } else {
+                    slewFlowRatePump1 = flowRatePump1;
+                }
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -285,7 +292,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                     },
                     body: JSON.stringify({
-                        "flow_rate1": parseInt(flowRatePump1),
+                        "flow_rate1": parseInt(slewFlowRatePump1),
                     })
                 })
                     .then(response => {
@@ -313,6 +320,13 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
             setSlewingPump2(true)
             if (flowRatePump2 >= 1) {
                 const url = `http://${sensor_ip}:${sensor_port}/steppump/2/slew`;
+                let slewFlowRatePump2;
+                if(!aspirateDispensePump2) {
+                    // if aspirate, set flowrate to negative
+                    slewFlowRatePump2 = -flowRatePump2;
+                } else {
+                    slewFlowRatePump2 = flowRatePump2;
+                }
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -320,7 +334,7 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                     },
                     body: JSON.stringify({
-                        "flow_rate2": parseInt(flowRatePump2),
+                        "flow_rate2": parseInt(slewFlowRatePump2),
                     })
                 })
                     .then(response => {
@@ -348,6 +362,20 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
             setSlewingPumpBoth(true)
             if (flowRatePump1 >= 1 && flowRatePump2 >= 1) {
                 const url = `http://${sensor_ip}:${sensor_port}/steppump/1/slew_both_pumps`;
+                let slewFlowRatePump1;
+                if(!aspirateDispensePump1) {
+                    // if aspirate, set flowrate to negative
+                    slewFlowRatePump1 = -flowRatePump1;
+                } else {
+                    slewFlowRatePump1 = flowRatePump1;
+                }
+                let slewFlowRatePump2;
+                if(!aspirateDispensePump2) {
+                    // if aspirate, set flowrate to negative
+                    slewFlowRatePump2 = -flowRatePump2;
+                } else {
+                    slewFlowRatePump2 = flowRatePump2;
+                }
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -355,8 +383,8 @@ function Pumps({inAction, setInAction, isDeployed, allowAnything}) {
                         'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                     },
                     body: JSON.stringify({
-                        "flow_rate1": parseInt(flowRatePump1),
-                        "flow_rate2": parseInt(flowRatePump2),
+                        "flow_rate1": parseInt(slewFlowRatePump1),
+                        "flow_rate2": parseInt(slewFlowRatePump2),
                     })
                 })
                     .then(response => {

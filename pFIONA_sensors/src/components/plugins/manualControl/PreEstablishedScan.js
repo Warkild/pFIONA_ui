@@ -1,12 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import Select from 'react-select';
 import Alert from "../universal/Alert";
 
-function PreEstablishedScan({ inAction, setInAction, handleSpecFinish }) {
+function PreEstablishedScan({inAction, setInAction, handleSpecFinish}) {
 
     // This component is used to manage pre-established scan (blank / sample / standard) for a selected reaction
 
-    // List of reactions from database
+
+    /**
+     * ALERT MESSAGE
+     */
+
+        // Alert box state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // Alert box error message
+
+    const [alertModalText, setAlertModalText] = useState("");
+
+    // Alert box close
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
+
+
+    /** PREESTABLISHED SCAN COMP **/
+
+        // List of reactions from database
     const [reactionNames, setReactionNames] = useState([]);
 
     // Selected reaction by user
@@ -27,34 +47,45 @@ function PreEstablishedScan({ inAction, setInAction, handleSpecFinish }) {
 
     // Launch scan in sensor
     const launchScan = (scanType) => {
-        const url = `http://${sensor_ip}:${sensor_port}/sensor/save_${scanType}_spectrum`;
-        setInAction(true);
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-            },
-            body: JSON.stringify({
-                "reaction_to_do": selectedReaction.value,
-            })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                setInAction(false); // Reset inAction after success
-                handleSpecFinish();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                handleSpecFinish();
-                setInAction(false);
-            });
+        if (sessionStorage.getItem('accessToken')) {
+            try {
+                const url = `http://${sensor_ip}:${sensor_port}/sensor/save_${scanType}_spectrum`;
+                setInAction(true);
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    },
+                    body: JSON.stringify({
+                        "reaction_to_do": selectedReaction.value,
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(`Network response was not ok: ${errorData.message}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        setInAction(false); // Reset inAction after success
+                        handleSpecFinish();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        setInAction(false);
+                        setAlertModalText(error.message);
+                        setIsModalOpen(true);
+                    });
+            } catch (error) {
+                setAlertModalText(error.message);
+                setIsModalOpen(true);
+            }
+        }
+
     };
 
     // Transform reactionNames to options for react-select
@@ -90,6 +121,7 @@ function PreEstablishedScan({ inAction, setInAction, handleSpecFinish }) {
                     ))}
                 </div>
             </div>
+            <Alert isOpen={isModalOpen} onRequestClose={closeModal} text={alertModalText}/>
         </div>
     );
 }

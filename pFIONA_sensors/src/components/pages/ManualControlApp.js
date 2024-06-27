@@ -23,7 +23,6 @@ function ManualControlApp() {
 
     // State for allowing anything
     // Global var shared with every subcomponent
-    // Global var shared with every subcomponent
     const [allowAnything, setAllowAnything] = useState(false);
 
     // State for preestablished scan
