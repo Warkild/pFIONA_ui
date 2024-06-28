@@ -40,4 +40,5 @@ urlpatterns = [
     path('export_concentration_csv/', views.export_concentration_csv, name='export_concentration_csv'),
     path('get_lasts_spectrum_cycle_0', views.get_lasts_spectrum_cycle_0, name='get_lasts_spectrum_cycle_0'),
     path('delete_spectrums/', views.api_delete_spectrums_by_deployment, name='api_delete_spectrums_by_deployment'),
+    path('get_active_ports_names/', views.api_get_active_ports_names, name='api_get_active_ports_names'),
 ]
