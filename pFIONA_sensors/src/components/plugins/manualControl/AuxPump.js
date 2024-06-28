@@ -30,111 +30,122 @@ function AuxPump({inAction, setInAction, isDeployed, allowAnything}) {
 
     // Function to turn on pump throw sensor API
     const turnOnAuxPump = () => {
-        const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_on`;
+        if (sessionStorage.getItem('accessToken')) {
+            const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_on`;
 
-        try {
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                },
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errorData => {
-                            throw new Error(`Network response was not ok: ${errorData.message}`);
-                        });
-                    }
+            try {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    },
                 })
-                .then(data => {
-                    console.log('Success:', data);
-                    setAuxPumpRunning(true);
-                    setInAction(true);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    setAuxPumpRunning(false);
-                    setInAction(false);
-                    setAlertModalText(error.message);
-                    setIsModalOpen(true);
-                });
-        } catch (error) {
-            setAlertModalText(error.message);
-            setIsModalOpen(true);
-            setAuxPumpRunning(false);
-            setInAction(false);
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(`Network response was not ok: ${errorData.message}`);
+                            });
+                        }
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        setAuxPumpRunning(true);
+                        setInAction(true);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        setAuxPumpRunning(false);
+                        setInAction(false);
+                        setAlertModalText(error.message);
+                        setIsModalOpen(true);
+                    });
+            } catch (error) {
+                setAlertModalText(error.message);
+                setIsModalOpen(true);
+                setAuxPumpRunning(false);
+                setInAction(false);
+            }
         }
     };
 
     // Function to turn off pump throw sensor API
     const turnOffAuxPump = () => {
-        const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_off`;
+        if (sessionStorage.getItem('accessToken')) {
+            const url = `http://${sensor_ip}:${sensor_port}/auxpump/turn_off`;
 
-        try {
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                },
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errorData => {
-                            throw new Error(`Network response was not ok: ${errorData.message}`);
-                        });
-                    }
-                    return response.json();
+            try {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    },
                 })
-                .then(data => {
-                    console.log('Success:', data);
-                    setAuxPumpRunning(false);
-                    setInAction(false);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    setAlertModalText(error.message);
-                    setIsModalOpen(true);
-                });
-        } catch (error) {
-            setAlertModalText(error.message);
-            setIsModalOpen(true);
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(`Network response was not ok: ${errorData.message}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        setAuxPumpRunning(false);
+                        setInAction(false);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        setAlertModalText(error.message);
+                        setIsModalOpen(true);
+                    });
+            } catch (error) {
+                setAlertModalText(error.message);
+                setIsModalOpen(true);
+            }
         }
+
 
     };
 
     // Function to get the state of aux pump from sensor
     const getStatus = () => {
-        try {
-            fetch(`http://${sensor_ip}:${sensor_port}/auxpump/is_active`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                    'Content-Type': 'application/json',
-                },
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errorData => {
-                            throw new Error(`Network response was not ok: ${errorData.message}`);
-                        });
-                    }
-                    return response.json();
+        if (sessionStorage.getItem('accessToken')) {
+
+            const url = `http://${sensor_ip}:${sensor_port}/auxpump/is_active`;
+
+            try {
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json',
+                    },
                 })
-                .then(data => {
-                    console.log('Success:', data);
-                    setAuxPumpRunning(JSON.parse(data.message));
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    setAlertModalText(error.message);
-                    setIsModalOpen(true);
-                });
-        } catch (error) {
-            setAlertModalText(error.message);
-            setIsModalOpen(true);
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(errorData => {
+                                throw new Error(`Network response was not ok: ${errorData.message}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        setAuxPumpRunning(JSON.parse(data.message));
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        setAlertModalText(error.message);
+                        setIsModalOpen(true);
+                    });
+            } catch (error) {
+                setAlertModalText(error.message);
+                setIsModalOpen(true);
+            }
         }
+
 
     };
 

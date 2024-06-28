@@ -2,13 +2,17 @@ import React, {useEffect, useState} from 'react';
 import Alert from "../universal/Alert";
 
 const ValvePort = ({numberOfPorts = 8, inAction, setInAction, isDeployed, allowAnything}) => {
+
     // Get value of current valve in sensor
     const [currentVal, setCurrentVal] = useState('-');
 
     // Alert Box state
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    // Alert box error message
+    const [alertModalText, setAlertModalText] = useState("");
 
-        const closeModal = () => {
+
+    const closeModal = () => {
         setIsModalOpen(false);
     };
 
@@ -23,40 +27,90 @@ const ValvePort = ({numberOfPorts = 8, inAction, setInAction, isDeployed, allowA
 
     // Get current port from sensor's API
     const getCurrentPort = () => {
-        fetch(`http://${sensor_ip}:${sensor_port}/valve/get_valve`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                if (data.message === 0) {
-                    setCurrentVal('Air');
-                    setSelectedPort('Air');
-                } else {
-                    setCurrentVal(data.message);
-                    setSelectedPort(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+        try {
+            if (sessionStorage.getItem('accessToken')) {
+                fetch(`http://${sensor_ip}:${sensor_port}/valve/get_valve`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                        'Content-Type': 'application/json',
+                    },
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        if (data.message === 0) {
+                            setCurrentVal('Air');
+                            setSelectedPort('Air');
+                        } else {
+                            setCurrentVal(data.message);
+                            setSelectedPort(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        setAlertModalText(error.message);
+                        setIsModalOpen(true);
+                    });
+            }
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
+        }
+
     };
 
     // Change valve port threw sensor's API
     const handleMoveClick = (port) => {
-        if (port <= 0) {
+        try {
+            if (port <= 0) {
+                setIsModalOpen(true);
+            } else {
+                const url = `http://${sensor_ip}:${sensor_port}/valve/change_valve`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
+                    },
+                    body: JSON.stringify({
+                        "valve_number": parseInt(port)
+                    })
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Success:', data);
+                        setCurrentVal(port.toString());
+                        setSelectedPort(port);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        setAlertModalText(error.message);
+                        setIsModalOpen(true);
+                    });
+            }
+        } catch (error) {
+            setAlertModalText(error.message);
             setIsModalOpen(true);
-        } else {
-            const url = `http://${sensor_ip}:${sensor_port}/valve/change_valve`;
+        }
+
+    };
+
+    // Move to the air port
+    const handleMoveAirPortClick = () => {
+        try {
+            const url = `http://${sensor_ip}:${sensor_port}/valve/go_air_port`;
 
             fetch(url, {
                 method: 'POST',
@@ -64,9 +118,6 @@ const ValvePort = ({numberOfPorts = 8, inAction, setInAction, isDeployed, allowA
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 },
-                body: JSON.stringify({
-                    "valve_number": parseInt(port)
-                })
             })
                 .then(response => {
                     if (!response.ok) {
@@ -76,40 +127,19 @@ const ValvePort = ({numberOfPorts = 8, inAction, setInAction, isDeployed, allowA
                 })
                 .then(data => {
                     console.log('Success:', data);
-                    setCurrentVal(port.toString());
-                    setSelectedPort(port);
+                    setCurrentVal('Air');
+                    setSelectedPort('Air');
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    setAlertModalText(error.message);
+                    setIsModalOpen(true);
                 });
+        } catch (error) {
+            setAlertModalText(error.message);
+            setIsModalOpen(true);
         }
-    };
 
-    // Move to the air port
-    const handleMoveAirPortClick = () => {
-        const url = `http://${sensor_ip}:${sensor_port}/valve/go_air_port`;
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
-            },
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Success:', data);
-                setCurrentVal('Air');
-                setSelectedPort('Air');
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
     };
 
     // Get current port every 3 seconds
