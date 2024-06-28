@@ -135,12 +135,12 @@ const LogAndDatabase = ({  }) => {
                 onClick={handleGetLog}
                 onMouseEnter={() => setShowLogText(true)}
                 onMouseLeave={() => setShowLogText(false)}
-                className="flex"
+                className="flex cursor-pointer"
             >
                 <img
                     src="/static/img/ico/icons8-file-512.svg"
                     alt="Get Log"
-                    className="h-10 cursor-pointer"
+                    className="h-10"
                     style={{ filter: 'invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%)' }}
                 />
                 {/* Conditionally render the Log text based on showLogText state */}
@@ -152,12 +152,12 @@ const LogAndDatabase = ({  }) => {
                 onClick={handleGetDatabase}
                 onMouseEnter={() => setShowDatabaseText(true)}
                 onMouseLeave={() => setShowDatabaseText(false)}
-                className="flex"
+                className="flex cursor-pointer"
             >
                 <img
                     src="/static/img/ico/icons8-data-server-512.svg"
                     alt="Get Database"
-                    className="h-10 cursor-pointer"
+                    className="h-10"
                     style={{ filter: 'invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%)' }}
                 />
                 {/* Conditionally render the Database text based on showDatabaseText state */}

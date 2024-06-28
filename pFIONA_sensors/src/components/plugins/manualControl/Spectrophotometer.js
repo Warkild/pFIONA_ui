@@ -375,7 +375,7 @@ function Spectrophotometer({inAction, setInAction, isDeployed, preScanCount}) {
                     >Calibrate
                     </button>
                     <p>Integration time :</p>
-                    <p>{{integrationTime}}</p>
+                    <p>{integrationTime}</p>
                 </div>
                 <div className={"flex flex-col w-full ml-4 h-full"}>
                     <div style={{height: '400px'}}>

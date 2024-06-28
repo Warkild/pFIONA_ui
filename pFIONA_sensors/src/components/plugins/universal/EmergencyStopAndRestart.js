@@ -146,13 +146,13 @@ const EmergencyStopAndRestart = ({  }) => {
                 onDoubleClick={handleEmergencyStop}
                 onMouseEnter={() => setShowEmergencyStopText(true)}
                 onMouseLeave={() => setShowEmergencyStopText(false)}
-                className="flex"
+                className="flex cursor-pointer"
             >
                 <img
                     src="/static/img/ico/icons8-open-hand-512.svg"
                     alt="icons-list"
                     style={{ filter: 'invert(22%) sepia(80%) saturate(2871%) hue-rotate(346deg) brightness(87%) contrast(97%)' }}
-                    className="h-10 cursor-pointer"
+                    className="h-10"
                 />
                 {/* Conditionally render the Emergency Stop text based on showEmergencyStopText state */}
                 {showEmergencyStopText && (
@@ -163,13 +163,13 @@ const EmergencyStopAndRestart = ({  }) => {
                 onDoubleClick={handleRestart}
                 onMouseEnter={() => setShowRestartText(true)}
                 onMouseLeave={() => setShowRestartText(false)}
-                className="flex"
+                className="flex cursor-pointer"
             >
                 <img
                     src="/static/img/ico/icons8-restart-512.svg"
                     alt="icons-list"
                     style={{ filter: 'invert(20%) sepia(7%) saturate(2126%) hue-rotate(178deg) brightness(98%) contrast(84%)' }}
-                    className="h-10 cursor-pointer"
+                    className="h-10"
                 />
                 {/* Conditionally render the Restart text based on showRestartText state */}
                 {showRestartText && (
