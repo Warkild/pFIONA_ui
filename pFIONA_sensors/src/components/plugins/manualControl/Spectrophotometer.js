@@ -199,7 +199,7 @@ function Spectrophotometer({inAction, setInAction, isDeployed, preScanCount}) {
                         return response.json();
                     })
                     .then(data => {
-                        setIntegrationTime(data.message);
+                        setLightStatus(data.message === "true");
                     })
                     .catch(error => {
                         console.error('Error:', error);
@@ -232,7 +232,7 @@ function Spectrophotometer({inAction, setInAction, isDeployed, preScanCount}) {
                         return response.json();
                     })
                     .then(data => {
-                        setLightStatus(data.message === "true");
+                        setIntegrationTime(data.message);
                     })
                     .catch(error => {
                         console.error('Error:', error);
