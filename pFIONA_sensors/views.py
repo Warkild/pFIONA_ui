@@ -18,6 +18,9 @@ from pFIONA_api.analysis.formula import absorbance
 from pFIONA_api.analysis.spectrum_finder import *
 from .decorators import admin_required
 from .forms import SensorForm, SensorNameAndNotesForm, ReagentEditForm, SensorLatLongForm, SensorSettingsForm
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse_lazy
 
 
 @login_required()
@@ -62,7 +65,7 @@ def sensors_deploy(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     user_groups = request.user.groups.values_list('name', flat=True)
     return render(request, 'pFIONA_sensors/view/sensors_deploy.html',
-                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,'user_groups': user_groups, })
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, 'user_groups': user_groups, })
 
 
 @login_required()
@@ -70,7 +73,7 @@ def sensors_data(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     user_groups = request.user.groups.values_list('name', flat=True)
     return render(request, 'pFIONA_sensors/view/sensors_data.html',
-                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, 'user_groups': user_groups,})
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, 'user_groups': user_groups, })
 
 
 @login_required()
@@ -213,7 +216,7 @@ def sensors_reagent_add(request, sensor_id):
         if reagent_form.is_valid():
             max_id = \
                 Reagent.objects.filter(id__gte=sensor_id * 10000000,
-                                                          id__lte=(sensor_id + 1) * 10000000).aggregate(Max('id'))[
+                                       id__lte=(sensor_id + 1) * 10000000).aggregate(Max('id'))[
                     'id__max']
 
             if max_id is None:
@@ -270,7 +273,8 @@ def sensors_settings(request, sensor_id):
 
     return render(request, 'pFIONA_sensors/view/sensors_settings.html',
                   {'id': sensor_id, 'name_notes_form': name_notes_form, 'sensor': sensor,
-                   'lat_long_form': lat_long_form, 'sensor_settings_form': sensor_settings_form, 'user_groups':user_groups})
+                   'lat_long_form': lat_long_form, 'sensor_settings_form': sensor_settings_form,
+                   'user_groups': user_groups})
 
 
 @login_required()

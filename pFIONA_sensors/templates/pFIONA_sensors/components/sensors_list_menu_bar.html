@@ -20,6 +20,7 @@
         </div>
     </div>
     <div>
+        <a href="{% url 'change_password' %}" class="flex justify-around mb-7 font-poppins font-bold text-blue-600 hover:text-blue-400 hover:underline">Change Password</a>
         <form action="{% url 'logout' %}" method="post" class="flex justify-around">
             {% csrf_token %}
             <button class="text-red-600 mb-7 font-poppins font-bold hover:text-red-400 hover:underline" type="submit">Logout</button>
