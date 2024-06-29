@@ -3,8 +3,7 @@ import { Line } from 'react-chartjs-2';
 import Chart from 'chart.js/auto';
 import moment from 'moment';
 
-
-const AbsorbanceChart = () => {
+const AbsorbanceChart = ({  }) => {
     const [cycleCount, setCycleCount] = useState(0);
     const [selectedCycle, setSelectedCycle] = useState('');
     const [selectedReaction, setSelectedReaction] = useState('');
@@ -40,15 +39,19 @@ const AbsorbanceChart = () => {
             const epochTimestamp = moment(timestamp).unix();
             const response = await fetch(`/api/get_cycle_count?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
             const result = await response.json();
-            if (result.cycle_count > 0) {
-                setCycleCount(result.cycle_count);
-                setSelectedCycle(result.cycle_count.toString());
+            if (response.ok) {
+                if (result.cycle_count > 0) {
+                    setCycleCount(result.cycle_count);
+                    setSelectedCycle(result.cycle_count.toString());
+                } else {
+                    setCycleCount(0);
+                    setSelectedCycle('');
+                    setData(null);
+                    setDeploymentInfo(null);
+                    setErrorMessage('No deployment found before the selected date.');
+                }
             } else {
-                setCycleCount(0);
-                setSelectedCycle('');
-                setData(null);
-                setDeploymentInfo(null);
-                setErrorMessage('No deployment found before the selected date.');
+                throw new Error(result.message || 'Error fetching cycle count.');
             }
         } catch (error) {
             console.error('Error fetching cycle count:', error);
@@ -64,22 +67,27 @@ const AbsorbanceChart = () => {
             const epochTimestamp = moment(timestamp).unix();
             const response = await fetch(`/api/get_absorbance_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
             const result = await response.json();
-            const reactions = Object.keys(result.absorbance_data || {});
-            setAvailableReactions(reactions);
-            setAllReactionsData(result.absorbance_data);
+            if (response.ok) {
+                const reactions = Object.keys(result.absorbance_data || {});
+                setAvailableReactions(reactions);
+                setAllReactionsData(result.absorbance_data);
 
-            if (reactions.includes(selectedReaction)) {
-                setData(result.absorbance_data[selectedReaction] || {});
+                if (reactions.includes(selectedReaction)) {
+                    setData(result.absorbance_data[selectedReaction] || {});
+                } else {
+                    const firstReaction = reactions[0] || '';
+                    setSelectedReaction(firstReaction);
+                    setData(result.absorbance_data[firstReaction] || {});
+                }
+
+                setWavelengths(result.wavelengths);
+                setDeploymentInfo(result.deployment_info);
             } else {
-                const firstReaction = reactions[0] || '';
-                setSelectedReaction(firstReaction);
-                setData(result.absorbance_data[firstReaction] || {});
+                throw new Error(result.message || 'Error fetching absorbance data.');
             }
-
-            setWavelengths(result.wavelengths);
-            setDeploymentInfo(result.deployment_info);
         } catch (error) {
             console.error('Error fetching absorbance data:', error);
+            setErrorMessage(error.message || 'Error fetching absorbance data. Please try again.');
         } finally {
             setLoading(false);
         }

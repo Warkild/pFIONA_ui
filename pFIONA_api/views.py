@@ -373,6 +373,29 @@ def api_get_sample_frequency(request):
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
+def api_get_active_ports_names(request):
+    try:
+        sensor_id = request.GET.get('sensor_id')
+
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        active_ports_names = q.get_active_ports_names(sensor_id)
+
+        return JsonResponse({'status': 'success', 'data': active_ports_names})
+
+    except ValueError as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
 def api_get_last_states(request):
     try:
         sensor_id = request.GET.get('sensor_id')

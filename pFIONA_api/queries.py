@@ -532,3 +532,8 @@ def get_3_last_spectrum_cycle_0(sensor_id):
         response_data.append(spectrum_data)
 
     return response_data
+
+
+def get_active_ports_names(sensor_id):
+    reagents = models.Reagent.objects.filter(pfiona_sensor_id=sensor_id).exclude(port=None).values_list('name', flat=True)
+    return list(reagents)
