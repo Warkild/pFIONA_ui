@@ -603,6 +603,10 @@ def get_absorbance_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
                     if len(ref_values) == len(dark_values) == len(sample_values):
                         absorbance_values = absorbance(ref_values, dark_values, sample_values)
                         absorbance_data[reaction][type_key][subcycle] = absorbance_values
+                        deployment_info["time_" + str(reaction) + "_" + str(type_key) + "_subcycle_" + str(subcycle)] = \
+                        [s['time'] for s in spectrums_list if
+                         type_key in s['spectrumtype'] and 'Dark' not in s['spectrumtype'] and 'Reference' not in
+                         s['spectrumtype'] and 'wavelength_monitored' not in s['spectrumtype']][0]
                     else:
                         print(
                             f"Skipping due to shape mismatch: ref={len(ref_values)}, dark={len(dark_values)}, sample={len(sample_values)}")
@@ -614,6 +618,28 @@ def get_absorbance_spectrums_in_cycle_full_info(timestamp, sensor_id, cycle):
 
     return absorbance_data, wavelengths, deployment_info
 
+
+def update_deployment_info_with_cycle(existing_info, new_info, cycle):
+    """
+    Met à jour le dictionnaire d'informations de déploiement existant avec les nouvelles informations fournies,
+    en ajoutant le numéro de cycle aux clés de temps.
+    """
+    if existing_info is None:
+        existing_info = {}
+
+    for key, value in new_info.items():
+        if "time_" in key:
+            parts = key.split('_subcycle_')
+            new_key = f"{parts[0]}_cycle_{cycle}_subcycle_{parts[1]}"
+        else:
+            new_key = key
+
+        if new_key not in existing_info:
+            existing_info[new_key] = value
+        elif isinstance(value, dict):
+            existing_info[new_key] = update_deployment_info_with_cycle(existing_info.get(new_key, {}), value, cycle)
+
+    return existing_info
 
 def get_absorbance_spectrums_in_deployment_full_info(timestamp, sensor_id):
     # Récupérer le nombre de cycles
@@ -638,7 +664,7 @@ def get_absorbance_spectrums_in_deployment_full_info(timestamp, sensor_id):
             if not all_wavelengths:
                 all_wavelengths = wavelengths
 
-        if not deployment_info and cycle_deployment_info:
-            deployment_info = cycle_deployment_info
+        if cycle_deployment_info:
+            deployment_info = update_deployment_info_with_cycle(deployment_info, cycle_deployment_info, cycle)
 
     return all_absorbance_data, all_wavelengths, deployment_info

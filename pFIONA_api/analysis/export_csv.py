@@ -77,8 +77,7 @@ def export_raw_data(timestamp, sensor_id):
 
 
 def export_absorbance_data(timestamp, sensor_id):
-    all_absorbance_data, all_wavelengths, deployment_info = get_absorbance_spectrums_in_deployment_full_info(timestamp,
-                                                                                                             sensor_id)
+    all_absorbance_data, all_wavelengths, deployment_info = get_absorbance_spectrums_in_deployment_full_info(timestamp, sensor_id)
 
     if not all_absorbance_data or not isinstance(all_absorbance_data, dict):
         return HttpResponse("No absorbance data found for the given timestamp and sensor ID.", status=404)
@@ -96,13 +95,20 @@ def export_absorbance_data(timestamp, sensor_id):
                             'Wavelength': all_wavelengths[wavelength],
                             'Absorbance': absorbance_value
                         }
+                        # Ajout des informations de temps associées
+                        time_key = f'time_{reaction}_{spectrum_type}_cycle_{cycle}_subcycle_{wavelength_index}'
+                        timestamp = deployment_info.get(time_key, None)
+                        if timestamp is not None:
+                            local_datetime = datetime.fromtimestamp(timestamp).strftime('%m/%d/%Y %H:%M:%S')
+                            row['Time'] = local_datetime
+                        else:
+                            row['Time'] = ''
                         data.append(row)
 
     df = pd.DataFrame(data)
 
     # Create a pivot table to organize the data
-    pivoted_df = df.pivot_table(index=['Cycle', 'Reaction', 'Type'], columns='Wavelength', values='Absorbance',
-                                aggfunc='first').fillna('').reset_index()
+    pivoted_df = df.pivot_table(index=['Cycle', 'Reaction', 'Type', 'Time'], columns='Wavelength', values='Absorbance', aggfunc='first').fillna('').reset_index()
 
     # Create CSV response
     response = HttpResponse(
