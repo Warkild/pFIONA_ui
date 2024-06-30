@@ -284,7 +284,7 @@ def get_absorbance_spectrums_in_cycle(timestamp, sensor_id, cycle):
                     if len(ref_values) == len(dark_values) == len(sample_values):
                         absorbance_values = absorbance(ref_values, dark_values, sample_values)
                         absorbance_data[reaction][type_key][subcycle] = absorbance_values
-                        deployment_info[str(reaction) + "_" + str(type_key) + "_" + str(subcycle)] = [s['time'] for s in spectrums_list if
+                        deployment_info["time_"+str(reaction) + "_" + str(type_key) + "_subcycle_" + str(subcycle)] = [s['time'] for s in spectrums_list if
                                type_key in s['spectrumtype'] and 'Dark' not in s['spectrumtype'] and 'Reference' not in
                                s['spectrumtype'] and 'wavelength_monitored' not in s['spectrumtype']][0]
                     else:

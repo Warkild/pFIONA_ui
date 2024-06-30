@@ -15,22 +15,49 @@ const AbsorbanceChart = ({  }) => {
     const [deploymentInfo, setDeploymentInfo] = useState(null);
     const [availableReactions, setAvailableReactions] = useState([]);
     const [allReactionsData, setAllReactionsData] = useState({});
+    const [deployments, setDeployments] = useState([]); // State to store deployments list
+    const [currentDeploymentIndex, setCurrentDeploymentIndex] = useState(null); // State to store the index of current deployment
+    const [shouldFetch, setShouldFetch] = useState(false); // State to trigger fetch action
+    const [shouldFetchSpectrum, setShouldFetchSpectrum] = useState(false); // State to trigger fetch spectrum action
 
     useEffect(() => {
         fetchCycleCount();
     }, []);
 
     useEffect(() => {
-        if (selectedCycle) {
-            fetchAbsorbanceData(selectedCycle);
+        fetchDeploymentList(); // Fetch deployment list on component mount
+    }, []);
+
+    const fetchDeploymentList = async () => { // Fetch the list of deployments from API
+        try {
+            const response = await fetch(`/api/get_deployment_list?sensor_id=${sensor_id}`);
+            const result = await response.json();
+            setDeployments(result); // Set the deployments state with fetched data
+        } catch (error) {
+            console.error('Error fetching deployment list:', error);
+            setErrorMessage('Error fetching deployment list. Please try again.');
         }
-    }, [selectedCycle]);
+    };
+
+    useEffect(() => {
+        if (selectedCycle && shouldFetchSpectrum) { // Fetch spectrum data if a cycle is selected and shouldFetchSpectrum is true
+            fetchAbsorbanceData(selectedCycle);
+            setShouldFetchSpectrum(false); // Reset the flag after fetching spectrum data
+        }
+    }, [selectedCycle, shouldFetchSpectrum]);
 
     useEffect(() => {
         if (selectedReaction) {
             setData(allReactionsData[selectedReaction] || {});
         }
     }, [selectedReaction]);
+
+    useEffect(() => {
+        if (shouldFetch) { // Fetch cycle count if shouldFetch is true
+            fetchCycleCount();
+            setShouldFetch(false); // Reset the flag after fetching cycle count
+        }
+    }, [timestamp, shouldFetch]);
 
     const fetchCycleCount = async () => {
         setLoading(true);
@@ -43,6 +70,7 @@ const AbsorbanceChart = ({  }) => {
                 if (result.cycle_count > 0) {
                     setCycleCount(result.cycle_count);
                     setSelectedCycle(result.cycle_count.toString());
+                    setShouldFetchSpectrum(true); // Set the flag to fetch spectrum data
                 } else {
                     setCycleCount(0);
                     setSelectedCycle('');
@@ -81,6 +109,9 @@ const AbsorbanceChart = ({  }) => {
                 }
 
                 setWavelengths(result.wavelengths);
+                const deploymentId = result.deployment_info.deployment_id;
+                const deploymentIndex = deployments.findIndex(deployment => deployment.deployment === deploymentId);
+                setCurrentDeploymentIndex(deploymentIndex); // Set current deployment index state
                 setDeploymentInfo(result.deployment_info);
             } else {
                 throw new Error(result.message || 'Error fetching absorbance data.');
@@ -114,12 +145,40 @@ const AbsorbanceChart = ({  }) => {
 
     const handleNextCycle = () => {
         const nextCycle = Math.min(parseInt(selectedCycle) + 1, cycleCount).toString();
+        setErrorMessage("");
         handleCycleChange(nextCycle);
     };
 
     const handlePrevCycle = () => {
         const prevCycle = Math.max(parseInt(selectedCycle) - 1, 1).toString();
+        setErrorMessage("");
         handleCycleChange(prevCycle);
+    };
+
+    const handleNextDeployment = () => {
+        if (currentDeploymentIndex !== null && currentDeploymentIndex < deployments.length - 1) {
+            const nextDeploymentIndex = currentDeploymentIndex + 1;
+            const nextDeployment = deployments[nextDeploymentIndex];
+            const averageTimestamp = (nextDeployment.start_time + nextDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of next deployment
+            setCurrentDeploymentIndex(nextDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
+        }
+    };
+
+    const handlePrevDeployment = () => {
+        if (currentDeploymentIndex !== null && currentDeploymentIndex > 0) {
+            const prevDeploymentIndex = currentDeploymentIndex - 1;
+            const prevDeployment = deployments[prevDeploymentIndex];
+            const averageTimestamp = (prevDeployment.start_time + prevDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of previous deployment
+            setCurrentDeploymentIndex(prevDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
+        }
     };
 
     const generateColor = (baseColor, subcycleIndex) => {
@@ -146,11 +205,19 @@ const AbsorbanceChart = ({  }) => {
 
         for (const [type, subcycles] of Object.entries(cycleData || {})) {
             for (const [subcycle, absorbanceValues] of Object.entries(subcycles || {})) {
+                const key="time_"+selectedReaction+"_"+type+"_subcycle_"+subcycle
+                let spectra_time = ""
+                try {
+                    spectra_time = deploymentInfo[key]
+                } catch (error) {
+                    console.error(error)
+                }
                 chartData.datasets.push({
                     label: `${type} Subcycle ${subcycle}`,
                     data: absorbanceValues,
                     borderColor: generateColor(baseColors[type] || [0, 0, 0], subcycle),
                     fill: false,
+                    time: spectra_time
                 });
             }
         }
@@ -180,13 +247,31 @@ const AbsorbanceChart = ({  }) => {
                                 />
                             </label>
                         </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
-                        >
-                            Fetch Deployment
-                        </button>
+                        <div className={"flex flex-rox space-x-10"}> {/* Button container */}
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Fetch Deployment
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handlePrevDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex === 0}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Previous Deployment
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNextDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Next Deployment
+                            </button>
+                        </div>
                     </form>
                     {!loading && errorMessage && <div className="text-red-500 mb-5">{errorMessage}</div>}
                     <div className="flex flex-row justify-between">
@@ -305,7 +390,11 @@ const AbsorbanceChart = ({  }) => {
                                                         label += context.parsed.y.toFixed(2); // round absorbance to 2 decimal places
                                                     }
                                                     return label;
-                                                }
+                                                },
+                                                afterLabel: function (context) {
+                                                    const time = context.dataset.time;
+                                                    return `Time: ${moment.unix(time).format('YYYY-MM-DD HH:mm:ss')}`;
+                                                },
                                             }
                                         }
                                     },
