@@ -775,8 +775,13 @@ def get_lasts_spectrum_cycle_0(request):
 
 @login_required()
 @csrf_exempt
-def api_get_current_reagents_from_current_reaction(request, sensor_id):
+def api_get_current_reagents_from_current_reaction(request):
     try:
+        sensor_id = request.GET.get('sensor_id')
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
         current_reagents = q.get_reagents_for_current_reaction(sensor_id)
         return JsonResponse(
             {'status': 'success', 'reaction_names': current_reagents if current_reagents else []})

@@ -20,7 +20,7 @@ function DeployTransport({ connected, isDeployed}) {
         async function fetchReagents() {
             try {
                 // Fetch current reagents for the current reaction
-                const currentReagentsResponse = await fetch(`/api/get_current_reagents_for_current_reaction/${sensor_id}`);
+                const currentReagentsResponse = await fetch(`/api/get_current_reagents_for_current_reaction?sensor_id=${sensor_id}`);
                 const currentReagentsData = await currentReagentsResponse.json();
 
                 // Fetch active ports names
@@ -89,7 +89,7 @@ function DeployTransport({ connected, isDeployed}) {
         // Set isPrimePort state to true
         setIsPrimePort(true);
         // Send POST request to prime ports
-        fetch(`http://${sensor_ip}:5000/sensor/valve_port_priming`, {
+        fetch(`http://${sensor_ip}:${sensor_port}/sensor/valve_port_priming`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -132,7 +132,7 @@ function DeployTransport({ connected, isDeployed}) {
         // Set isFlushPort state to true
         setIsFlushPort(true);
         // Send POST request to flush ports
-        fetch(`http://${sensor_ip}:5000/sensor/valve_port_flushing`, {
+        fetch(`http://${sensor_ip}:${sensor_port}/sensor/valve_port_flushing`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
