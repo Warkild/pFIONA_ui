@@ -84,13 +84,11 @@ const AbsorbanceChart = ({  }) => {
         } catch (error) {
             console.error('Error fetching cycle count:', error);
             setErrorMessage('Error fetching cycle count. Please try again.');
-        } finally {
             setLoading(false);
         }
     };
 
     const fetchAbsorbanceData = async (cycle) => {
-        setLoading(true);
         try {
             const epochTimestamp = moment(timestamp).unix();
             const response = await fetch(`/api/get_absorbance_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
