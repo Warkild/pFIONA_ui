@@ -69,7 +69,8 @@ def get_spectrums_in_cycle(timestamp, sensor_id, cycle):
 
     spectrums = Spectrum.objects.filter(
         deployment=deployment_id,
-        cycle=cycle
+        cycle=cycle,
+        pfiona_sensor_id=sensor_id,
     ).exclude(
         pfiona_spectrumtype__type__icontains='wavelength_monitored'
     ).select_related(
@@ -88,7 +89,7 @@ def get_spectrums_in_cycle(timestamp, sensor_id, cycle):
             wavelengths = sorted(spectrum.wavelengths)  # Sort wavelengths
 
         # Sort values by the sorted order of wavelengths
-        sorted_values = [value for _, value in sorted(zip(spectrum.wavelengths, spectrum.values))]
+        values = [value for _, value in sorted(zip(spectrum.wavelengths, spectrum.values))]
 
         spectrum_data = {
             'id': spectrum.id,
@@ -96,7 +97,7 @@ def get_spectrums_in_cycle(timestamp, sensor_id, cycle):
             'spectrumtype': spectrum.pfiona_spectrumtype.type,
             'cycle': spectrum.cycle,
             'deployment': spectrum.deployment,
-            'values': list(zip(wavelengths, sorted_values))  # Use sorted wavelengths and corresponding values
+            'values': list(zip(wavelengths, values))  # Use sorted wavelengths and corresponding values
         }
 
         spectrum_type = spectrum.pfiona_spectrumtype.type
@@ -668,3 +669,109 @@ def get_absorbance_spectrums_in_deployment_full_info(timestamp, sensor_id):
             deployment_info = update_deployment_info_with_cycle(deployment_info, cycle_deployment_info, cycle)
 
     return all_absorbance_data, all_wavelengths, deployment_info
+
+from collections import defaultdict
+from django.db.models import Q, Min, Max
+from django.contrib.postgres.aggregates import ArrayAgg
+
+def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sensor_id, cycle):
+    last_spectrum = Spectrum.objects.filter(
+        pfiona_sensor_id=sensor_id,
+        pfiona_time__timestamp__lt=timestamp,
+        cycle__gte=1
+    ).exclude(
+        pfiona_spectrumtype__type__endswith='wavelength_monitored'
+    ).order_by('-pfiona_time__timestamp').first()
+
+    if not last_spectrum:
+        return None, None, None
+
+    deployment_id = last_spectrum.deployment
+
+    times = Spectrum.objects.filter(
+        deployment=deployment_id,
+        pfiona_sensor_id=sensor_id,
+        cycle__gte=1
+    ).aggregate(
+        deployment_start_time=Min('pfiona_time__timestamp'),
+        deployment_end_time=Max('pfiona_time__timestamp'),
+        cycle_start_time=Min('pfiona_time__timestamp', filter=Q(cycle=cycle)),
+        cycle_end_time=Max('pfiona_time__timestamp', filter=Q(cycle=cycle))
+    )
+
+    deployment_start_time = times['deployment_start_time']
+    deployment_end_time = times['deployment_end_time']
+    cycle_start_time = times['cycle_start_time']
+    cycle_end_time = times['cycle_end_time']
+
+    spectrums = Spectrum.objects.filter(
+        deployment=deployment_id,
+        cycle=cycle,
+        pfiona_sensor_id=sensor_id,
+        pfiona_spectrumtype__type__endswith='wavelength_monitored'
+    ).select_related(
+        'pfiona_spectrumtype', 'pfiona_time'
+    ).annotate(
+        wavelengths=ArrayAgg('value__wavelength', ordering='value__wavelength'),
+        values=ArrayAgg('value__value', ordering='value__wavelength')
+    ).order_by('id')
+
+    spectrums_data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    wavelengths = []
+    current_subcycle = defaultdict(lambda: defaultdict(int))
+    previous_id = defaultdict(lambda: None)
+
+
+    for spectrum in spectrums:
+        if not wavelengths:
+            wavelengths = sorted(spectrum.wavelengths)  # Sort wavelengths
+
+        # Sort values by the sorted order of wavelengths
+        sorted_values = [value for _, value in sorted(zip(spectrum.wavelengths, spectrum.values))]
+
+        spectrum_data = {
+            'id': spectrum.id,
+            'time': spectrum.pfiona_time.timestamp,
+            'spectrumtype': spectrum.pfiona_spectrumtype.type,
+            'cycle': spectrum.cycle,
+            'deployment': spectrum.deployment,
+            'values': list(zip(wavelengths, sorted_values))  # Use sorted wavelengths and corresponding values
+        }
+
+        spectrum_type = spectrum.pfiona_spectrumtype.type
+        reaction_type = spectrum_type.split('_')[0]
+
+        parts = spectrum_type.split('_')
+
+        if 'Blank' in spectrum_type:
+            key = 'Blank'
+        elif 'Sample' in spectrum_type:
+            key = 'Sample'
+        elif 'CRM' in spectrum_type:
+            key = 'CRM'
+        elif 'Standard' in spectrum_type:
+            if len(parts) >= 4 and parts[2] == 'Dillution':
+                dilution = parts[3]
+                key = f'Standard_Dillution_{dilution}'
+            else:
+                key = 'Standard'
+        else:
+            key = spectrum_type
+
+        # Check if this is a new subcycle
+        if previous_id[key] is not None and spectrum.id != previous_id[key] + 1:
+            current_subcycle[reaction_type][key] += 1
+
+        previous_id[key] = spectrum.id
+
+        spectrums_data[reaction_type][key][current_subcycle[reaction_type][key]].append(spectrum_data)
+
+    deployment_info = {
+        'deployment_id': deployment_id,
+        'deployment_start_time': deployment_start_time,
+        'deployment_end_time': deployment_end_time,
+        'cycle_start_time': cycle_start_time,
+        'cycle_end_time': cycle_end_time,
+    }
+
+    return spectrums_data, wavelengths, deployment_info

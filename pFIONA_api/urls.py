@@ -26,6 +26,7 @@ urlpatterns = [
          name='api_get_deployment_list'),
     path('get_spectrums_in_cycle', views.api_get_spectrums_in_cycle, name='api_get_spectrums_in_cycle'),
     path('get_spectrums_in_cycle_full_info', views.api_get_spectrum_in_cycle_full_info, name='api_get_spectrum_in_cycle_full_info'),
+    path('get_only_wavelength_monitored_through_time_in_cycle_full_info', views.api_get_only_wavelength_monitored_through_time_in_cycle_full_info, name='api_get_only_wavelength_monitored_through_time_in_cycle_full_info'),
     path('get_spectrums_in_deployment_full_info', views.api_get_spectrum_in_deployment_full_info, name='api_get_spectrum_in_deployment_full_info'),
     path('get_absorbance_spectrums_in_cycle_full_info', views.api_get_absorbance_spectrums_in_cycle_full_info, name='api_get_absorbance_spectrums_in_cycle_full_info'),
     path('get_absorbance_spectrums_in_deployment_full_info', views.api_get_absobance_spectrums_in_deployment_full_info, name='api_get_absobance_spectrums_in_deployment_full_info'),

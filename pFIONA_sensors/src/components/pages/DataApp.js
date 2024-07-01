@@ -5,6 +5,7 @@ import AbsorbanceChart from "../plugins/data/AbsorbanceChart";
 import ConcentrationChart from "../plugins/data/ConcentrationChart";
 import MultiStandardChart from "../plugins/data/MultiStandardChart";
 import SpectrumChart from "../plugins/data/SpectrumChart";
+import WavelengthMonitoredChart from "../plugins/data/WavelengthMonitoredChart";
 function DataApp({  }) {
 
 
@@ -15,6 +16,7 @@ function DataApp({  }) {
           <AbsorbanceChart/>
           <ConcentrationChart/>
           <MultiStandardChart/>
+          <WavelengthMonitoredChart/>
       </div>
   );
 }
