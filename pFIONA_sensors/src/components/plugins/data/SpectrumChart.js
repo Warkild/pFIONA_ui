@@ -88,14 +88,14 @@ const SpectrumChart = ({  }) => { // Define SpectrumChart component accepting se
     const fetchSpectrumData = async (cycle) => { // Fetch spectrum data for the selected cycle
         try {
             const epochTimestamp = moment(timestamp).unix(); // Convert timestamp to epoch time
-            const response = await fetch(`/api/get_spectrums_in_cycle?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
+            const response = await fetch(`/api/get_spectrums_in_cycle_full_info?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`);
             const result = await response.json();
 
-            if (!result || !result.spectrums_data) {
+            if (!result || !result.data) {
                 throw new Error('Spectrums data is missing or invalid');
             }
 
-            const spectrumsData = result.spectrums_data; // Store fetched spectrums data
+            const spectrumsData = result.data; // Store fetched spectrums data
             const reactions = Object.keys(spectrumsData); // Extract reactions from spectrums data
             if (reactions.length === 0) {
                 throw new Error('No reactions data available');
