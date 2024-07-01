@@ -4,7 +4,7 @@ from . import views
 urlpatterns = [
     path('set_current_reaction/<int:sensor_id>', views.api_set_current_reaction, name='api_set_current_reaction'),
     path('get_current_reaction/<int:sensor_id>', views.api_get_current_reaction, name='api_get_current_reaction'),
-    path('get_current_reagents_for_current_reaction/<int:sensor_id>',
+    path('get_current_reagents_for_current_reaction',
          views.api_get_current_reagents_from_current_reaction, name='api_get_current_reagents_from_current_reaction'),
     path('add_reaction', views.api_add_reaction, name='api_add_reaction'),
     path('edit_reaction', views.api_edit_reaction, name='api_edit_reaction'),
@@ -26,6 +26,7 @@ urlpatterns = [
          name='api_get_deployment_list'),
     path('get_spectrums_in_cycle', views.api_get_spectrums_in_cycle, name='api_get_spectrums_in_cycle'),
     path('get_spectrums_in_cycle_full_info', views.api_get_spectrum_in_cycle_full_info, name='api_get_spectrum_in_cycle_full_info'),
+    path('get_only_wavelength_monitored_through_time_in_cycle_full_info', views.api_get_only_wavelength_monitored_through_time_in_cycle_full_info, name='api_get_only_wavelength_monitored_through_time_in_cycle_full_info'),
     path('get_spectrums_in_deployment_full_info', views.api_get_spectrum_in_deployment_full_info, name='api_get_spectrum_in_deployment_full_info'),
     path('get_absorbance_spectrums_in_cycle_full_info', views.api_get_absorbance_spectrums_in_cycle_full_info, name='api_get_absorbance_spectrums_in_cycle_full_info'),
     path('get_absorbance_spectrums_in_deployment_full_info', views.api_get_absobance_spectrums_in_deployment_full_info, name='api_get_absobance_spectrums_in_deployment_full_info'),

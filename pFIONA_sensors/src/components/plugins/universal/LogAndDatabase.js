@@ -22,31 +22,31 @@ const LogAndDatabase = ({  }) => {
         // Check if the access token exists in session storage
         if (sessionStorage.getItem('accessToken') != null) {
             // Fetch the sensor state from the server
-            fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
+            fetch(`http://${sensor_ip}:${sensor_port}/sensor/get_state`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                     'Content-Type': 'application/json',
                 },
             })
-                .then(response => {
-                    // Check if the response is ok
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    // Parse the response JSON
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Success:', data);
-                    // Set the connected state to true
-                    setConnected(true);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Set the connected state to false
-                    setConnected(false);
-                });
+            .then(response => {
+                // Check if the response is ok
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Parse the response JSON
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                // Set the connected state to true
+                setConnected(true);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Set the connected state to false
+                setConnected(false);
+            });
         }
     };
 
@@ -66,7 +66,7 @@ const LogAndDatabase = ({  }) => {
     const handleGetLog = () => {
         // Check if the access token exists in session storage
         if (sessionStorage.getItem('accessToken') != null) {
-            const getLogUrl = `http://${sensor_ip}:5000/sensor/get_logs`;
+            const getLogUrl = `http://${sensor_ip}:${sensor_port}/sensor/get_logs`;
             // Fetch the log file from the server
             fetch(getLogUrl, {
                 method: 'GET',
@@ -75,23 +75,25 @@ const LogAndDatabase = ({  }) => {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 },
             })
-                .then(response => {
-                    // Check if the response is ok
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    // Parse the response as a blob
-                    return response.blob();
-                })
-                .then(blob => {
-                    // Create a URL for the blob
-                    const url = window.URL.createObjectURL(blob);
-                    // Set the log URL state
-                    setLogUrl(url);
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
+            .then(response => {
+                // Check if the response is ok
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Parse the response as a blob
+                return response.blob();
+            })
+            .then(blob => {
+                // Create a URL for the blob
+                const url = window.URL.createObjectURL(blob);
+                // Set the log URL state
+                setLogUrl(url);
+                // Trigger the download of the log file
+                downloadFile(url, 'log.txt');
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
         }
     };
 
@@ -99,7 +101,7 @@ const LogAndDatabase = ({  }) => {
     const handleGetDatabase = () => {
         // Check if the access token exists in session storage
         if (sessionStorage.getItem('accessToken') != null) {
-            const getDatabaseUrl = `http://${sensor_ip}:5000/sensor/get_sqlite_db`;
+            const getDatabaseUrl = `http://${sensor_ip}:${sensor_port}/sensor/get_sqlite_db`;
             // Fetch the database file from the server
             fetch(getDatabaseUrl, {
                 method: 'GET',
@@ -108,24 +110,35 @@ const LogAndDatabase = ({  }) => {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
                 },
             })
-                .then(response => {
-                    // Check if the response is ok
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    // Parse the response as a blob
-                    return response.blob();
-                })
-                .then(blob => {
-                    // Create a URL for the blob
-                    const url = window.URL.createObjectURL(blob);
-                    // Set the database URL state
-                    setDatabaseUrl(url);
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
+            .then(response => {
+                // Check if the response is ok
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                // Parse the response as a blob
+                return response.blob();
+            })
+            .then(blob => {
+                // Create a URL for the blob
+                const url = window.URL.createObjectURL(blob);
+                // Set the database URL state
+                setDatabaseUrl(url);
+                // Trigger the download of the database file
+                downloadFile(url, 'database.sqlite');
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+            });
         }
+    };
+
+    // Function to trigger the download of a file given its URL and filename
+    const downloadFile = (url, filename) => {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
     };
 
     // Render the component if connected
@@ -166,7 +179,7 @@ const LogAndDatabase = ({  }) => {
                 )}
             </li>
         </div>
-    ): null;
+    ) : null;
 };
 
 export default LogAndDatabase;

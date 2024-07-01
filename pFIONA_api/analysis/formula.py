@@ -11,16 +11,18 @@ def absorbance(ref_scan, dark_scan, sample_scan):
 
     :return: list of absorbance
     """
-
+    # Convert the input lists to numpy arrays
     ref_scan = np.array(ref_scan)
     dark_scan = np.array(dark_scan)
     sample_scan = np.array(sample_scan)
 
+    # Calculate absorbance values, ignoring divide and invalid warnings
     with np.errstate(divide='ignore', invalid='ignore'):
         absorbance_values = np.log10((ref_scan - dark_scan) / (sample_scan - dark_scan))
-        absorbance_values[np.isnan(absorbance_values)] = 0  # Replace NaNs with 0 or another appropriate value
+        # Replace NaNs with 0
+        absorbance_values[np.isnan(absorbance_values)] = 0
 
-    # Remplacer les valeurs infinies par le minimum des valeurs d'absorbance
+    # Replace infinite values with the minimum absorbance value or 0 if no finite values exist
     finite_absorbance_values = absorbance_values[np.isfinite(absorbance_values)]
     if finite_absorbance_values.size > 0:
         min_absorbance = finite_absorbance_values.min()
@@ -32,9 +34,14 @@ def absorbance(ref_scan, dark_scan, sample_scan):
 
 
 def concentration(abs_sample, abs_blank, abs_standard, std_conc):
-    print('CALCUL')
-    print(f"abs_sample: {abs_sample}")
-    print(f"abs_blank: {abs_blank}")
-    print(f"abs_standard: {abs_standard}")
-    print(f"std_conc: {std_conc}")
+    """
+    Compute the concentration of a sample.
+
+    :param abs_sample: absorbance of the sample
+    :param abs_blank: absorbance of the blank
+    :param abs_standard: absorbance of the standard
+    :param std_conc: concentration of the standard
+
+    :return: concentration of the sample
+    """
     return ((abs_sample - abs_blank) * std_conc) / (abs_standard - abs_blank)
