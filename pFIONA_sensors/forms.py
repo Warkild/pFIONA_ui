@@ -1,31 +1,31 @@
 from django.forms import ModelForm
 from .models import Sensor, Reagent
 
-
+# Form for creating and editing Sensor objects
 class SensorForm(ModelForm):
     class Meta:
         model = Sensor
-        fields = '__all__'
+        fields = '__all__'  # Includes all fields from the Sensor model
 
-
+# Form for editing the name and notes fields of a Sensor
 class SensorNameAndNotesForm(ModelForm):
     class Meta:
         model = Sensor
-        fields = ['name', 'notes']
+        fields = ['name', 'notes']  # Only includes 'name' and 'notes' fields
 
-
+# Form for editing specific fields of a Reagent
 class ReagentEditForm(ModelForm):
     class Meta:
         model = Reagent
-        fields = ['name', 'volume_max', 'is_standard']
+        fields = ['name', 'volume_max', 'is_standard']  # Only includes specified fields
 
-
+# Form for editing the latitude and longitude of a Sensor
 class SensorLatLongForm(ModelForm):
     class Meta:
         model = Sensor
-        fields = ['lat', 'long']
+        fields = ['lat', 'long']  # Only includes 'lat' and 'long' fields
 
-
+# Form for editing various settings of a Sensor
 class SensorSettingsForm(ModelForm):
     class Meta:
         model = Sensor
@@ -33,8 +33,9 @@ class SensorSettingsForm(ModelForm):
             'boxcar_width', 'scans_to_average', 'time_to_wait_for_lamp', 'time_between_2_spectrophotometer_scan',
             'flush_flow_rate', 'flush_volume', 'max_flow_rate', 'max_aspirate_volume', 'volume_for_valve_port_priming',
             'time_to_pump'
-        ]
+        ]  # Includes specified fields for sensor settings
 
+        # Labels for the fields to provide more descriptive names
         labels = {
             'boxcar_width': 'Boxcar width (number of neighboring pixels used to average each pixel)',
             'time_to_wait_for_lamp': 'Time to wait for lamp to be at full intensity (s)',
@@ -48,6 +49,7 @@ class SensorSettingsForm(ModelForm):
             'time_to_pump': 'Time to pump sample from ocean (s)'
         }
 
+    # Custom validation to ensure fields have non-negative values
     def clean(self):
         cleaned_data = super().clean()
         fields_to_check = [
