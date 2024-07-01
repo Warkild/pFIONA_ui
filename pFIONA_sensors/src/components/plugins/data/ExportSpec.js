@@ -198,7 +198,7 @@ function ExportSpec() {
     };
 
     const confirmDeleteAction = (deploymentId) => {
-        fetch(`/api/delete_spectrums?sensor_id=${sensorId}&deployment_id=${deploymentId}`, {
+        fetch(`/api/delete_spectrums?sensor_id=${sensor_id}&deployment_id=${deploymentId}`, {
             method: 'DELETE',
         })
             .then(response => response.json())
