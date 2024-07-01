@@ -14,7 +14,7 @@ function ReagentsList({ reagents, connected }) {
 
     /** FULLY FILLED ***/
     const fullyFilled = () => {
-        fetch(`http://${sensor_ip}:5000/sensor/fully_filled`, {
+        fetch(`http://${sensor_ip}:${sensor_port}/sensor/fully_filled`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,

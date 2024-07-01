@@ -11,7 +11,7 @@ function DeployApp({  }) {
 
     const checkStatus = () => {
         if(sessionStorage.getItem('accessToken') != null) {
-            fetch(`http://${sensor_ip}:5000/sensor/get_state`, {
+            fetch(`http://${sensor_ip}:${sensor_port}/sensor/get_state`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
