@@ -190,14 +190,14 @@ function ExportSpec() {
             });
     };
 
-    const handleDelete = (sensorId, deploymentId) => {
+    const handleDelete = (deploymentId) => {
         setConfirmDelete(deploymentId);
         setTimeout(() => {
             setConfirmDelete(null);
         }, 3000);
     };
 
-    const confirmDeleteAction = (sensorId, deploymentId) => {
+    const confirmDeleteAction = (deploymentId) => {
         fetch(`/api/delete_spectrums?sensor_id=${sensorId}&deployment_id=${deploymentId}`, {
             method: 'DELETE',
         })
@@ -296,7 +296,7 @@ function ExportSpec() {
                             </td>
                             <td className="font-montserrat font-medium text-gray-600 pb-2 pt-2 pl-5">
                                 <div className="flex space-x-2">
-                                    <button className={`text-red-700 ${exporting ? 'button-disabled text-gray-600': ''}`} disabled={exporting} onClick={() => confirmDelete === deployment.deployment ? confirmDeleteAction(2, deployment.deployment) : handleDelete(2, deployment.deployment)}>
+                                    <button className={`text-red-700 ${exporting ? 'button-disabled text-gray-600': ''}`} disabled={exporting} onClick={() => confirmDelete === deployment.deployment ? confirmDeleteAction(deployment.deployment) : handleDelete(deployment.deployment)}>
                                         {confirmDelete === deployment.deployment ? 'Sure?' : 'Delete'}
                                     </button>
                                 </div>
