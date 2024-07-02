@@ -982,7 +982,7 @@ def api_get_standard_concentration(request):
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
-def get_lasts_spectrum_cycle_0(request):
+def api_get_lasts_spectrum_cycle_0(request):
     """
     API endpoint to get the last three spectrums for cycle 0 of a sensor.
 
