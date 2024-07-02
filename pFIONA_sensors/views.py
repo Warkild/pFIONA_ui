@@ -47,6 +47,7 @@ def sensors_add(request):
 
 
 @login_required()
+@admin_required
 def sensors_manual(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     user_groups = request.user.groups.values_list('name', flat=True)
@@ -61,6 +62,7 @@ def sensors_manual(request, sensor_id):
 
 
 @login_required()
+@admin_required
 def sensors_deploy(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
     user_groups = request.user.groups.values_list('name', flat=True)
@@ -124,6 +126,7 @@ def sensors_reagents(request, sensor_id):
 
 @login_required()
 @csrf_exempt
+@admin_required
 def sensors_reagents_valve_update(request, sensor_id):
     if request.method == 'POST':
         try:
