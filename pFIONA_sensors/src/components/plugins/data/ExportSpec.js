@@ -1,229 +1,230 @@
 import React, { useEffect, useState } from 'react';
 import { TailSpin } from 'react-loader-spinner';
 
-function ExportSpec() {
-    const [deploymentData, setDeploymentData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [exporting, setExporting] = useState(false);
-    const [exportingRawCsv, setExportingRawCsv] = useState(null);
-    const [exportingRawJson, setExportingRawJson] = useState(null);
-    const [exportingAbsorbanceCsv, setExportingAbsorbanceCsv] = useState(null);
-    const [exportingAbsorbanceJson, setExportingAbsorbanceJson] = useState(null);
-    const [exportingConcentrationCsv, setExportingConcentrationCsv] = useState(null);
-    const [exportingConcentrationJson, setExportingConcentrationJson] = useState(null);
-    const [confirmDelete, setConfirmDelete] = useState(null);
+// ExportSpec component
+const ExportSpec = ({  }) => {
+    const [deploymentData, setDeploymentData] = useState([]); // State to store deployment data
+    const [loading, setLoading] = useState(true); // State to indicate loading
+    const [exporting, setExporting] = useState(false); // State to indicate exporting
+    const [exportingRawCsv, setExportingRawCsv] = useState(null); // State to indicate exporting raw CSV
+    const [exportingRawJson, setExportingRawJson] = useState(null); // State to indicate exporting raw JSON
+    const [exportingAbsorbanceCsv, setExportingAbsorbanceCsv] = useState(null); // State to indicate exporting absorbance CSV
+    const [exportingAbsorbanceJson, setExportingAbsorbanceJson] = useState(null); // State to indicate exporting absorbance JSON
+    const [exportingConcentrationCsv, setExportingConcentrationCsv] = useState(null); // State to indicate exporting concentration CSV
+    const [exportingConcentrationJson, setExportingConcentrationJson] = useState(null); // State to indicate exporting concentration JSON
+    const [confirmDelete, setConfirmDelete] = useState(null); // State to confirm deletion
 
     useEffect(() => {
         fetch(`/api/get_deployment_list?sensor_id=${sensor_id}`)
-            .then(response => response.json())
+            .then(response => response.json()) // Parse the JSON response
             .then(data => {
-                setDeploymentData(data);
-                setLoading(false);
+                setDeploymentData(data); // Set the deployment data state
+                setLoading(false); // Set loading state to false
             })
             .catch(error => {
-                console.error("Error fetching data:", error);
-                setLoading(false);
+                console.error("Error fetching data:", error); // Log error to console
+                setLoading(false); // Set loading state to false
             });
     }, []);
 
     const handleExportRawData = (deploymentId, startTime, endTime) => {
-        setExporting(true);
-        setExportingRawJson(deploymentId);
-        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        setExporting(true); // Set exporting state to true
+        setExportingRawJson(deploymentId); // Set exporting raw JSON state
+        const avgTimestamp = Math.floor((startTime + endTime) / 2); // Calculate the average timestamp
         const url = `/api/get_spectrums_in_deployment_full_info?sensor_id=${sensor_id}&timestamp=${avgTimestamp}`;
 
         fetch(url)
-            .then(response => response.json())
+            .then(response => response.json()) // Parse the JSON response
             .then(data => {
-                const jsonStr = JSON.stringify(data);
-                const blob = new Blob([jsonStr], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const jsonStr = JSON.stringify(data); // Convert data to JSON string
+                const blob = new Blob([jsonStr], { type: "application/json" }); // Create a blob from the JSON string
+                const url = URL.createObjectURL(blob); // Create a URL for the blob
+                const link = document.createElement('a'); // Create a link element
                 link.href = url;
-                link.download = `spectrum_data_${avgTimestamp}.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setExportingRawJson(null);
-                setExporting(false);
+                link.download = `spectrum_data_${avgTimestamp}.json`; // Set the download attribute
+                document.body.appendChild(link); // Append the link to the body
+                link.click(); // Click the link to start the download
+                document.body.removeChild(link); // Remove the link from the body
+                setExportingRawJson(null); // Reset exporting raw JSON state
+                setExporting(false); // Set exporting state to false
             })
             .catch(error => {
-                console.error("Error exporting data:", error);
-                setExportingRawJson(null);
-                setExporting(false);
+                console.error("Error exporting data:", error); // Log error to console
+                setExportingRawJson(null); // Reset exporting raw JSON state
+                setExporting(false); // Set exporting state to false
             });
     };
 
     const handleExportRawCsvData = (deploymentId, startTime, endTime) => {
-        setExporting(true);
-        setExportingRawCsv(deploymentId);
-        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        setExporting(true); // Set exporting state to true
+        setExportingRawCsv(deploymentId); // Set exporting raw CSV state
+        const avgTimestamp = Math.floor((startTime + endTime) / 2); // Calculate the average timestamp
         const url = `/api/export_raw_spectra_csv?timestamp=${avgTimestamp}&sensor_id=${sensor_id}`;
 
         fetch(url)
-            .then(response => response.blob())
+            .then(response => response.blob()) // Parse the response as a blob
             .then(blob => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob); // Create a URL for the blob
+                const link = document.createElement('a'); // Create a link element
                 link.href = url;
-                link.download = `spectrum_data_${avgTimestamp}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setExportingRawCsv(null);
-                setExporting(false);
+                link.download = `spectrum_data_${avgTimestamp}.csv`; // Set the download attribute
+                document.body.appendChild(link); // Append the link to the body
+                link.click(); // Click the link to start the download
+                document.body.removeChild(link); // Remove the link from the body
+                setExportingRawCsv(null); // Reset exporting raw CSV state
+                setExporting(false); // Set exporting state to false
             })
             .catch(error => {
-                console.error("Error exporting data:", error);
-                setExportingRawCsv(null);
-                setExporting(false);
+                console.error("Error exporting data:", error); // Log error to console
+                setExportingRawCsv(null); // Reset exporting raw CSV state
+                setExporting(false); // Set exporting state to false
             });
     };
 
     const handleExportAbsorbanceData = (deploymentId, startTime, endTime) => {
-        setExporting(true);
-        setExportingAbsorbanceJson(deploymentId);
-        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        setExporting(true); // Set exporting state to true
+        setExportingAbsorbanceJson(deploymentId); // Set exporting absorbance JSON state
+        const avgTimestamp = Math.floor((startTime + endTime) / 2); // Calculate the average timestamp
         const url = `/api/get_absorbance_spectrums_in_deployment_full_info?sensor_id=${sensor_id}&timestamp=${avgTimestamp}`;
 
         fetch(url)
-            .then(response => response.json())
+            .then(response => response.json()) // Parse the JSON response
             .then(data => {
-                const jsonStr = JSON.stringify(data);
-                const blob = new Blob([jsonStr], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const jsonStr = JSON.stringify(data); // Convert data to JSON string
+                const blob = new Blob([jsonStr], { type: "application/json" }); // Create a blob from the JSON string
+                const url = URL.createObjectURL(blob); // Create a URL for the blob
+                const link = document.createElement('a'); // Create a link element
                 link.href = url;
-                link.download = `absorbance_data_${avgTimestamp}.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setExportingAbsorbanceJson(null);
-                setExporting(false);
+                link.download = `absorbance_data_${avgTimestamp}.json`; // Set the download attribute
+                document.body.appendChild(link); // Append the link to the body
+                link.click(); // Click the link to start the download
+                document.body.removeChild(link); // Remove the link from the body
+                setExportingAbsorbanceJson(null); // Reset exporting absorbance JSON state
+                setExporting(false); // Set exporting state to false
             })
             .catch(error => {
-                console.error("Error exporting data:", error);
-                setExportingAbsorbanceJson(null);
-                setExporting(false);
+                console.error("Error exporting data:", error); // Log error to console
+                setExportingAbsorbanceJson(null); // Reset exporting absorbance JSON state
+                setExporting(false); // Set exporting state to false
             });
     };
 
     const handleExportAbsorbanceCsvData = (deploymentId, startTime, endTime) => {
-        setExporting(true);
-        setExportingAbsorbanceCsv(deploymentId);
-        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        setExporting(true); // Set exporting state to true
+        setExportingAbsorbanceCsv(deploymentId); // Set exporting absorbance CSV state
+        const avgTimestamp = Math.floor((startTime + endTime) / 2); // Calculate the average timestamp
         const url = `/api/export_absorbance_spectra_csv?timestamp=${avgTimestamp}&sensor_id=${sensor_id}`;
 
         fetch(url)
-            .then(response => response.blob())
+            .then(response => response.blob()) // Parse the response as a blob
             .then(blob => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob); // Create a URL for the blob
+                const link = document.createElement('a'); // Create a link element
                 link.href = url;
-                link.download = `absorbance_data_${avgTimestamp}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setExportingAbsorbanceCsv(null);
-                setExporting(false);
+                link.download = `absorbance_data_${avgTimestamp}.csv`; // Set the download attribute
+                document.body.appendChild(link); // Append the link to the body
+                link.click(); // Click the link to start the download
+                document.body.removeChild(link); // Remove the link from the body
+                setExportingAbsorbanceCsv(null); // Reset exporting absorbance CSV state
+                setExporting(false); // Set exporting state to false
             })
             .catch(error => {
-                console.error("Error exporting data:", error);
-                setExportingAbsorbanceCsv(null);
-                setExporting(false);
+                console.error("Error exporting data:", error); // Log error to console
+                setExportingAbsorbanceCsv(null); // Reset exporting absorbance CSV state
+                setExporting(false); // Set exporting state to false
             });
     };
 
     // Function to handle exporting concentration data as JSON
     const handleExportConcentrationData = (deploymentId, startTime, endTime) => {
-        setExporting(true);
-        setExportingConcentrationJson(deploymentId);
-        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        setExporting(true); // Set exporting state to true
+        setExportingConcentrationJson(deploymentId); // Set exporting concentration JSON state
+        const avgTimestamp = Math.floor((startTime + endTime) / 2); // Calculate the average timestamp
         const url = `/api/get_concentration_for_deployment?sensor_id=${sensor_id}&timestamp=${avgTimestamp}`;
 
         fetch(url)
-            .then(response => response.json())
+            .then(response => response.json()) // Parse the JSON response
             .then(data => {
-                const jsonStr = JSON.stringify(data);
-                const blob = new Blob([jsonStr], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const jsonStr = JSON.stringify(data); // Convert data to JSON string
+                const blob = new Blob([jsonStr], { type: "application/json" }); // Create a blob from the JSON string
+                const url = URL.createObjectURL(blob); // Create a URL for the blob
+                const link = document.createElement('a'); // Create a link element
                 link.href = url;
-                link.download = `concentration_data_${avgTimestamp}.json`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setExportingConcentrationJson(null);
-                setExporting(false);
+                link.download = `concentration_data_${avgTimestamp}.json`; // Set the download attribute
+                document.body.appendChild(link); // Append the link to the body
+                link.click(); // Click the link to start the download
+                document.body.removeChild(link); // Remove the link from the body
+                setExportingConcentrationJson(null); // Reset exporting concentration JSON state
+                setExporting(false); // Set exporting state to false
             })
             .catch(error => {
-                console.error("Error exporting data:", error);
-                setExportingConcentrationJson(null);
-                setExporting(false);
+                console.error("Error exporting data:", error); // Log error to console
+                setExportingConcentrationJson(null); // Reset exporting concentration JSON state
+                setExporting(false); // Set exporting state to false
             });
     };
 
     // Function to handle exporting concentration data as CSV
     const handleExportConcentrationCsvData = (deploymentId, startTime, endTime) => {
-        setExporting(true);
-        setExportingConcentrationCsv(deploymentId);
-        const avgTimestamp = Math.floor((startTime + endTime) / 2);
+        setExporting(true); // Set exporting state to true
+        setExportingConcentrationCsv(deploymentId); // Set exporting concentration CSV state
+        const avgTimestamp = Math.floor((startTime + endTime) / 2); // Calculate the average timestamp
         const url = `/api/export_concentration_csv?timestamp=${avgTimestamp}&sensor_id=${sensor_id}`;
 
         fetch(url)
-            .then(response => response.blob())
+            .then(response => response.blob()) // Parse the response as a blob
             .then(blob => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob); // Create a URL for the blob
+                const link = document.createElement('a'); // Create a link element
                 link.href = url;
-                link.download = `concentration_data_${avgTimestamp}.csv`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setExportingConcentrationCsv(null);
-                setExporting(false);
+                link.download = `concentration_data_${avgTimestamp}.csv`; // Set the download attribute
+                document.body.appendChild(link); // Append the link to the body
+                link.click(); // Click the link to start the download
+                document.body.removeChild(link); // Remove the link from the body
+                setExportingConcentrationCsv(null); // Reset exporting concentration CSV state
+                setExporting(false); // Set exporting state to false
             })
             .catch(error => {
-                console.error("Error exporting data:", error);
-                setExportingConcentrationCsv(null);
-                setExporting(false);
+                console.error("Error exporting data:", error); // Log error to console
+                setExportingConcentrationCsv(null); // Reset exporting concentration CSV state
+                setExporting(false); // Set exporting state to false
             });
     };
 
     const handleDelete = (deploymentId) => {
-        setConfirmDelete(deploymentId);
+        setConfirmDelete(deploymentId); // Set confirm delete state
         setTimeout(() => {
-            setConfirmDelete(null);
+            setConfirmDelete(null); // Reset confirm delete state after 3 seconds
         }, 3000);
     };
 
     const confirmDeleteAction = (deploymentId) => {
         fetch(`/api/delete_spectrums?sensor_id=${sensor_id}&deployment_id=${deploymentId}`, {
-            method: 'DELETE',
+            method: 'DELETE', // Send a DELETE request
         })
-            .then(response => response.json())
+            .then(response => response.json()) // Parse the JSON response
             .then(data => {
                 if (data.status === 'success') {
-                    setDeploymentData(prevData => prevData.filter(deployment => deployment.deployment !== deploymentId));
+                    setDeploymentData(prevData => prevData.filter(deployment => deployment.deployment !== deploymentId)); // Filter out the deleted deployment
                 } else {
-                    console.error("Error deleting data:", data.message);
+                    console.error("Error deleting data:", data.message); // Log error to console
                 }
-                setConfirmDelete(null);
+                setConfirmDelete(null); // Reset confirm delete state
             })
             .catch(error => {
-                console.error("Error deleting data:", error);
-                setConfirmDelete(null);
+                console.error("Error deleting data:", error); // Log error to console
+                setConfirmDelete(null); // Reset confirm delete state
             });
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div>Loading...</div>; // Display loading message
     }
 
     return (
         <div className={"w-full"}>
             <div className={"mb-5"}>
-                <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>EXPORT SPECTROPHOTOMETER</h2>
+                <h2 className={"font-poppins font-bold text-gray-500 text-sm"}>EXPORT SPECTROPHOTOMETER</h2> {/* Header for the component */}
             </div>
             <div className={"flex flex-col font-montserrat bg-white shadow-lg rounded-2xl py-7 px-8"}>
                 <table className="min-w-full leading-normal">
