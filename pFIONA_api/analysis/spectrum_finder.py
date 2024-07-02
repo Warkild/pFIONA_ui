@@ -660,8 +660,6 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
         'deployment_id': deployment_id,
         'deployment_start_time': deployment_start_time,
         'deployment_end_time': deployment_end_time,
-        'cycle_start_time': cycle_start_time,
-        'cycle_end_time': cycle_end_time,
     }
 
     # Return the organized spectrums data, sorted wavelengths, and deployment information
