@@ -381,7 +381,7 @@ function Spectrophotometer({inAction, setInAction, isDeployed, preScanCount}) {
                 </div>
                 <div className={"flex flex-col w-full ml-4 h-full"}>
                     <div style={{height: '400px'}}>
-                        <Line data={chartData} options={{maintainAspectRatio: false}}/>
+                        <Line data={chartData} options={{responsive: true}}/>
                     </div>
                 </div>
                 <Alert isOpen={isModalOpen} onRequestClose={closeModal} text={alertModalText}/>
