@@ -19,6 +19,11 @@ class ReagentEditForm(ModelForm):
         model = Reagent
         fields = ['name', 'volume_max', 'is_standard']  # Only includes specified fields
 
+        labels = {
+            'is_standard': 'Is standard reagent?',
+            'volume_max': 'Volume max (mL)',
+        }
+
 # Form for editing the latitude and longitude of a Sensor
 class SensorLatLongForm(ModelForm):
     class Meta:
