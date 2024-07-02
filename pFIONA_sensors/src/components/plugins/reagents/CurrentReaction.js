@@ -35,7 +35,7 @@ function CurrentReaction({ reactions }) {
 
     useEffect(() => {
         if (reactions.length > 0) {
-            fetch(`/api/get_current_reaction/${sensor_id}`)
+            fetch(`/api/get_current_reaction?sensor_id=${sensor_id}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log("Success:", data);
@@ -58,9 +58,9 @@ function CurrentReaction({ reactions }) {
     }, [sensor_id, reactions]);
 
     const handleSave = () => {
-        const payload = { reaction_ids: selectedReactionIds.map(option => option.value) };
+        const payload = { reaction_ids: selectedReactionIds.map(option => option.value), sensor_id:sensor_id };
 
-        fetch(`/api/set_current_reaction/${sensor_id}`, {
+        fetch(`/api/set_current_reaction`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
