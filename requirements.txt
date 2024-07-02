@@ -1,0 +1,9 @@
+django
+django-widget-tweaks
+django-tailwind
+python-decouple
+python-dotenv
+psycopg2-binary
+djangorestframework
+djangorestframework-simplejwt
+pandas
