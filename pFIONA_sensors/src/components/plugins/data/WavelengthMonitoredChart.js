@@ -8,7 +8,7 @@ const WavelengthMonitoredChart = ({  }) => {
     const [cycle, setCycle] = useState(''); // State for selected cycle
     const [cycleCount, setCycleCount] = useState(0); // State for total cycle count
     const [data, setData] = useState(null); // State for fetched data
-    const [wavelengths, setWavelengths] = useState([]); // State for wavelengths
+    const [wavelengths, setWavelengths] = useState({}); // State for wavelengths as dictionary
     const [selectedReaction, setSelectedReaction] = useState(''); // State for selected reaction
     const [availableReactions, setAvailableReactions] = useState([]); // State for available reactions
     const [loading, setLoading] = useState(false); // State for loading status
@@ -35,12 +35,7 @@ const WavelengthMonitoredChart = ({  }) => {
                     setDeploymentInfo(result.deployment_info); // Set deployment info
                     fetchData(); // Fetch data after getting cycle count
                 } else {
-                    setCycle(''); // Clear cycle
-                    setData(null); // Clear data
-                    setWavelengths([]); // Clear wavelengths
-                    setAvailableReactions([]); // Clear available reactions
-                    setSelectedReaction(''); // Clear selected reaction
-                    setDeploymentInfo(null); // Clear deployment info
+                    clearData(); // Clear data if no cycles are available
                 }
             } else {
                 throw new Error(result.message || 'Error fetching cycle count.');
@@ -53,6 +48,15 @@ const WavelengthMonitoredChart = ({  }) => {
         }
     };
 
+    const clearData = () => { // Function to clear data states
+        setCycle('');
+        setData(null);
+        setWavelengths({});
+        setAvailableReactions([]);
+        setSelectedReaction('');
+        setDeploymentInfo(null);
+    };
+
     const fetchData = async () => { // Function to fetch data
         setLoading(true); // Set loading to true
         setErrorMessage(null); // Clear error message
@@ -63,7 +67,7 @@ const WavelengthMonitoredChart = ({  }) => {
 
             if (result.data && result.wavelengths && result.deployment_info) {
                 setData(result.data); // Set data
-                setWavelengths(result.wavelengths); // Set wavelengths
+                setWavelengths(result.wavelengths); // Set wavelengths dictionary
                 const reactions = Object.keys(result.data); // Get reactions from data
                 setAvailableReactions(reactions); // Set available reactions
                 setSelectedReaction(reactions[0]); // Set first reaction as selected
@@ -105,8 +109,8 @@ const WavelengthMonitoredChart = ({  }) => {
         handleCycleChange({ target: { value: prevCycle } }); // Change cycle
     };
 
-    const generateChartData = (spectraData) => { // Function to generate chart data
-        if (!spectraData || !wavelengths.length) return { labels: [], datasets: [] }; // Return empty if no data
+    const generateChartData = (spectraData, wavelengths) => { // Function to generate chart data
+        if (!spectraData || !wavelengths) return { labels: [], datasets: [] }; // Return empty if no data
 
         const labels = []; // Array for labels
         const datasets = {}; // Object for datasets
@@ -134,9 +138,7 @@ const WavelengthMonitoredChart = ({  }) => {
         });
 
         Object.values(datasets).forEach(dataset => { // Clean datasets to remove empty data points
-            dataset.data = dataset.data.filter((_, index) => {
-                return labels[index] !== undefined; // Return only defined labels
-            });
+            dataset.data = dataset.data.filter((_, index) => labels[index] !== undefined);
         });
 
         return { labels, datasets: Object.values(datasets) }; // Return labels and datasets
@@ -262,7 +264,7 @@ const WavelengthMonitoredChart = ({  }) => {
                                 <h2 className="text-lg font-bold mb-2">{type}</h2> {/* Type title */}
                                 <div style={{ height: '300px' }}> {/* Chart container */}
                                     <Line
-                                        data={generateChartData(data[selectedReaction][type])} // Generate chart data
+                                        data={generateChartData(data[selectedReaction][type], wavelengths[selectedReaction])} // Generate chart data with wavelengths dictionary
                                         options={{
                                             responsive: true,
                                             maintainAspectRatio: false,

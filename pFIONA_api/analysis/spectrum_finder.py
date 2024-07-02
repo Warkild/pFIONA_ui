@@ -603,14 +603,17 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
 
     # Initialize a dictionary to organize spectrum data
     spectrums_data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
-    wavelengths = []
-    current_subcycle = defaultdict(lambda: defaultdict(int))
-    previous_id = defaultdict(lambda: None)
+    wavelengths_dict = defaultdict(list)
+    current_subcycle = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    previous_id = defaultdict(lambda: defaultdict(lambda: None))
 
     # Iterate over each spectrum to sort and organize data
     for spectrum in spectrums:
-        if not wavelengths:
-            wavelengths = sorted(spectrum.wavelengths)  # Sort wavelengths initially
+        spectrum_type = spectrum.pfiona_spectrumtype.type
+        reaction_type = spectrum_type.split('_')[0]
+
+        if not wavelengths_dict[reaction_type]:
+            wavelengths_dict[reaction_type] = sorted(spectrum.wavelengths)  # Sort wavelengths initially for each reaction type
 
         # Sort values by the sorted order of wavelengths
         sorted_values = [value for _, value in sorted(zip(spectrum.wavelengths, spectrum.values))]
@@ -622,11 +625,8 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
             'spectrumtype': spectrum.pfiona_spectrumtype.type,
             'cycle': spectrum.cycle,
             'deployment': spectrum.deployment,
-            'values': list(zip(wavelengths, sorted_values))  # Use sorted wavelengths and corresponding values
+            'values': list(zip(wavelengths_dict[reaction_type], sorted_values))  # Use sorted wavelengths and corresponding values
         }
-
-        spectrum_type = spectrum.pfiona_spectrumtype.type
-        reaction_type = spectrum_type.split('_')[0]
 
         parts = spectrum_type.split('_')
 
@@ -646,14 +646,14 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
         else:
             key = spectrum_type
 
-        # Check if this is a new subcycle
-        if previous_id[key] is not None and spectrum.id != previous_id[key] + 1:
-            current_subcycle[reaction_type][key] += 1
+        # Check if this is a new subcycle for the specific reaction and key
+        if previous_id[reaction_type][key] is not None and spectrum.id != previous_id[reaction_type][key] + 1:
+            current_subcycle[reaction_type][key][spectrum.cycle] += 1
 
-        previous_id[key] = spectrum.id
+        previous_id[reaction_type][key] = spectrum.id
 
         # Append spectrum data to the organized dictionary
-        spectrums_data[reaction_type][key][current_subcycle[reaction_type][key]].append(spectrum_data)
+        spectrums_data[reaction_type][key][current_subcycle[reaction_type][key][spectrum.cycle]].append(spectrum_data)
 
     # Prepare deployment information
     deployment_info = {
@@ -662,8 +662,10 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
         'deployment_end_time': deployment_end_time,
     }
 
-    # Return the organized spectrums data, sorted wavelengths, and deployment information
-    return spectrums_data, wavelengths, deployment_info
+    # Return the organized spectrums data, wavelengths dictionary, and deployment information
+    return spectrums_data, wavelengths_dict, deployment_info
+
+
 
 
 """
