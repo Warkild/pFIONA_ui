@@ -91,7 +91,13 @@ function CurrentReaction({ reactions }) {
             </div>
             <div className="flex flex-col font-montserrat bg-white shadow-lg rounded-2xl py-7 px-8">
                 {loading ? (
-                    <p>Loading...</p>
+                    <>
+                        {reactions.length > 0 ? (
+                            <p>Loading...</p>
+                        ) : (
+                            <p>You have not yet created a reaction</p>
+                        )}
+                    </>
                 ) : (
                     <Select
                         isMulti
