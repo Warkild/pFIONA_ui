@@ -166,7 +166,7 @@ function DeployStatus({ connected, isDeployed, setIsDeployed, isLoadingDeployed,
 
     // useEffect to fetch the current reaction names on component mount
     useEffect(() => {
-        fetch(`/api/get_current_reaction/${sensor_id}`)
+        fetch(`/api/get_current_reaction?sensor_id=${sensor_id}`)
         .then(response => response.json())
         .then(data => {
             const reactionNames = data.reaction_names || []; // assuming the API returns a list of reaction names

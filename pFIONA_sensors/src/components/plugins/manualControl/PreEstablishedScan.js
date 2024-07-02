@@ -34,7 +34,7 @@ function PreEstablishedScan({inAction, setInAction, handleSpecFinish}) {
 
     // Fetch the reaction names from the Django's API
     useEffect(() => {
-        fetch(`/api/get_current_reaction/${sensor_id}`)
+        fetch(`/api/get_current_reaction?sensor_id=${sensor_id}`)
             .then(response => response.json())
             .then(data => setReactionNames(data.reaction_names))
             .catch(error => console.error('Error fetching reaction names:', error));
