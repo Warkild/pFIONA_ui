@@ -25,7 +25,7 @@
                             <p class="w-4/12">{{ sensor.name }}</p>
                             <p class="w-3/12">{{ sensor.ip_address }}</p>
                             <div class="w-3/12" id="status_app" data-ip="{{ sensor.ip_address }}"></div>
-                            <p class="w-2/12 pl-2"><a href="{% url 'sensors_manual' sensor_id=sensor.id %}" class="bg-blue-600 py-1 px-8 rounded-lg text-sm text-white font-poppins hover:bg-blue-400">View</a></p>
+                            <p class="w-2/12 pl-2"><a href="{% url 'sensors_data' sensor_id=sensor.id %}" class="bg-blue-600 py-1 px-8 rounded-lg text-sm text-white font-poppins hover:bg-blue-400">View</a></p>
                         </div>
                     {% endfor %}
                 {% else %}
