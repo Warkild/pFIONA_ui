@@ -1,5 +1,6 @@
 from math import floor
 
+from django.db import transaction
 from django.db.models import Q, F, Max, When, Case, OuterRef, Value, IntegerField, Subquery
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404
@@ -61,6 +62,20 @@ def get_utils_reagents(sensor_id, return_json=False):
     else:
 
         return reagents
+
+def delete_spectrums_by_deployment(sensor_id, deployment_id):
+    """
+    Deletes all spectrums belonging to a specific deployment for a given sensor_id.
+    """
+    try:
+        # Use a transaction to ensure atomicity of the delete operation
+        with transaction.atomic():
+            models.Spectrum.objects.filter(pfiona_sensor_id=sensor_id, deployment=deployment_id).delete()
+            print(
+                f"All spectrums for sensor_id {sensor_id} and deployment {deployment_id} have been successfully deleted.")
+    except Exception as e:
+        # Print an error message if something goes wrong
+        print(f"An error occurred while deleting spectrums: {e}")
 
 
 def create_reaction(name, standard_id, standard_concentration, volume_of_mixture, volume_to_push_to_flow_cell,

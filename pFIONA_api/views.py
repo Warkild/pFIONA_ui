@@ -1,23 +1,18 @@
-import csv
-import datetime
-import json
 import ast
+import json
 
-import pandas as pd
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
 import pFIONA_api.queries as q
 from pFIONA_api.analysis.export_csv import export_raw_data, export_absorbance_data, export_concentration_data
-from pFIONA_api.analysis.formula import absorbance
 from pFIONA_api.analysis.spectrum_finder import *
 from pFIONA_api.validation import validate_reaction_data
 from pFIONA_sensors.decorators import admin_required
+from pFIONA_sensors.models import Sensor
 
 
 @login_required()
@@ -508,37 +503,6 @@ def api_get_mean_absorbance_spectrums_in_cycle(request):
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
-def api_get_spectrums_in_cycle(request):
-    try:
-        sensor_id = request.GET.get('sensor_id')
-        timestamp = request.GET.get('timestamp')
-        cycle = request.GET.get('cycle')
-
-        if not sensor_id:
-            raise ValueError("Missing sensor_id parameter")
-
-        if not timestamp:
-            raise ValueError("Missing timestamp parameter")
-
-        if not cycle:
-            raise ValueError("Missing cycle parameter")
-
-        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
-            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
-
-        absorbance_data, wavelengths, deployment_info = get_spectrums_in_cycle(timestamp, sensor_id, cycle)
-        return JsonResponse(
-            {"spectrums_data": absorbance_data, "wavelengths": wavelengths, "deployment_info": deployment_info})
-
-    except ValueError as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
-    except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-
-@login_required
-@require_http_methods(["GET"])
-@csrf_exempt
 def test(request):
     try:
         sensor_id = request.GET.get('sensor_id')
@@ -646,7 +610,9 @@ def api_get_only_wavelength_monitored_through_time_in_cycle_full_info(request):
         if not q.models.Sensor.objects.filter(id=sensor_id).exists():
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
-        data, wavelengths, deployment_info = get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sensor_id, cycle)
+        data, wavelengths, deployment_info = get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp,
+                                                                                                           sensor_id,
+                                                                                                           cycle)
         return JsonResponse(
             {"data": data, "wavelengths": wavelengths, "deployment_info": deployment_info})
 
@@ -713,7 +679,7 @@ def api_get_monitored_wavelength_values_in_deployment(request):
 @login_required
 @require_http_methods(["GET"])
 @csrf_exempt
-def api_get_absobance_spectrums_in_deployment_full_info(request):
+def api_get_absorbance_spectrums_in_deployment_full_info(request):
     try:
         sensor_id = request.GET.get('sensor_id')
         timestamp = request.GET.get('timestamp')
@@ -974,7 +940,7 @@ def api_delete_spectrums_by_deployment(request):
             return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
 
         # Call the function to delete spectrums
-        delete_spectrums_by_deployment(sensor_id, deployment_id)
+        q.delete_spectrums_by_deployment(sensor_id, deployment_id)
 
         return JsonResponse({'status': 'success', 'message': 'Spectrums deleted successfully'})
 
