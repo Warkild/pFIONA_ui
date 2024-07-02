@@ -26,11 +26,13 @@
              </div>
         </div>
     </div>
+    <!-- Load sensor_ip and sensor_id in var for React Comp access -->
     <script>
         let sensor_ip = "{{ ip_address }}";
         let sensor_id = "{{ id }}";
         let sensor_port = "5000"
     </script>
+    <!-- Load react main component -->
     <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>
 </html>

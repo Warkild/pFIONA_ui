@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import Chart from 'chart.js/auto';
-import moment from 'moment';
+import React, { useState, useEffect } from 'react'; // Import React and necessary hooks
+import { Line } from 'react-chartjs-2'; // Import Line chart from react-chartjs-2
+import Chart from 'chart.js/auto'; // Import Chart.js
+import moment from 'moment'; // Import moment for date and time manipulation
 
-const MultiStandardChart = () => {
-    const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm'));
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
-    const [chartData, setChartData] = useState(null);
-    const [regressionEquations, setRegressionEquations] = useState([]);
-    const [errorMessage, setErrorMessage] = useState('');
-    const [selectedReaction, setSelectedReaction] = useState('');
-    const [selectedCycle, setSelectedCycle] = useState('');
-    const [availableReactions, setAvailableReactions] = useState([]);
-    const [availableCycles, setAvailableCycles] = useState([]);
-    const [deploymentInfo, setDeploymentInfo] = useState(null);
-    const [standardDillutionCycleInfo, setStandardDillutionCycleInfo] = useState('');
-    const [cycleStartTime, setCycleStartTime] = useState('');
-    const [cycleEndTime, setCycleEndTime] = useState('');
-    const [standardConcentration, setStandardConcentration] = useState(null);
+const MultiStandardChart = () => { // Define MultiStandardChart component
+    const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm')); // Initialize timestamp state
+    const [loading, setLoading] = useState(false); // Initialize loading state
+    const [data, setData] = useState(null); // Initialize data state
+    const [chartData, setChartData] = useState(null); // Initialize chart data state
+    const [regressionEquations, setRegressionEquations] = useState([]); // Initialize regression equations state
+    const [errorMessage, setErrorMessage] = useState(''); // Initialize error message state
+    const [selectedReaction, setSelectedReaction] = useState(''); // Initialize selected reaction state
+    const [selectedCycle, setSelectedCycle] = useState(''); // Initialize selected cycle state
+    const [availableReactions, setAvailableReactions] = useState([]); // Initialize available reactions state
+    const [availableCycles, setAvailableCycles] = useState([]); // Initialize available cycles state
+    const [deploymentInfo, setDeploymentInfo] = useState(null); // Initialize deployment info state
+    const [standardDillutionCycleInfo, setStandardDillutionCycleInfo] = useState(''); // Initialize standard dilution cycle info state
+    const [cycleStartTime, setCycleStartTime] = useState(''); // Initialize cycle start time state
+    const [cycleEndTime, setCycleEndTime] = useState(''); // Initialize cycle end time state
+    const [standardConcentration, setStandardConcentration] = useState(null); // Initialize standard concentration state
 
-    useEffect(() => {
+    useEffect(() => { // Effect to set available reactions when data changes
         if (data) {
             const reactionsWithStandards = Object.keys(data).filter(reaction =>
                 Object.keys(data[reaction]).some(cycle =>
@@ -38,7 +38,7 @@ const MultiStandardChart = () => {
         }
     }, [data, deploymentInfo]);
 
-    useEffect(() => {
+    useEffect(() => { // Effect to set available cycles when selected reaction changes
         if (selectedReaction) {
             const cycles = Object.keys(data[selectedReaction]);
             setAvailableCycles(cycles);
@@ -52,7 +52,7 @@ const MultiStandardChart = () => {
         }
     }, [selectedReaction, data, deploymentInfo]);
 
-    useEffect(() => {
+    useEffect(() => { // Effect to set chart data when selected cycle or reaction changes
         if (selectedCycle && selectedReaction) {
             const cycleData = data[selectedReaction][selectedCycle];
             const { standardDillutionData, cycleInfo, cycleStart, cycleEnd } = getLastStandardDillutionData(selectedReaction, selectedCycle);
@@ -65,7 +65,7 @@ const MultiStandardChart = () => {
         }
     }, [selectedCycle, selectedReaction, standardConcentration]);
 
-    const fetchData = async () => {
+    const fetchData = async () => { // Function to fetch data
         setLoading(true);
         setErrorMessage('');
         try {
@@ -82,7 +82,7 @@ const MultiStandardChart = () => {
         }
     };
 
-    const fetchStandardConcentration = async (reactionName) => {
+    const fetchStandardConcentration = async (reactionName) => { // Function to fetch standard concentration
         try {
             const response = await fetch(`/api/get_standard_concentration?reaction_name=${reactionName}`);
             const result = await response.json();
@@ -92,26 +92,26 @@ const MultiStandardChart = () => {
         }
     };
 
-    const handleTimestampChange = (event) => {
+    const handleTimestampChange = (event) => { // Function to handle timestamp change
         setTimestamp(event.target.value);
         setErrorMessage('');
     };
 
-    const handleNextCycle = () => {
+    const handleNextCycle = () => { // Function to handle next cycle button click
         const currentIndex = availableCycles.indexOf(selectedCycle);
         if (currentIndex < availableCycles.length - 1) {
             setSelectedCycle(availableCycles[currentIndex + 1]);
         }
     };
 
-    const handlePreviousCycle = () => {
+    const handlePreviousCycle = () => { // Function to handle previous cycle button click
         const currentIndex = availableCycles.indexOf(selectedCycle);
         if (currentIndex > 0) {
             setSelectedCycle(availableCycles[currentIndex - 1]);
         }
     };
 
-    const calculateRegression = (dataPoints) => {
+    const calculateRegression = (dataPoints) => { // Function to calculate regression
         const n = dataPoints.length;
         const sumX = dataPoints.reduce((sum, point) => sum + point.x, 0);
         const sumY = dataPoints.reduce((sum, point) => sum + point.y, 0);
@@ -124,7 +124,7 @@ const MultiStandardChart = () => {
         return { slope, intercept };
     };
 
-    const getLastStandardDillutionData = (reaction, cycle) => {
+    const getLastStandardDillutionData = (reaction, cycle) => { // Function to get last standard dilution data
         const cycles = Object.keys(data[reaction]);
         const cycleIndex = cycles.indexOf(cycle);
 
@@ -139,7 +139,7 @@ const MultiStandardChart = () => {
         return { standardDillutionData: null, cycleInfo: '', cycleStart: '', cycleEnd: '' };
     };
 
-    const generateChartData = (cycleData, standardDillutionData) => {
+    const generateChartData = (cycleData, standardDillutionData) => { // Function to generate chart data
         if (standardConcentration === null) {
             return { labels: [], datasets: [] };
         }
@@ -236,7 +236,7 @@ const MultiStandardChart = () => {
         return { labels, datasets };
     };
 
-    const getColor = (wavelength) => {
+    const getColor = (wavelength) => { // Function to get color based on wavelength
         const colors = {
             '810.0': 'rgb(255, 99, 132)',
             '660.0': 'rgb(54, 162, 235)',
