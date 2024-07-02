@@ -14,6 +14,7 @@
             <div id="reagents_app" data-ip='{{ ip_address }}'></div>
         </div>
     </div>
+    <!-- Load sensor_ip and sensor_id in var for React Comp access -->
     <script>
         let reagents_json = {{ reagents_json|safe }}
         let reactions_json = {{ reactions_json|safe }}
@@ -21,6 +22,7 @@
         let sensor_ip = "{{ ip_address }}";
         let sensor_port = "5000"
     </script>
+    <!-- Load react main component -->
     <script src="{% static "pFIONA_sensors/main.js" %}"></script>
 </body>
 </html>
