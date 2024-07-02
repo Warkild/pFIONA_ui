@@ -70,7 +70,7 @@ const MultiStandardChart = () => {
         setErrorMessage('');
         try {
             const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`/api/get_monitored_wavelength_values_in_deployment?sensor_id=2&timestamp=${epochTimestamp}`);
+            const response = await fetch(`/api/get_monitored_wavelength_values_in_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
             const result = await response.json();
             setData(result.data);
             setDeploymentInfo(result.deployment_info);
