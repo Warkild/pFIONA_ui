@@ -29,7 +29,8 @@ const ValvePort = ({numberOfPorts = 8, inAction, setInAction, isDeployed, allowA
     const getCurrentPort = () => {
         try {
             if (sessionStorage.getItem('accessToken')) {
-                fetch(`http://${sensor_ip}:${sensor_port}/valve/get_valve`, {
+                const url = `http://${sensor_ip}:${sensor_port}/valve/get_valve`
+                fetch(url, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,

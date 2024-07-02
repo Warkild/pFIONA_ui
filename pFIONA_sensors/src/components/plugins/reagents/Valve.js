@@ -16,7 +16,8 @@ function Valve({ ip, reagents }) {
     const [saveText, setSaveText] = useState("Save");
 
     const getNbPorts = () => {
-        fetch(`http://${sensor_ip}:${sensor_port}/valve/get_numbers_valves`, {
+        const url = `http://${sensor_ip}:${sensor_port}/valve/get_numbers_valves`
+        fetch(url, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
@@ -98,7 +99,8 @@ function Valve({ ip, reagents }) {
     /** UPDATE REAGENTS **/
 
     function sensorUpdateReagent() {
-         fetch(`http://${sensor_ip}:${sensor_port}/sensor/reload_reagents`, {
+        const url = `http://${sensor_ip}:${sensor_port}/sensor/reload_reagents`
+         fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -128,7 +130,8 @@ function Valve({ ip, reagents }) {
 
     const checkStatus = () => {
         if(sessionStorage.getItem('accessToken') != null) {
-            fetch(`http://${sensor_ip}:${sensor_port}/sensor/get_state`, {
+            const url = `http://${sensor_ip}:${sensor_port}/sensor/get_state`
+            fetch(url, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
