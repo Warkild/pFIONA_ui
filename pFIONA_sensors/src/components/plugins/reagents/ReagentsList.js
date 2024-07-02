@@ -73,8 +73,8 @@ function ReagentsList({ reagents, connected }) {
                         <thead>
                             <tr className="border border-custom-gray-1 bg-custom-gray-2">
                                 <th className="font-montserrat font-medium pt-8 pb-2 pl-5 text-left">Name</th>
-                                <th className="font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left">Volume</th>
-                                <th className="font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left">Max Volume</th>
+                                <th className="font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left">Volume (mL)</th>
+                                <th className="font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left">Max Volume (mL)</th>
                                 <th className="font-montserrat w-2/12 font-medium pt-8 pb-2 pl-5 text-left">Status</th>
                                 <th className="w-1/12"></th>
                             </tr>
