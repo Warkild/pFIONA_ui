@@ -31,7 +31,7 @@ def sensors_list(request):
     :param request: HTTP request object
     :return: Rendered HTML page with the list of sensors
     """
-    sensors_list = Sensor.objects.all()  # Get all sensor objects
+    sensors_list = Sensor.objects.all().order_by('id')  # Get all sensor objects
 
     context = {
         'sensors_list': sensors_list,
