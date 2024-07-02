@@ -151,29 +151,6 @@ def api_edit_reaction(request):
                             status=500)
 
 
-@login_required
-@require_http_methods(["GET"])
-@csrf_exempt
-def api_get_last_spectrum_all_type_view(request):
-    # Récupérer les paramètres de la requête
-    reaction_name = request.GET.get('reaction_name')
-    timestamp = request.GET.get('timestamp', None)
-
-    # Validation des paramètres
-    if not reaction_name or not timestamp:
-        return JsonResponse({'error': 'Missing required parameters.'}, status=400)
-
-    # Conversion du timestamp en entier
-    try:
-        timestamp = int(timestamp)
-    except ValueError:
-        return JsonResponse({'error': 'Invalid timestamp format.'}, status=400)
-
-    # Appel de la fonction pour récupérer les données
-    result = q.get_last_spectrum_all_type(reaction_name, timestamp)
-
-    # Renvoyer les données en format JSON
-    return JsonResponse(result)
 
 
 @login_required
@@ -812,91 +789,6 @@ def api_get_concentration_for_deployment(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-
-# @login_required()
-# def export_raw_spectra_csv(request):
-#     start_timestamp_ms = request.GET.get('start')
-#     end_timestamp_ms = request.GET.get('end')
-#     sensor_id = request.GET.get('sensor_id')
-#
-#     response = HttpResponse(
-#         content_type='text/csv',
-#         headers={'Content-Disposition': 'attachment; filename="spectra.csv"'},
-#     )
-#     writer = csv.writer(response)
-#
-#     if start_timestamp_ms and end_timestamp_ms:
-#         start_timestamp = int(start_timestamp_ms) // 1000
-#         end_timestamp = int(end_timestamp_ms) // 1000
-#
-#         query = Spectrum.objects.filter(
-#             pfiona_time__timestamp__gte=start_timestamp,
-#             pfiona_time__timestamp__lte=end_timestamp,
-#             pfiona_sensor=sensor_id
-#         ).select_related('pfiona_spectrumtype', 'pfiona_time').order_by('id')
-#     else:
-#         query = Spectrum.objects.all().select_related('pfiona_spectrumtype', 'pfiona_time').order_by('id')
-#
-#     spectra = query
-#     data = []
-#
-#     for spectrum in spectra:
-#         spectrum_type = spectrum.pfiona_spectrumtype.type
-#         local_datetime = datetime.fromtimestamp(spectrum.pfiona_time.timestamp).strftime('%m/%d/%Y %H:%M:%S')
-#         deployment = spectrum.deployment
-#         cycle = spectrum.cycle
-#         id = spectrum.id
-#         for value in spectrum.value_set.all():
-#             data.append({
-#                 'SpectrumType': spectrum_type,
-#                 'Timestamp': local_datetime,
-#                 'Deployment': deployment,
-#                 'Cycle': cycle,
-#                 'Id': id,
-#                 'Wavelength': value.wavelength,
-#                 'Value': value.value
-#             })
-#
-#     df = pd.DataFrame(data)
-#
-#     # Use pivot_table and fillna efficiently
-#     pivoted_df = df.pivot_table(index=['SpectrumType', 'Timestamp', 'Deployment', 'Cycle', 'Id'], columns='Wavelength',
-#                                 values='Value', aggfunc='first').fillna('').reset_index()
-#
-#     # Sort by Id
-#     pivoted_df = pivoted_df.sort_values(by='Id')
-#
-#     # Write the header
-#     writer.writerow(pivoted_df.columns)
-#
-#     # Write the data
-#     for row in pivoted_df.itertuples(index=False):
-#         writer.writerow(row)
-#
-#     return response
-#
-#
-# @login_required
-# def prepare_export_raw_spectra_csv(request):
-#     return render(request, "prepare_export.html", {
-#         'sensor_id': request.GET.get('sensor_id', ''),
-#         'start': request.GET.get('start', ''),
-#         'end': request.GET.get('end', '')
-#     })
-#
-#
-# @login_required
-# def prepare_export(request):
-#     data_type = request.GET.get('data_type', 'raw')
-#     file_format = request.GET.get('file_format', 'csv')
-#
-#     if data_type == 'raw' and file_format == 'csv':
-#         url = reverse('prepare_export_raw_spectra_csv')
-#         params = f'?start={request.GET.get("start")}&end={request.GET.get("end")}&sensor_id={request.GET.get("sensor_id")}'
-#         return redirect(f'{url}{params}')
-#     else:
-#         return HttpResponse("No export available for the selected data type and file format.", status=400)
 
 
 @login_required
