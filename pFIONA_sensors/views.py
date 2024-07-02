@@ -35,18 +35,6 @@ def sensors_list(request):
 
 
 @login_required()
-def sensors_add(request):
-    if request.method == 'POST':
-        form = SensorForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('sensors_list')
-    else:
-        form = SensorForm()
-    return render(request, 'pFIONA_sensors/sensors_add.html', {'form': form})
-
-
-@login_required()
 @admin_required
 def sensors_manual(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)
