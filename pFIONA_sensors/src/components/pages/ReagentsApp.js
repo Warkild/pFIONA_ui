@@ -13,7 +13,8 @@ function ReagentsApp({ip}) {
 
     const checkStatus = () => {
         if(sessionStorage.getItem('accessToken') != null) {
-            fetch(`http://${sensor_ip}:${sensor_port}/sensor/get_state`, {
+            const url = `http://${sensor_ip}:${sensor_port}/sensor/get_state`
+            fetch(url, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,

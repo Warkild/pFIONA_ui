@@ -22,7 +22,8 @@ const LogAndDatabase = ({  }) => {
         // Check if the access token exists in session storage
         if (sessionStorage.getItem('accessToken') != null) {
             // Fetch the sensor state from the server
-            fetch(`http://${sensor_ip}:${sensor_port}/sensor/get_state`, {
+            const url = `http://${sensor_ip}:${sensor_port}/sensor/get_state`
+            fetch(url, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,

@@ -185,7 +185,8 @@ function Spectrophotometer({inAction, setInAction, isDeployed, preScanCount}) {
     const checkLightStatus = () => {
         if (sessionStorage.getItem('accessToken')) {
             try {
-                fetch(`http://${sensor_ip}:${sensor_port}/lamp/is_active`, {
+                const url = `http://${sensor_ip}:${sensor_port}/lamp/is_active`
+                fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -218,7 +219,8 @@ function Spectrophotometer({inAction, setInAction, isDeployed, preScanCount}) {
     const getIntegrationTime = () => {
         if (sessionStorage.getItem('accessToken')) {
             try {
-                fetch(`http://${sensor_ip}:${sensor_port}/spectrophotometer/get_integration_time`, {
+                const url = `http://${sensor_ip}:${sensor_port}/spectrophotometer/get_integration_time`
+                fetch(url, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',

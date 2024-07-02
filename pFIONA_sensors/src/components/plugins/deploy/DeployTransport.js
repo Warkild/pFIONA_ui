@@ -89,7 +89,8 @@ function DeployTransport({ connected, isDeployed}) {
         // Set isPrimePort state to true
         setIsPrimePort(true);
         // Send POST request to prime ports
-        fetch(`http://${sensor_ip}:${sensor_port}/sensor/valve_port_priming`, {
+        const url = `http://${sensor_ip}:${sensor_port}/sensor/valve_port_priming`
+        fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -132,7 +133,8 @@ function DeployTransport({ connected, isDeployed}) {
         // Set isFlushPort state to true
         setIsFlushPort(true);
         // Send POST request to flush ports
-        fetch(`http://${sensor_ip}:${sensor_port}/sensor/valve_port_flushing`, {
+        const url = `http://${sensor_ip}:${sensor_port}/sensor/valve_port_flushing`
+        fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

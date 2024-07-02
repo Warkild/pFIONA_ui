@@ -16,7 +16,8 @@ function ReagentsList({reagents, connected}) {
     const fullyFilled = () => {
         if (sessionStorage.getItem('accessToken')) {
             try {
-                fetch(`http://${sensor_ip}:${sensor_port}/sensor/fully_filled`, {
+                const url = `http://${sensor_ip}:${sensor_port}/sensor/fully_filled`
+                fetch(url, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${sessionStorage.getItem('accessToken')}`,
