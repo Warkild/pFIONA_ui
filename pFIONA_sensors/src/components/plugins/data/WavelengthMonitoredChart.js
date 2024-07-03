@@ -88,7 +88,7 @@ const WavelengthMonitoredChart = ({  }) => {
         setErrorMessage(null); // Clear error message
         try {
             const epochTimestamp = moment(timestamp).unix(); // Convert timestamp to epoch time
-            const response = await fetch(`/api/get_only_wavelength_monitored_through_time_in_cycle_full_info?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`); // Fetch data from API
+            const response = await fetch(`/api/get_only_absorbance_wavelength_monitored_through_time_in_cycle_full_info?sensor_id=${sensor_id}&timestamp=${epochTimestamp}&cycle=${cycle}`); // Fetch data from API
             const result = await response.json(); // Parse JSON response
 
             if (result.data && result.wavelengths && result.deployment_info) {
