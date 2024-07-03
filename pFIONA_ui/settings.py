@@ -91,11 +91,11 @@ ENVIRONMENT = config('ENVIRONMENT', default='development')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME_DEV' if ENVIRONMENT == 'development' else (  'DB_NAME_PROD' if ENVIRONMENT == 'development' else "")  ),
-        'USER': config('DB_USER_DEV' if ENVIRONMENT == 'development' else ( 'DB_USER_PROD' if ENVIRONMENT == 'development' else "")  ),
-        'PASSWORD': config('DB_PASSWORD_DEV' if ENVIRONMENT == 'development' else ( 'DB_PASSWORD_PROD' if ENVIRONMENT == 'development' else "" )  ),
-        'HOST': config('DB_HOST_DEV' if ENVIRONMENT == 'development' else ( 'DB_HOST_PROD' if ENVIRONMENT == 'development' else "" )  ),
-        'PORT': config('DB_PORT_DEV' if ENVIRONMENT == 'development' else ( 'DB_PORT_PROD' if ENVIRONMENT == 'development' else "" )  ),
+        'NAME': config('DB_NAME_DEV' if ENVIRONMENT == 'development' else (  'DB_NAME_PROD' if ENVIRONMENT == 'production' else "")  ),
+        'USER': config('DB_USER_DEV' if ENVIRONMENT == 'development' else ( 'DB_USER_PROD' if ENVIRONMENT == 'production' else "")  ),
+        'PASSWORD': config('DB_PASSWORD_DEV' if ENVIRONMENT == 'development' else ( 'DB_PASSWORD_PROD' if ENVIRONMENT == 'production' else "" )  ),
+        'HOST': config('DB_HOST_DEV' if ENVIRONMENT == 'development' else ( 'DB_HOST_PROD' if ENVIRONMENT == 'production' else "" )  ),
+        'PORT': config('DB_PORT_DEV' if ENVIRONMENT == 'development' else ( 'DB_PORT_PROD' if ENVIRONMENT == 'production' else "" )  ),
     }
 }
 
