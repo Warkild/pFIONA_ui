@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react'; // Import React and necessar
 import { Line } from 'react-chartjs-2'; // Import Line chart from react-chartjs-2
 import Chart from 'chart.js/auto'; // Import Chart.js
 import moment from 'moment'; // Import moment for date and time manipulation
+import { TailSpin } from 'react-loader-spinner'; // Import TailSpin for loading spinner
 
-const MultiStandardChart = () => { // Define MultiStandardChart component
+const MultiStandardChart = ({  }) => { // Define MultiStandardChart component
     const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm')); // Initialize timestamp state
     const [loading, setLoading] = useState(false); // Initialize loading state
     const [data, setData] = useState(null); // Initialize data state
@@ -19,6 +20,9 @@ const MultiStandardChart = () => { // Define MultiStandardChart component
     const [cycleStartTime, setCycleStartTime] = useState(''); // Initialize cycle start time state
     const [cycleEndTime, setCycleEndTime] = useState(''); // Initialize cycle end time state
     const [standardConcentration, setStandardConcentration] = useState(null); // Initialize standard concentration state
+    const [deployments, setDeployments] = useState([]); // Initialize deployments list state
+    const [currentDeploymentIndex, setCurrentDeploymentIndex] = useState(null); // Initialize current deployment index state
+    const [shouldFetch, setShouldFetch] = useState(false); // Initialize shouldFetch state
 
     useEffect(() => { // Effect to set available reactions when data changes
         if (data) {
@@ -65,20 +69,48 @@ const MultiStandardChart = () => { // Define MultiStandardChart component
         }
     }, [selectedCycle, selectedReaction, standardConcentration]);
 
-    const fetchData = async () => { // Function to fetch data
-        setLoading(true);
-        setErrorMessage('');
+    // Fetch the list of deployments on component mount
+    useEffect(() => {
+        fetchDeploymentList();
+    }, []);
+
+    // Fetch concentration data if shouldFetch flag is true
+    useEffect(() => {
+        if (shouldFetch) {
+            fetchData();
+            setShouldFetch(false);
+        }
+    }, [shouldFetch]);
+
+    const fetchDeploymentList = async () => { // Function to fetch the list of deployments from the API
         try {
-            const epochTimestamp = moment(timestamp).unix();
-            const response = await fetch(`/api/get_monitored_wavelength_values_in_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
+            const response = await fetch(`/api/get_deployment_list?sensor_id=${sensor_id}`);
             const result = await response.json();
-            setData(result.data);
-            setDeploymentInfo(result.deployment_info);
+            setDeployments(result);
         } catch (error) {
-            console.error('Error fetching data:', error);
-            setErrorMessage('Error fetching data. Please try again.');
+            console.error('Error fetching deployment list:', error);
+            setErrorMessage('Error fetching deployment list. Please try again.');
+        }
+    };
+
+    const fetchData = async () => { // Function to fetch data
+        setLoading(true); // Start loading
+        setErrorMessage(''); // Clear previous error messages
+        try {
+            const epochTimestamp = moment(timestamp).unix(); // Convert timestamp to epoch time
+            const response = await fetch(`/api/get_monitored_wavelength_values_in_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
+            const result = await response.json(); // Parse the JSON response
+            setData(result.data); // Set the fetched data to state
+            setDeploymentInfo(result.deployment_info); // Set the deployment info
+            // Set current deployment index based on deployment info
+            const deploymentId = result.deployment_info.deployment_id;
+            const deploymentIndex = deployments.findIndex(deployment => deployment.deployment === deploymentId);
+            setCurrentDeploymentIndex(deploymentIndex);
+        } catch (error) {
+            console.error('Error fetching data:', error); // Log error to the console
+            setErrorMessage('Error fetching data. Please try again.'); // Display error message
         } finally {
-            setLoading(false);
+            setLoading(false); // Stop loading
         }
     };
 
@@ -108,6 +140,32 @@ const MultiStandardChart = () => { // Define MultiStandardChart component
         const currentIndex = availableCycles.indexOf(selectedCycle);
         if (currentIndex > 0) {
             setSelectedCycle(availableCycles[currentIndex - 1]);
+        }
+    };
+
+    const handleNextDeployment = () => { // Function to handle next deployment button click
+        if (currentDeploymentIndex !== null && currentDeploymentIndex < deployments.length - 1) {
+            const nextDeploymentIndex = currentDeploymentIndex + 1;
+            const nextDeployment = deployments[nextDeploymentIndex];
+            const averageTimestamp = (nextDeployment.start_time + nextDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of next deployment
+            setCurrentDeploymentIndex(nextDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
+        }
+    };
+
+    const handlePrevDeployment = () => { // Function to handle previous deployment button click
+        if (currentDeploymentIndex !== null && currentDeploymentIndex > 0) {
+            const prevDeploymentIndex = currentDeploymentIndex - 1;
+            const prevDeployment = deployments[prevDeploymentIndex];
+            const averageTimestamp = (prevDeployment.start_time + prevDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of previous deployment
+            setCurrentDeploymentIndex(prevDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
         }
     };
 
@@ -267,14 +325,36 @@ const MultiStandardChart = () => { // Define MultiStandardChart component
                                 />
                             </label>
                         </div>
-                        <button
-                            type="button"
-                            onClick={fetchData}
-                            disabled={loading}
-                            className="mt-2 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                        >
-                            {loading ? 'Fetching...' : 'Fetch Deployment'}
-                        </button>
+                        <div className="flex flex-row space-x-10">
+                            <button
+                                type="button"
+                                onClick={() => setShouldFetch(true)}
+                                disabled={loading}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                {loading ? (
+                                    <TailSpin height="24" width="24" color="#000" ariaLabel="loading" />
+                                ) : (
+                                    'Fetch Deployment'
+                                )}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handlePrevDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex === 0}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Previous Deployment
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNextDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Next Deployment
+                            </button>
+                        </div>
                     </form>
                     {!loading && errorMessage && <div className="text-red-500 mb-5">{errorMessage}</div>}
                     {data && availableReactions.length > 0 && (

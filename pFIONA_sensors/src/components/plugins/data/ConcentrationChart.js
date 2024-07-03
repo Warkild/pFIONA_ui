@@ -14,14 +14,41 @@ const ConcentrationChart = ({  }) => {
     const [errorMessage, setErrorMessage] = useState(''); // Error message to display
     const [startDate, setStartDate] = useState(''); // Start date for filtering data
     const [endDate, setEndDate] = useState(''); // End date for filtering data
+    const [deployments, setDeployments] = useState([]); // List of deployments
+    const [currentDeploymentIndex, setCurrentDeploymentIndex] = useState(null); // Index of the current deployment
+    const [shouldFetch, setShouldFetch] = useState(false); // Flag to trigger data fetch
 
-    // Function to fetch concentration data from the API
+    // Fetch the list of deployments on component mount
+    useEffect(() => {
+        fetchDeploymentList();
+    }, []);
+
+    // Fetch concentration data if shouldFetch flag is true
+    useEffect(() => {
+        if (shouldFetch) {
+            fetchConcentrationData();
+            setShouldFetch(false);
+        }
+    }, [shouldFetch]);
+
+    // Fetch the list of deployments from the API
+    const fetchDeploymentList = async () => {
+        try {
+            const response = await fetch(`/api/get_deployment_list?sensor_id=${sensor_id}`);
+            const result = await response.json();
+            setDeployments(result);
+        } catch (error) {
+            console.error('Error fetching deployment list:', error);
+            setErrorMessage('Error fetching deployment list. Please try again.');
+        }
+    };
+
+    // Fetch concentration data from the API
     const fetchConcentrationData = async () => {
         setLoading(true); // Start loading
         setErrorMessage(''); // Clear previous error messages
         try {
             const epochTimestamp = moment(timestamp).unix(); // Convert timestamp to epoch time
-            // Fetch concentration data from the API
             const response = await fetch(`/api/get_concentration_for_deployment?sensor_id=${sensor_id}&timestamp=${epochTimestamp}`);
             const result = await response.json(); // Parse the JSON response
             setData(result); // Set the fetched data to state
@@ -30,9 +57,13 @@ const ConcentrationChart = ({  }) => {
             if (reactions.length > 0) {
                 setSelectedReaction(reactions[0]); // Automatically select the first reaction
             }
-            // Set default start and end dates based on the deployment info
             setStartDate(moment.unix(result.deployment_info.deployment_start_time).format('YYYY-MM-DDTHH:mm'));
             setEndDate(moment.unix(result.deployment_info.deployment_end_time).format('YYYY-MM-DDTHH:mm'));
+
+            // Set current deployment index based on deployment info
+            const deploymentId = result.deployment_info.deployment_id;
+            const deploymentIndex = deployments.findIndex(deployment => deployment.deployment === deploymentId);
+            setCurrentDeploymentIndex(deploymentIndex);
         } catch (error) {
             console.error('Error fetching concentration data:', error); // Log error to the console
             setErrorMessage('Error fetching concentration data. Please try again.'); // Display error message
@@ -69,7 +100,35 @@ const ConcentrationChart = ({  }) => {
         }
     };
 
-    // Effect to update chart data whenever selected reaction or data changes
+    // Handler for fetching the next deployment
+    const handleNextDeployment = () => {
+        if (currentDeploymentIndex !== null && currentDeploymentIndex < deployments.length - 1) {
+            const nextDeploymentIndex = currentDeploymentIndex + 1;
+            const nextDeployment = deployments[nextDeploymentIndex];
+            const averageTimestamp = (nextDeployment.start_time + nextDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of next deployment
+            setCurrentDeploymentIndex(nextDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
+        }
+    };
+
+    // Handler for fetching the previous deployment
+    const handlePrevDeployment = () => {
+        if (currentDeploymentIndex !== null && currentDeploymentIndex > 0) {
+            const prevDeploymentIndex = currentDeploymentIndex - 1;
+            const prevDeployment = deployments[prevDeploymentIndex];
+            const averageTimestamp = (prevDeployment.start_time + prevDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of previous deployment
+            setCurrentDeploymentIndex(prevDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
+        }
+    };
+
+    // Update chart data whenever selected reaction or data changes
     useEffect(() => {
         if (selectedReaction && data && data.spectrums_data[selectedReaction]) {
             setChartData(generateChartData(data.spectrums_data[selectedReaction])); // Generate chart data for the selected reaction
@@ -156,18 +215,36 @@ const ConcentrationChart = ({  }) => {
                                 />
                             </label>
                         </div>
-                        <button
-                            type="button"
-                            onClick={fetchConcentrationData}
-                            disabled={loading} // Disable button when loading
-                            className={`mt-3 w-full text-center justify-center inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ${loading ? 'bg-gray-300' : 'bg-indigo-600 hover:bg-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
-                        >
-                            {loading ? (
-                                <TailSpin height="24" width="24" color="#000" ariaLabel="loading" />
-                            ) : (
-                                'Fetch Deployment'
-                            )}
-                        </button>
+                        <div className="flex flex-row space-x-10">
+                            <button
+                                type="button"
+                                onClick={() => setShouldFetch(true)}
+                                disabled={loading}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                {loading ? (
+                                    <TailSpin height="24" width="24" color="#000" ariaLabel="loading" />
+                                ) : (
+                                    'Fetch Deployment'
+                                )}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handlePrevDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex === 0}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Previous Deployment
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNextDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Next Deployment
+                            </button>
+                        </div>
                     </form>
                     {!loading && errorMessage && <div className="text-red-500 mb-5">{errorMessage}</div>} {/* Display error message */}
                     {availableReactions.length > 0 && ( // Only show the reaction select if reactions are available
@@ -191,39 +268,51 @@ const ConcentrationChart = ({  }) => {
                         </div>
                     )}
                 </div>
+                {data && data.deployment_info && (
+                    <div className="md:w-1/2 mb-5 md:mb-0 pr-5">
+                        <div className="mb-4">
+                            <h3 className="font-bold text-lg mb-3">Deployment Information</h3>
+                            <div className="bg-gray-100 p-4 rounded-md shadow-sm">
+                                <p className="text-sm"><strong>Deployment ID:</strong> {data.deployment_info.deployment_id}</p>
+                                <p className="text-sm"><strong>Deployment Start Time:</strong> {moment.unix(data.deployment_info.deployment_start_time).format('YYYY-MM-DD HH:mm:ss')}</p>
+                                <p className="text-sm"><strong>Deployment End Time:</strong> {moment.unix(data.deployment_info.deployment_end_time).format('YYYY-MM-DD HH:mm:ss')}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 {chartData && ( // Show date filters only if chart data is available
-                <div className="flex mt-5 items-center">
-                    <div className="mr-3">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Start Date:
-                            <input
-                                type="datetime-local"
-                                value={startDate}
-                                onChange={handleStartDateChange}
-                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                        </label>
+                    <div className="flex mt-5 items-center">
+                        <div className="mr-3">
+                            <label className="block text-sm font-medium text-gray-700">
+                                Start Date:
+                                <input
+                                    type="datetime-local"
+                                    value={startDate}
+                                    onChange={handleStartDateChange}
+                                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                />
+                            </label>
+                        </div>
+                        <div className="mr-3">
+                            <label className="block text-sm font-medium text-gray-700">
+                                End Date:
+                                <input
+                                    type="datetime-local"
+                                    value={endDate}
+                                    onChange={handleEndDateChange}
+                                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                />
+                            </label>
+                        </div>
+                        <button
+                            type="button"
+                            onClick={handleDateChange}
+                            className="text-center justify-center mt-5 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        >
+                            Change
+                        </button>
                     </div>
-                    <div className="mr-3">
-                        <label className="block text-sm font-medium text-gray-700">
-                            End Date:
-                            <input
-                                type="datetime-local"
-                                value={endDate}
-                                onChange={handleEndDateChange}
-                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                            />
-                        </label>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={handleDateChange}
-                        className="text-center justify-center mt-5 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        Change
-                    </button>
-                </div>
-            )}
+                )}
                 <div>
                     {chartData && ( // Only show the chart if chart data is available
                         <div className="mt-5" style={{ height: '500px' }}>
