@@ -1,3 +1,4 @@
+import math
 from math import floor
 
 from django.db import transaction
@@ -148,7 +149,7 @@ def create_reaction(name, standard_id, standard_concentration, volume_of_mixture
         reaction_time=reaction_time,
         id=creating_id,
         crm=crm,
-        crm_time=crm_time,
+        crm_time=crm_time*1440, # One day in UI = 1440 min for the sensor
     )
 
     # Save the newly created reaction to the database
@@ -308,7 +309,7 @@ def get_reaction_details(reaction_id=None, reaction_name=None, sensor_id=None):
         'number_of_standard': reaction.number_of_standard,
         'reaction_time': reaction.reaction_time,
         'crm': reaction.crm,
-        'crm_time': reaction.crm_time
+        'crm_time': round(reaction.crm_time/1440) # One day in UI = 1440 min for the sensor
     })
 
     # Return the reaction details as a JSON string
