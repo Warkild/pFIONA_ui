@@ -37,7 +37,7 @@ def sensors_list(request):
         'sensors_list': sensors_list,
         'current_path': request.path,
     }
-    return render(request, 'pFIONA_sensors/sensors_list.html', context=context)  # Render the list of sensors
+    return render(request, 'pFIONA_sensors/view/sensors_list.html', context=context)  # Render the list of sensors
 
 
 @login_required()
@@ -75,7 +75,8 @@ def sensors_deploy(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)  # Get the sensor object or return 404 if not found
     user_groups = request.user.groups.values_list('name', flat=True)  # Get user groups
     return render(request, 'pFIONA_sensors/view/sensors_deploy.html',
-                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, 'user_groups': user_groups, })  # Render the deployment page
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,
+                   'user_groups': user_groups, })  # Render the deployment page
 
 
 @login_required()
@@ -90,7 +91,8 @@ def sensors_data(request, sensor_id):
     sensor = get_object_or_404(Sensor, pk=sensor_id)  # Get the sensor object or return 404 if not found
     user_groups = request.user.groups.values_list('name', flat=True)  # Get user groups
     return render(request, 'pFIONA_sensors/view/sensors_data.html',
-                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address, 'user_groups': user_groups, })  # Render the data page
+                  {'id': sensor_id, 'sensor': sensor, 'ip_address': sensor.ip_address,
+                   'user_groups': user_groups, })  # Render the data page
 
 
 @login_required()
@@ -159,11 +161,13 @@ def sensors_reagents_valve_update(request, sensor_id):
             data = json.loads(request.body.decode('utf-8'))  # Parse the request body as JSON
             print(data)  # Print the data for debugging
 
-            Reagent.objects.filter(pfiona_sensor_id=sensor_id).update(port=None)  # Reset all ports for the sensor's reagents
+            Reagent.objects.filter(pfiona_sensor_id=sensor_id).update(
+                port=None)  # Reset all ports for the sensor's reagents
 
             for index, reagent_id in enumerate(data):
                 if reagent_id != 'none':
-                    Reagent.objects.filter(id=int(reagent_id)).update(port=index + 1)  # Update the port for each reagent
+                    Reagent.objects.filter(id=int(reagent_id)).update(
+                        port=index + 1)  # Update the port for each reagent
 
             return JsonResponse({'status': 'success', 'message': 'Ports updated successfully'})
         except Exception as e:
@@ -207,11 +211,13 @@ def sensors_reagent_deletion(request, sensor_id, reagent_id):
     reagent = get_object_or_404(Reagent, pk=reagent_id)  # Get the reagent object or return 404 if not found
 
     with transaction.atomic():  # Use a transaction to ensure atomicity
-        standard_reactions = Reaction.objects.filter(standard_id=reagent_id)  # Get reactions where the reagent is the standard
+        standard_reactions = Reaction.objects.filter(
+            standard_id=reagent_id)  # Get reactions where the reagent is the standard
         standard_reaction_ids = set(standard_reactions.values_list('id', flat=True))  # Get the IDs of these reactions
 
         volume_to_adds = Step.objects.filter(pfiona_reagent_id=reagent_id)  # Get steps where the reagent is used
-        reaction_ids_from_volume_to_add = set(vta.pfiona_reaction_id for vta in volume_to_adds)  # Get the reaction IDs from these steps
+        reaction_ids_from_volume_to_add = set(
+            vta.pfiona_reaction_id for vta in volume_to_adds)  # Get the reaction IDs from these steps
         reaction_ids = standard_reaction_ids.union(reaction_ids_from_volume_to_add)  # Combine the reaction IDs
 
         Reaction.objects.filter(id__in=reaction_ids).delete()  # Delete the reactions
@@ -258,7 +264,8 @@ def sensors_reagent_edit(request, sensor_id, reagent_id):
 
     if request.method == 'POST':
         if 'submit_reagent' in request.POST:
-            reagent_form = ReagentEditForm(request.POST, instance=reagent, prefix='reagent')  # Update the reagent form with POST data
+            reagent_form = ReagentEditForm(request.POST, instance=reagent,
+                                           prefix='reagent')  # Update the reagent form with POST data
             if reagent_form.is_valid():
                 reagent_form.save()  # Save the form if valid
                 return redirect('sensors_reagents', sensor_id=sensor_id)  # Redirect to the reagents page
@@ -314,14 +321,18 @@ def sensors_settings(request, sensor_id):
     :return: Rendered HTML page for sensor settings
     """
     sensor = get_object_or_404(Sensor, pk=sensor_id)  # Get the sensor object or return 404 if not found
-    name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor, prefix='name_notes')  # Create the name and notes form
-    lat_long_form = SensorLatLongForm(request.POST or None, instance=sensor, prefix='lat_long')  # Create the latitude and longitude form
-    sensor_settings_form = SensorSettingsForm(request.POST or None, instance=sensor, prefix='settings')  # Create the settings form
+    name_notes_form = SensorNameAndNotesForm(request.POST or None, instance=sensor,
+                                             prefix='name_notes')  # Create the name and notes form
+    lat_long_form = SensorLatLongForm(request.POST or None, instance=sensor,
+                                      prefix='lat_long')  # Create the latitude and longitude form
+    sensor_settings_form = SensorSettingsForm(request.POST or None, instance=sensor,
+                                              prefix='settings')  # Create the settings form
     user_groups = request.user.groups.values_list('name', flat=True)  # Get user groups
 
     if request.method == 'POST':
         if 'submit_name_notes' in request.POST:
-            name_notes_form = SensorNameAndNotesForm(request.POST, instance=sensor, prefix='name_notes')  # Update the name and notes form with POST data
+            name_notes_form = SensorNameAndNotesForm(request.POST, instance=sensor,
+                                                     prefix='name_notes')  # Update the name and notes form with POST data
             if name_notes_form.is_valid():
                 name_notes_form.save()  # Save the form if valid
                 return redirect('sensors_settings', sensor_id=sensor_id)  # Redirect to the settings page
@@ -329,7 +340,8 @@ def sensors_settings(request, sensor_id):
             lat_long_form = SensorLatLongForm(None, instance=sensor, prefix='lat_long')
             sensor_settings_form = SensorSettingsForm(None, instance=sensor, prefix='settings')
         elif 'submit_lat_long' in request.POST:
-            lat_long_form = SensorLatLongForm(request.POST, instance=sensor, prefix='lat_long')  # Update the latitude and longitude form with POST data
+            lat_long_form = SensorLatLongForm(request.POST, instance=sensor,
+                                              prefix='lat_long')  # Update the latitude and longitude form with POST data
             if lat_long_form.is_valid():
                 lat_long_form.save()  # Save the form if valid
                 return redirect('sensors_settings', sensor_id=sensor_id)  # Redirect to the settings page
@@ -337,7 +349,8 @@ def sensors_settings(request, sensor_id):
             name_notes_form = SensorNameAndNotesForm(None, instance=sensor, prefix='name_notes')
             sensor_settings_form = SensorSettingsForm(None, instance=sensor, prefix='settings')
         elif 'submit_sensor_settings' in request.POST:
-            sensor_settings_form = SensorSettingsForm(request.POST, instance=sensor, prefix='settings')  # Update the settings form with POST data
+            sensor_settings_form = SensorSettingsForm(request.POST, instance=sensor,
+                                                      prefix='settings')  # Update the settings form with POST data
             if sensor_settings_form.is_valid():
                 sensor_settings_form.save()  # Save the form if valid
                 return redirect('sensors_settings', sensor_id=sensor_id)  # Redirect to the settings page
@@ -381,7 +394,8 @@ def sensors_reaction_edit(request, sensor_id, reaction_id):
     :return: Rendered HTML page for reaction editing
     """
     reagents_json = q.get_utils_reagents(sensor_id, return_json=True)  # Get reagents data in JSON format
-    reaction_json = q.get_reaction_details(reaction_id=reaction_id, sensor_id=sensor_id)  # Get reaction details in JSON format
+    reaction_json = q.get_reaction_details(reaction_id=reaction_id,
+                                           sensor_id=sensor_id)  # Get reaction details in JSON format
 
     return render(request, 'pFIONA_sensors/view/sensors_reaction_edit.html', {
         'id': sensor_id,

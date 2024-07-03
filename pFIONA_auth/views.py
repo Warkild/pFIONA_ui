@@ -37,3 +37,14 @@ class ChangePasswordView(LoginRequiredMixin,PasswordChangeView):
     form_class = PasswordChangeForm
     success_url = reverse_lazy('sensors_list')
     template_name = 'pFIONA_auth/change_password.html'
+
+
+def credits_page(request):
+    """
+    Display the credits
+
+    :param request: HTTP request object
+    :return: Rendered HTML page with the credits
+    """
+
+    return render(request, 'pFIONA_auth/credits.html')  # Render the list of sensors

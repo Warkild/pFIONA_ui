@@ -1,0 +1,31 @@
+{% load static tailwind_tags %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Credits - pFIONA</title>
+    {% tailwind_css %}
+    <link href="{% static 'css/dist/custom.css' %}" rel="stylesheet">
+</head>
+<body class="flex bg-gradient-to-br from-white to-gray-300 w-[100vw] h-[100vh] relative">
+    <div class="w-2/3 flex justify-center items-center">
+        <div class="h-fit w-1/2 p-16 bg-white rounded-2xl drop-shadow-xl">
+            <h1 class="font-poppins font-semibold text-4xl mb-8">Credits</h1>
+            <div class="flex flex-col font-montserrat mt-5">
+                <img src="{% static 'img/logo/sjsu.png' %}" style="width: 12rem; height: auto;" alt="Logo SJSU"/>
+                <p class="mt-5">Hardware : SJSU Students in Computer Engineering</p>
+            </div>
+            <div class="flex flex-col font-montserrat mt-5">
+                <img src="{% static 'img/logo/lru.png' %}" style="width: 12rem; height: auto;" alt="Logo SJSU"/>
+                <p class="mt-5">pFIONA code and User Interface :</p>
+                <p class="mt-2">Alexandre Jaud and Kylian Ronfleux--Corail</p>
+                <p>La Rochelle Université, France</p>
+            </div>
+        </div>
+    </div>
+    <div class="w-1/3">
+        <img src="{% static 'img/background/moss_landing_marine_laboratories_cover.jpg' %}" alt="Background Image" class="h-full object-cover">
+    </div>
+</body>
+</html>
