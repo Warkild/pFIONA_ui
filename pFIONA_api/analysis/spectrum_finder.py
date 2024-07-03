@@ -585,8 +585,6 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
     # Extract the aggregated times
     deployment_start_time = times['deployment_start_time']
     deployment_end_time = times['deployment_end_time']
-    cycle_start_time = times['cycle_start_time']
-    cycle_end_time = times['cycle_end_time']
 
     # Retrieve spectrums for the given cycle and sensor where the spectrum type ends with 'wavelength_monitored'
     spectrums = Spectrum.objects.filter(
@@ -613,7 +611,8 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
         reaction_type = spectrum_type.split('_')[0]
 
         if not wavelengths_dict[reaction_type]:
-            wavelengths_dict[reaction_type] = sorted(spectrum.wavelengths)  # Sort wavelengths initially for each reaction type
+            wavelengths_dict[reaction_type] = sorted(
+                spectrum.wavelengths)  # Sort wavelengths initially for each reaction type
 
         # Sort values by the sorted order of wavelengths
         sorted_values = [value for _, value in sorted(zip(spectrum.wavelengths, spectrum.values))]
@@ -625,7 +624,8 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
             'spectrumtype': spectrum.pfiona_spectrumtype.type,
             'cycle': spectrum.cycle,
             'deployment': spectrum.deployment,
-            'values': list(zip(wavelengths_dict[reaction_type], sorted_values))  # Use sorted wavelengths and corresponding values
+            'values': list(zip(wavelengths_dict[reaction_type], sorted_values))
+            # Use sorted wavelengths and corresponding values
         }
 
         parts = spectrum_type.split('_')
@@ -665,6 +665,211 @@ def get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sen
     # Return the organized spectrums data, wavelengths dictionary, and deployment information
     return spectrums_data, wavelengths_dict, deployment_info
 
+
+def get_dark_reference_in_cycle_full_info(timestamp, sensor_id, cycle):
+    """
+    Retrieve only dark and reference spectrum information for a specific cycle and sensor.
+
+    This function gathers spectrum data for spectrums that have types ending with 'wavelength_monitored'
+    within a specified cycle, including wavelengths and deployment information.
+
+    :param timestamp: The timestamp to compare against.
+    :param sensor_id: The ID of the sensor to retrieve data for.
+    :param cycle: The cycle number to retrieve spectrum information for.
+    :return: A tuple containing spectrums data, wavelengths, and deployment information.
+    """
+    # Retrieve the latest spectrum before the given timestamp for the specified sensor
+    last_spectrum = Spectrum.objects.filter(
+        pfiona_sensor_id=sensor_id,
+        pfiona_time__timestamp__lt=timestamp,
+        cycle__gte=1
+    ).exclude(
+        pfiona_spectrumtype__type__endswith='wavelength_monitored'
+    ).order_by('-pfiona_time__timestamp').first()
+
+    # If no spectrum is found, return None for all outputs
+    if not last_spectrum:
+        return None, None, None
+
+    # Get the deployment ID from the last spectrum found
+    deployment_id = last_spectrum.deployment
+
+    # Aggregate start and end times for both the deployment and the specific cycle
+    times = Spectrum.objects.filter(
+        deployment=deployment_id,
+        pfiona_sensor_id=sensor_id,
+        cycle__gte=1
+    ).aggregate(
+        deployment_start_time=Min('pfiona_time__timestamp'),
+        deployment_end_time=Max('pfiona_time__timestamp'),
+        cycle_start_time=Min('pfiona_time__timestamp', filter=Q(cycle=cycle)),
+        cycle_end_time=Max('pfiona_time__timestamp', filter=Q(cycle=cycle))
+    )
+
+    # Extract the aggregated times
+    deployment_start_time = times['deployment_start_time']
+    deployment_end_time = times['deployment_end_time']
+
+    # Retrieve spectrums for the given cycle and sensor where the spectrum type ends 'Dark', or 'Reference'
+    spectrums = Spectrum.objects.filter(
+        deployment=deployment_id,
+        cycle=cycle,
+        pfiona_sensor_id=sensor_id
+    ).filter(
+        Q(pfiona_spectrumtype__type__endswith='Dark') |
+        Q(pfiona_spectrumtype__type__endswith='Reference')
+    ).select_related(
+        'pfiona_spectrumtype', 'pfiona_time'
+    ).annotate(
+        wavelengths=ArrayAgg('value__wavelength', ordering='value__wavelength'),
+        values=ArrayAgg('value__value', ordering='value__wavelength')
+    ).order_by('id')
+
+    # Initialize a dictionary to organize spectrum data
+    spectrums_data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+    wavelengths_dict = defaultdict(list)
+    current_subcycle = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+    previous_id = defaultdict(lambda: defaultdict(lambda: None))
+
+    # Iterate over each spectrum to sort and organize data
+    for spectrum in spectrums:
+        spectrum_type = spectrum.pfiona_spectrumtype.type
+        reaction_type = spectrum_type.split('_')[0]
+
+        if not wavelengths_dict[reaction_type]:
+            wavelengths_dict[reaction_type] = sorted(
+                spectrum.wavelengths)  # Sort wavelengths initially for each reaction type
+
+        # Sort values by the sorted order of wavelengths
+        sorted_values = [value for _, value in sorted(zip(spectrum.wavelengths, spectrum.values))]
+
+        # Prepare spectrum data structure
+        spectrum_data = {
+            'id': spectrum.id,
+            'time': spectrum.pfiona_time.timestamp,
+            'spectrumtype': spectrum.pfiona_spectrumtype.type,
+            'cycle': spectrum.cycle,
+            'deployment': spectrum.deployment,
+            'values': list(zip(wavelengths_dict[reaction_type], sorted_values))
+            # Use sorted wavelengths and corresponding values
+        }
+
+        parts = spectrum_type.split('_')
+
+        # Determine the key for organizing spectrums based on their type
+        if 'Blank' in spectrum_type:
+            key = 'Blank'
+        elif 'Sample' in spectrum_type:
+            key = 'Sample'
+        elif 'CRM' in spectrum_type:
+            key = 'CRM'
+        elif 'Standard' in spectrum_type:
+            if len(parts) >= 4 and parts[2] == 'Dillution':
+                dilution = parts[3]
+                key = f'Standard_Dillution_{dilution}'
+            else:
+                key = 'Standard'
+        else:
+            key = spectrum_type
+
+        # Check if this is a new subcycle for the specific reaction and key
+        if previous_id[reaction_type][key] is not None and spectrum.id != previous_id[reaction_type][key] + 1:
+            current_subcycle[reaction_type][key][spectrum.cycle] += 1
+
+        previous_id[reaction_type][key] = spectrum.id
+
+        # Append spectrum data to the organized dictionary
+        spectrums_data[reaction_type][key][current_subcycle[reaction_type][key][spectrum.cycle]].append(spectrum_data)
+
+    # Prepare deployment information
+    deployment_info = {
+        'deployment_id': deployment_id,
+        'deployment_start_time': deployment_start_time,
+        'deployment_end_time': deployment_end_time,
+    }
+
+    # Return the organized spectrums data, wavelengths dictionary, and deployment information
+    return spectrums_data, wavelengths_dict, deployment_info
+
+
+def get_only_absorbance_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sensor_id, cycle):
+    """
+    Retrieve absorbance spectrum information for wavelength-monitored spectrums within a specified cycle and sensor.
+
+    This function calculates absorbance values for wavelength-monitored spectrums within a specified cycle,
+    based on reference, dark, and sample scans.
+
+    :param timestamp: The timestamp to compare against.
+    :param sensor_id: The ID of the sensor to retrieve data for.
+    :param cycle: The cycle number to retrieve absorbance spectrums for.
+    :return: A tuple containing absorbance data, wavelengths, and deployment information.
+    """
+    # Retrieve wavelength-monitored spectrum information for the specified cycle and sensor
+    wavelength_monitored_data, wavelengths, deployment_info = get_only_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sensor_id, cycle)
+    if not wavelength_monitored_data:
+        return None, None, None
+
+    # Retrieve dark and reference spectrum information for the specified cycle and sensor
+    dark_reference_data, _, _ = get_dark_reference_in_cycle_full_info(timestamp, sensor_id, cycle)
+    if not dark_reference_data:
+        return None, None, None
+
+    absorbance_data = defaultdict(lambda: defaultdict(lambda: defaultdict(list)))
+
+    # Process each reaction and its corresponding spectrum data
+    for reaction, types in wavelength_monitored_data.items():
+        for type_key, subcycles in types.items():
+            for subcycle, spectrums_list in subcycles.items():
+                # Separate reference and dark scans
+                dark_scan = []
+                ref_scan = []
+                for dr_spectrum in dark_reference_data.get(reaction, {}).get(type_key, {}).get(subcycle, []):
+                    if 'Dark' in dr_spectrum['spectrumtype']:
+                        dark_scan = dr_spectrum['values']
+                    elif 'Reference' in dr_spectrum['spectrumtype']:
+                        ref_scan = dr_spectrum['values']
+
+                if not dark_scan or not ref_scan:
+                    continue
+
+                # Create a dictionary for easy lookup of dark and reference values by wavelength
+                dark_dict = {wl: value for wl, value in dark_scan}
+                ref_dict = {wl: value for wl, value in ref_scan}
+
+                # Process each wavelength monitored spectrum
+                for spectrum in spectrums_list:
+                    spectrum_type = spectrum['spectrumtype']
+                    if 'wavelength_monitored' not in spectrum_type:
+                        continue
+
+                    sample_values = spectrum['values']
+
+                    # Filter the sample values to match the wavelengths in dark and reference
+                    filtered_sample_values = [(wl, value) for wl, value in sample_values if wl in dark_dict and wl in ref_dict]
+                    filtered_dark_values = [dark_dict[wl] for wl, value in sample_values if wl in dark_dict and wl in ref_dict]
+                    filtered_ref_values = [ref_dict[wl] for wl, value in sample_values if wl in dark_dict and wl in ref_dict]
+
+                    # Compute absorbance values if the lengths match
+                    if len(filtered_sample_values) == len(filtered_dark_values) == len(filtered_ref_values):
+                        absorbance_values = absorbance(filtered_ref_values, filtered_dark_values, [value for wl, value in filtered_sample_values])
+                        values = [(wl, absorbance_value) for (wl, _), absorbance_value in zip(filtered_sample_values, absorbance_values)]
+                        absorbance_data[reaction][type_key][subcycle].append({
+                            'id': spectrum['id'],
+                            'time': spectrum['time'],
+                            'spectrumtype': spectrum['spectrumtype'],
+                            'cycle': spectrum['cycle'],
+                            'deployment': spectrum['deployment'],
+                            'values': values
+                        })
+                    else:
+                        print(f"Skipping due to shape mismatch in {spectrum_type}: ref={len(filtered_ref_values)}, dark={len(filtered_dark_values)}, sample={len(filtered_sample_values)}")
+
+    # Convert defaultdict to dict to ensure JSON serialization
+    absorbance_data = {k: dict(v) for k, v in absorbance_data.items()}
+    for reaction, types in absorbance_data.items():
+        absorbance_data[reaction] = {k: dict(v) for k, v in types.items()}
+
+    return absorbance_data, wavelengths, deployment_info
 
 
 
