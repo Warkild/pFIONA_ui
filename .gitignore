@@ -17,3 +17,5 @@ pFIONA_ui/__pycache__/settings.cpython-311.pyc
 /theme/__pycache__
 /pFIONA_api/analysis/__pycache__
 /pFIONA_sensors/static/pFIONA_sensors/main.js
+pFIONA_ui/management/__pycache__/__init__.cpython-311.pyc
+/pFIONA_ui/management/commands/__pycache__

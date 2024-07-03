@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'pFIONA_sensors',
     "pFIONA_api",
+    "pFIONA_ui",
     "corsheaders"
 ]
 

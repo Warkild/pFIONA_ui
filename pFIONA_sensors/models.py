@@ -3,7 +3,7 @@ from django.db.models import JSONField
 
 
 class Sensor(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, default="New Sensor")
     ip_address = models.GenericIPAddressField()
     notes = models.TextField(null=True, blank=True)
     actual_reactions = JSONField(null=True, blank=True)
@@ -11,7 +11,7 @@ class Sensor(models.Model):
     long = models.FloatField(null=True)
     sample_frequency = models.FloatField(null=False, default=60)
     sleep = models.IntegerField(default=False)
-    last_states = models.CharField(max_length=200, null=True)
+    last_states = models.CharField(max_length=200, null=True, default="[]")
     scans_to_average = models.IntegerField(null=True)
     boxcar_width = models.IntegerField(null=True)
     time_to_wait_for_lamp = models.FloatField(null=True)

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'; // Import React and hooks
 import { Line } from 'react-chartjs-2'; // Import Line chart from react-chartjs-2
 import Chart from 'chart.js/auto'; // Import Chart.js
 import moment from 'moment'; // Import moment.js for date handling
+import { TailSpin } from 'react-loader-spinner'; // Import TailSpin spinner for loading
 
 const WavelengthMonitoredChart = ({  }) => {
     const [timestamp, setTimestamp] = useState(moment().format('YYYY-MM-DDTHH:mm')); // State for timestamp
@@ -14,12 +15,37 @@ const WavelengthMonitoredChart = ({  }) => {
     const [loading, setLoading] = useState(false); // State for loading status
     const [errorMessage, setErrorMessage] = useState(''); // State for error message
     const [deploymentInfo, setDeploymentInfo] = useState(null); // State for deployment info
+    const [deployments, setDeployments] = useState([]); // State for deployments list
+    const [currentDeploymentIndex, setCurrentDeploymentIndex] = useState(null); // State for the index of current deployment
+    const [shouldFetch, setShouldFetch] = useState(false); // State to trigger fetch action
 
     useEffect(() => { // Effect to fetch data when cycle changes
         if (cycle) {
             fetchData();
         }
     }, [cycle]);
+
+    useEffect(() => {
+        fetchDeploymentList(); // Fetch deployment list on component mount
+    }, []);
+
+    useEffect(() => {
+        if (shouldFetch) {
+            fetchCycleCount();
+            setShouldFetch(false);
+        }
+    }, [shouldFetch]);
+
+    const fetchDeploymentList = async () => { // Fetch the list of deployments from API
+        try {
+            const response = await fetch(`/api/get_deployment_list?sensor_id=${sensor_id}`);
+            const result = await response.json();
+            setDeployments(result); // Set the deployments state with fetched data
+        } catch (error) {
+            console.error('Error fetching deployment list:', error);
+            setErrorMessage('Error fetching deployment list. Please try again.');
+        }
+    };
 
     const fetchCycleCount = async () => { // Function to fetch cycle count
         setLoading(true); // Set loading to true
@@ -72,6 +98,10 @@ const WavelengthMonitoredChart = ({  }) => {
                 setAvailableReactions(reactions); // Set available reactions
                 setSelectedReaction(reactions[0]); // Set first reaction as selected
                 setDeploymentInfo(result.deployment_info); // Set deployment info
+                // Set current deployment index based on deployment info
+                const deploymentId = result.deployment_info.deployment_id;
+                const deploymentIndex = deployments.findIndex(deployment => deployment.deployment === deploymentId);
+                setCurrentDeploymentIndex(deploymentIndex);
             }
         } catch (error) {
             console.error('Error fetching data:', error); // Log error
@@ -107,6 +137,32 @@ const WavelengthMonitoredChart = ({  }) => {
     const handlePrevCycle = () => { // Handle previous cycle button click
         const prevCycle = Math.max(parseInt(cycle) - 1, 1).toString(); // Calculate previous cycle
         handleCycleChange({ target: { value: prevCycle } }); // Change cycle
+    };
+
+    const handleNextDeployment = () => { // Handle next deployment button click
+        if (currentDeploymentIndex !== null && currentDeploymentIndex < deployments.length - 1) {
+            const nextDeploymentIndex = currentDeploymentIndex + 1;
+            const nextDeployment = deployments[nextDeploymentIndex];
+            const averageTimestamp = (nextDeployment.start_time + nextDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of next deployment
+            setCurrentDeploymentIndex(nextDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
+        }
+    };
+
+    const handlePrevDeployment = () => { // Handle previous deployment button click
+        if (currentDeploymentIndex !== null && currentDeploymentIndex > 0) {
+            const prevDeploymentIndex = currentDeploymentIndex - 1;
+            const prevDeployment = deployments[prevDeploymentIndex];
+            const averageTimestamp = (prevDeployment.start_time + prevDeployment.end_time) / 2;
+
+            const formattedTimestamp = moment.unix(averageTimestamp).format('YYYY-MM-DDTHH:mm');
+            setTimestamp(formattedTimestamp); // Update timestamp to the average of previous deployment
+            setCurrentDeploymentIndex(prevDeploymentIndex); // Update current deployment index
+            setShouldFetch(true); // Set the flag to fetch data
+        }
     };
 
     const generateChartData = (spectraData, wavelengths) => { // Function to generate chart data
@@ -177,15 +233,38 @@ const WavelengthMonitoredChart = ({  }) => {
                                 />
                             </label>
                         </div>
-                        <button
-                            type="submit" // Submit button
-                            disabled={loading} // Disable if loading
-                            className={`inline-flex w-full mt-2 justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
-                        >
-                            Fetch Deployment
-                        </button>
+                        <div className="flex flex-row space-x-10">
+                            <button
+                                type="sumbit"
+                                disabled={loading}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                {loading ? (
+                                    <TailSpin height="24" width="24" color="#000" ariaLabel="loading"/>
+                                ) : (
+                                    'Fetch Deployment'
+                                )}
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handlePrevDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex === 0}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex === 0 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Previous Deployment
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleNextDeployment}
+                                disabled={loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1}
+                                className={`inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${loading || currentDeploymentIndex === null || currentDeploymentIndex >= deployments.length - 1 ? 'bg-gray-300 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}`}
+                            >
+                                Next Deployment
+                            </button>
+                        </div>
                     </form>
-                    {!loading && errorMessage && <div className="text-red-500 mb-5">{errorMessage}</div>} {/* Error message */}
+                    {!loading && errorMessage &&
+                        <div className="text-red-500 mb-5">{errorMessage}</div>} {/* Error message */}
                     {data && ( // Conditional rendering if data exists
                         <>
                             <div className="flex flex-row justify-between"> {/* Flex container for cycle selection */}
