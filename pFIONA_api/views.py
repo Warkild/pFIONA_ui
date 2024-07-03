@@ -818,6 +818,51 @@ def api_get_only_wavelength_monitored_through_time_in_cycle_full_info(request):
         # Catch other unexpected errors
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+@login_required
+@require_http_methods(["GET"])
+@csrf_exempt
+def api_get_only_absorbance_wavelength_monitored_through_time_in_cycle_full_info(request):
+    """
+    API endpoint to get only the monitored wavelengths through time in a specific cycle for a sensor.
+
+    :param request: HTTP request object
+    :return: JsonResponse indicating the monitored wavelengths data, wavelengths, and deployment info
+    """
+    try:
+        # Retrieve sensor_id, timestamp, and cycle from the GET parameters
+        sensor_id = request.GET.get('sensor_id')
+        timestamp = request.GET.get('timestamp')
+        cycle = request.GET.get('cycle')
+
+        # Validate the presence of the sensor_id, timestamp, and cycle parameters
+        if not sensor_id:
+            raise ValueError("Missing sensor_id parameter")
+        if not timestamp:
+            raise ValueError("Missing timestamp parameter")
+        if not cycle:
+            raise ValueError("Missing cycle parameter")
+
+        # Check if the sensor exists in the database
+        if not q.models.Sensor.objects.filter(id=sensor_id).exists():
+            return JsonResponse({'status': 'error', 'message': 'Sensor not found'}, status=400)
+
+        # Get the monitored wavelengths data, wavelengths, and deployment info for the given parameters
+        data, wavelengths, deployment_info = get_only_absorbance_wavelength_monitored_through_time_in_cycle_full_info(timestamp, sensor_id, cycle)
+
+        # Return the response with monitored wavelengths data, wavelengths, and deployment info
+        return JsonResponse({
+            "data": data,
+            "wavelengths": wavelengths,
+            "deployment_info": deployment_info
+        })
+
+    except ValueError as e:
+        # Return an error message if validation fails
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    except Exception as e:
+        # Catch other unexpected errors
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
 
 @login_required
 @require_http_methods(["GET"])
