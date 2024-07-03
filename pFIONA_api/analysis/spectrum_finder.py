@@ -456,8 +456,12 @@ def get_monitored_wavelength_values_in_cycle(timestamp, sensor_id, cycle):
 
     # Process each reaction and its corresponding mean absorbance data
     for reaction, types in mean_absorbance_data.items():
-        # Retrieve the Reaction object corresponding to the reaction name
-        reaction_obj = Reaction.objects.get(name=reaction, standard__pfiona_sensor_id=sensor_id)
+        try:
+            # Retrieve the Reaction object corresponding to the reaction name
+            reaction_obj = Reaction.objects.get(name=reaction, standard__pfiona_sensor_id=sensor_id)
+        except Reaction.DoesNotExist:
+            # If the reaction is not found, skip this reaction
+            continue
 
         # Retrieve all monitored wavelengths for this reaction
         monitored_wavelengths = list(
